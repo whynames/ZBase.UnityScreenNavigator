@@ -1,0 +1,19 @@
+{
+    "name": "UnityScreenNavigator.Samples",
+    "rootNamespace": "",
+    "references": [
+        "DOTween.Modules",
+        "UniTask",
+        "Unity.TextMeshPro",
+        "ZBase.UnityScreenNavigator"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

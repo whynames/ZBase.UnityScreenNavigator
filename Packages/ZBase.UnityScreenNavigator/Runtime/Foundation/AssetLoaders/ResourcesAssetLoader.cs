@@ -1,0 +1,70 @@
+﻿using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
+{
+    public sealed class ResourcesAssetLoader : IAssetLoader
+    {
+        private uint _nextControlId;
+
+        public AssetLoadHandle<T> Load<T>(string key) where T : Object
+        {
+            var controlId = _nextControlId++;
+
+            var handle = new AssetLoadHandle<T>(controlId);
+            var result = Resources.Load<T>(key);
+            handle.SetResult(result);
+
+            var status = result != null ? AssetLoadStatus.Success : AssetLoadStatus.Failed;
+            handle.SetStatus(status);
+
+            if (result == null)
+            {
+                var exception = new InvalidOperationException($"Requested asset（Key: {key}）was not found.");
+                handle.SetOperationException(exception);
+            }
+
+            handle.SetPercentCompleteFunc(() => 1.0f);
+            handle.SetTask(UniTask.FromResult(result));
+            return handle;
+        }
+
+        public AssetLoadHandle<T> LoadAsync<T>(string key) where T : Object
+        {
+            var controlId = _nextControlId++;
+            var handle = new AssetLoadHandle<T>(controlId);
+            var tcs = new UniTaskCompletionSource<T>();
+            var req = Resources.LoadAsync<T>(key);
+
+            req.completed += _ =>
+            {
+                var result = req.asset as T;
+                handle.SetResult(result);
+                var status = result != null ? AssetLoadStatus.Success : AssetLoadStatus.Failed;
+                handle.SetStatus(status);
+                if (result == null)
+                {
+                    var exception = new InvalidOperationException($"Requested asset（Key: {key}）was not found.");
+                    handle.SetOperationException(exception);
+                }
+
+                tcs.TrySetResult(result);
+            };
+
+            handle.SetPercentCompleteFunc(() => req.progress);
+            handle.SetTask(tcs.Task);
+            return handle;
+        }
+
+
+        /// <summary>
+        /// Resources.UnloadUnusedAssets() is responsible for releasing
+        /// assets loaded by Resources.Load(), so nothing is done here.
+        /// </summary>
+        public void Release(AssetLoadHandleId handleId)
+        {
+        }
+    }
+}

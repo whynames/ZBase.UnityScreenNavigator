@@ -7,7 +7,7 @@
 Library for screen transitions, transition animations, transition history stacking, and screen lifecycle management in Unity's uGUI.
 
 <p align="center">
-  <img width="80%" src="https://user-images.githubusercontent.com/47441314/137313323-b2f24a0c-1ee3-4df0-a175-05fba32d9af3.gif" alt="Demo">
+  <img width=700 src="https://user-images.githubusercontent.com/47441314/137313323-b2f24a0c-1ee3-4df0-a175-05fba32d9af3.gif" alt="Demo">
 </p>
 
 ## Table of Contents
@@ -54,13 +54,6 @@ Library for screen transitions, transition animations, transition history stacki
     - [Close the active modal when the backdrop is clicked](#close-the-active-modal-when-the-backdrop-is-clicked)
     - [Enable interaction during transitions](#enable-interaction-during-transitions)
     - [Disable masking for container](#disable-masking-for-container)
-    - [Get information about playing animation information](#get-information-about-playing-animation-information)
-    - [Use loaded Prefab instances when loading screens](#use-loaded-prefab-instances-when-loading-screens)
-- [FAQ](#faq)
-    - [How to make each Screen with Scene instead of Prefab](#how-to-make-each-screen-with-scene-instead-of-prefab)
-    - [How to separate view and logic](#how-to-separate-view-and-logic)
-    - [How to pass data to each screen](#how-to-pass-data-to-each-screen)
-    - [How to reuse popped pages or modals](#how-to-reuse-popped-pages-or-modals)
 - [License](#license)
 
 </details>
@@ -100,7 +93,7 @@ For more information, including copyright, please refer to the following website
    * https://github.com/Haruma-K/UnityScreenNavigator.git?path=/Assets/UnityScreenNavigator
 
 <p align="center">
-  <img width="80%" src="https://user-images.githubusercontent.com/47441314/118421190-97842b00-b6fb-11eb-9f94-4dc94e82367a.png" alt="Package Manager">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/118421190-97842b00-b6fb-11eb-9f94-4dc94e82367a.png" alt="Package Manager">
 </p>
 
 Or, open Packages/manifest.json and add the following to the dependencies block.
@@ -127,28 +120,28 @@ For example, when you transition from the Page A to Page B, Page A will be stack
 And when you return from Page B, Page A will be redisplayed with its states intact.
 
 <p align="center">
-  <img width="50%" src="https://user-images.githubusercontent.com/47441314/136680850-2aca1977-02c2-4730-a0d8-603934f71c80.gif" alt="Demo">
+  <img width=400 src="https://user-images.githubusercontent.com/47441314/136680850-2aca1977-02c2-4730-a0d8-603934f71c80.gif" alt="Demo">
 </p>
 
 "Modal" is a screen that is stacked in a window.  
 When it is displayed, all interactions except for the foreground modal will be blocked.
 
 <p align="center">
-  <img width="50%" src="https://user-images.githubusercontent.com/47441314/136698982-21ff5172-e38d-4d80-a976-a7ecc511c048.gif" alt="Demo">
+  <img width=400 src="https://user-images.githubusercontent.com/47441314/136698982-21ff5172-e38d-4d80-a976-a7ecc511c048.gif" alt="Demo">
 </p>
 
 And "Sheet" is used for tab-like GUI.  
 History is not managed, and only one active screen is displayed.
 
 <p align="center">
-  <img width="50%" src="https://user-images.githubusercontent.com/47441314/136700074-2a4fa134-dc5d-4b72-90d8-f6b12c91fc0f.gif" alt="Demo">
+  <img width=400 src="https://user-images.githubusercontent.com/47441314/136700074-2a4fa134-dc5d-4b72-90d8-f6b12c91fc0f.gif" alt="Demo">
 
 These screens can be nested.  
 And, the area of each screen can be freely specified (not necessarily the entire window).
 
 </p>
 <p align="center">
-  <img width="50%" src="https://user-images.githubusercontent.com/47441314/137634860-ae202ce7-5d2d-48b1-a938-358381d16780.gif" alt="Demo">
+  <img width=400 src="https://user-images.githubusercontent.com/47441314/137634860-ae202ce7-5d2d-48b1-a938-358381d16780.gif" alt="Demo">
 </p>
 
 #### Create page and transition
@@ -197,7 +190,7 @@ This root GameObject will be adjusted to fit the size of the `Modal Container`.
 So if you want to create the modal with margins, create a child GameObject with a smaller size and create the content inside it.
 
 <p align="center">
-  <img width="70%" src="https://user-images.githubusercontent.com/47441314/136698661-e4e247b6-7938-4fb5-8f6f-f2897f42eebe.png" alt="Demo">
+  <img width=600 src="https://user-images.githubusercontent.com/47441314/136698661-e4e247b6-7938-4fb5-8f6f-f2897f42eebe.png" alt="Demo">
 </p>
 
 Place this GameObject under the Resources folder with an arbitrary name.
@@ -355,7 +348,7 @@ Then, instantiate this Scriptable Object, and assign it to `UnityScreenNavigator
 You can create `UnityScreenNavigatorSettings` from `Assets > Create > Screen Navigator Settings`.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137321487-e2267184-6eba-46a7-9f4e-468176822408.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137321487-e2267184-6eba-46a7-9f4e-468176822408.png">
 </p>
 
 #### Setting transition animation for each screen
@@ -365,7 +358,7 @@ Each Page, Modal, and Sheet component has the `Animation Container` property.
 You can set the transition animation to it.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137632127-2e224b47-3ef1-4fdd-a64a-986b38d5ea6a.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137632127-2e224b47-3ef1-4fdd-a64a-986b38d5ea6a.png">
 </p>
 
 You can change the transition animation of this screen by setting the `Asset Type` to `Scriptable Object` and assigning the `TransitionAnimationObject` described in the previous section to `Animation Object`.
@@ -382,14 +375,14 @@ For example, when screen A enters and screen B exits, screen B is called the "Pa
 If you enter the name of the partner screen in the property shown below, the transition animation will be applied only when this name matches the partner screen name.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137632918-9d777817-d2dc-43c9-bd7e-c6a1713a5f26.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137632918-9d777817-d2dc-43c9-bd7e-c6a1713a5f26.png">
 </p>
 
 In default, the prefab name is used as the screen name.  
 If you want to name it explicitly, uncheck `Use Prefab Name As Identifier` and enter a name in the `Identifier` property.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137632986-f5727a42-4c27-48aa-930d-e7b0673b978f.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137632986-f5727a42-4c27-48aa-930d-e7b0673b978f.png">
 </p>
 
 In addition, regular expressions can be used for the `Partner Page Identifier Regex`.  
@@ -402,7 +395,7 @@ For example, an animation where the screen covers the partner screen.
 If you want to control the drawing order, use the `Rendering Order` property.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137633021-4e864c77-baa0-4d42-a8e7-b0183f7302f5.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137633021-4e864c77-baa0-4d42-a8e7-b0183f7302f5.png">
 </p>
 
 During screen transitions, the screen is drawn in the order of decreasing this value.
@@ -416,14 +409,14 @@ This can be created from `Assets > Create > Screen Navigator > Simple Transition
 Then, a ScriptableObject as shown below will be generated, and you can set up the animation from the Inspector.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137326944-112e0254-cd27-4d49-a32b-9c436b9537e4.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137326944-112e0254-cd27-4d49-a32b-9c436b9537e4.png">
 </p>
 
 You can also use `SimpleTransitionAnimationBehaviour` as a MonoBehaviour implementation of this.  
 This is used by attaching it directly to a GameObject.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137326555-90cdce8d-98da-4a00-99cc-5a65c1086760.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137326555-90cdce8d-98da-4a00-99cc-5a65c1086760.png">
 </p>
 
 Description of each property is as follows.
@@ -445,7 +438,7 @@ You can also create animations that refer to the state of the partner screen.
 In the following example, the image of the previous modal is enlarged while seamlessly transitioning to the next modal.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137315378-974395a8-f910-41a9-8e07-2964efded848.gif">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137315378-974395a8-f910-41a9-8e07-2964efded848.gif">
 </p>
 
 To implement this, first create a class that derived from `TransitionAnimationObject` or `TransitionAnimationBehaviour`.  
@@ -459,32 +452,32 @@ You can use Timeline to create transition animation.
 It is recommended to use Timeline for complex transition animation.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137634258-135b454e-04b5-49e8-a87a-bfb6ede03f49.gif">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137634258-135b454e-04b5-49e8-a87a-bfb6ede03f49.gif">
 </p>
 
 To implement this, first attach the `Timeline Transition Animation Behaviour` to a GameObject.  
 And assign `Playable Director` and `Timeline Asset` to properties.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137633599-dd8b204e-e6ec-46bf-b93c-ee54b4ac3d59.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137633599-dd8b204e-e6ec-46bf-b93c-ee54b4ac3d59.png">
 </p>
 
 `Play On Awake` property of `Playable Director` need to be unchecked.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137633492-4d837177-a381-486f-8942-df26e522da91.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137633492-4d837177-a381-486f-8942-df26e522da91.png">
 </p>
 
 Finally, assign this `Timeline Transition Animation Behaviour` to the `Animation Container`.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137633821-1fa1a8d6-ca41-49ca-aacf-dcf7f744c0b1.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137633821-1fa1a8d6-ca41-49ca-aacf-dcf7f744c0b1.png">
 </p>
 
 In addition, I recommend [UnityUIPlayables](https://github.com/Haruma-K/UnityUIPlayables) to create uGUI animations with Timeline.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/113313016-cf9afe80-9345-11eb-9aa9-422c53b5a3f8.gif">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/113313016-cf9afe80-9345-11eb-9aa9-422c53b5a3f8.gif">
 </p>
 
 ## Lifecycle Events
@@ -522,24 +515,16 @@ public class SomePage : Page
 }
 ```
 
-You can also register lifecycle events externally by `Page.AddLifecycleEvents()` as below.
+You can also register lifecycle events externally by registering an object that implements `IPageLifecycleEvent` to Page as shown below.  
+`IPageLifecycleEvent` is an interface where the above methods are defined.
 
 ```cs
-// IPageLifecycleEvent is the interface that has lifecycle events described above.
-// You can specify the execution priority with the second argument.
-//  Less than 0: executed before Page lifecycle event.
-//  Greater than 0: executed after Page lifecycle event.
 IPageLifecycleEvent lifecycleEventImpl;
 Page page;
+// You can specify the execution priority with the second argument.
+// Less than 0: executed before Page lifecycle event.
+// Greater than 1: executed after Page lifecycle event.
 page.AddLifecycleEvent(lifecycleEventImpl, -1);
-
-// It is also possible to register only some lifecycle events as follows.
-IEnumerator OnWillPushEnter()
-{
-    // Some code.
-    yield break;
-}
-page.AddLifecycleEvent(onWillPushEnter: OnWillPushEnter);
 ```
 
 And you can also hook transition events from the container by passing object that implements `IPageContainerCallbackReceiver` to `PageContainer.AddCallbackReceiver()`.
@@ -594,24 +579,16 @@ public class SomeModal : Modal
 }
 ```
 
-You can also register lifecycle events externally by `Modal.AddLifecycleEvents()` as below.
+You can also register lifecycle events externally by registering an object that implements `IModalLifecycleEvent` to ModalContainer as shown below.  
+`IModalLifecycleEvent` is an interface where the above methods are defined.
 
 ```cs
-// IModalLifecycleEvent is the interface that has lifecycle events described above.
-// You can specify the execution priority with the second argument.
-//  Less than 0: executed before Modal lifecycle event.
-//  Greater than 0: executed after Modal lifecycle event.
 IModalLifecycleEvent lifecycleEventImpl;
 Modal modal;
-Modal.AddLifecycleEvent(lifecycleEventImpl, -1);
-
-// It is also possible to register only some lifecycle events as follows.
-IEnumerator OnWillPushEnter()
-{
-    // Some code.
-    yield break;
-}
-modal.AddLifecycleEvent(onWillPushEnter: OnWillPushEnter);
+// You can specify the execution priority with the second argument.
+// Less than 0: executed before Modal lifecycle event.
+// Greater than 1: executed after Modal lifecycle event.
+modal.AddLifecycleEvent(lifecycleEventImpl, -1);
 ```
 
 And you can also hook transition events from the container by passing object that implements `IModalContainerCallbackReceiver` to `ModalContainer.AddCallbackReceiver()`.
@@ -658,24 +635,16 @@ public class SomeSheet : Sheet
 }
 ```
 
-You can also register lifecycle events externally by `Sheet.AddLifecycleEvents()` as below.
+You can also register lifecycle events externally by registering an object that implements `ISheetLifecycleEvent` to SheetContainer as shown below.  
+`ISheetLifecycleEvent` is an interface where the above methods are defined.
 
 ```cs
-// ISheetLifecycleEvent is the interface that has lifecycle events described above.
-// You can specify the execution priority with the second argument.
-//  Less than 0: executed before Sheet lifecycle event.
-//  Greater than 0: executed after Sheet lifecycle event.
 ISheetLifecycleEvent lifecycleEventImpl;
 Sheet sheet;
-Sheet.AddLifecycleEvent(lifecycleEventImpl, -1);
-
-// It is also possible to register only some lifecycle events as follows.
-IEnumerator OnWillEnter()
-{
-    // Some code.
-    yield break;
-}
-sheet.AddLifecycleEvent(onWillEnter: OnWillEnter);
+// You can specify the execution priority with the second argument.
+// Less than 0: executed before Sheet lifecycle event.
+// Greater than 1: executed after Sheet lifecycle event.
+sheet.AddLifecycleEvent(lifecycleEventImpl, -1);
 ```
 
 And you can also hook transition events from the container by passing object that implements `ISheetContainerCallbackReceiver` to `SheetContainer.AddCallbackReceiver()`.
@@ -744,12 +713,10 @@ Please refer to [ResourcesAssetLoader](https://github.com/Haruma-K/UnityScreenNa
 After create it, assign it's instance to `AssetLoader` property of `UnityScreenNavigatorSettings`.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137721037-18c84aad-28d3-4dd8-9a4a-4450a80badd2.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137721037-18c84aad-28d3-4dd8-9a4a-4450a80badd2.png">
 </p>
 
 You can create `UnityScreenNavigatorSettings` from `Assets > Create > Screen Navigator Settings`.
-
-You can also set the `IAssetLoader`for each container by setting the `AssetLoader` property of each `Container`.
 
 #### Use Addressable Asset System for the loading
 An implementation of `IAssetLoader` for the Addressable Asset System is provided by default.  
@@ -833,6 +800,7 @@ PageContainer container;
 yield return container.Push("FooPage", true, stack: false);
 
 // Transition to BarPage, and FooPage is disposed.
+// BarPageに遷移し、FooPageは破棄される
 yield return container.Push("BarPage", true);
 
 // When Pop, it does not back to FooPage, but to the page before it.
@@ -852,7 +820,7 @@ Next, assign this prefab as the modal backdrop.
 To change the modal backdrop of the whole application, assign it to `Modal Backdrop Prefab` in `UnityScreenNavigatorSettings`.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137837643-f5c7cc13-a379-4c0f-9c34-1e9c19869136.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137837643-f5c7cc13-a379-4c0f-9c34-1e9c19869136.png">
 </p>
 
 You can create `UnityScreenNavigatorSettings` from `Assets > Create > Screen Navigator Settings`.
@@ -869,16 +837,13 @@ Then, check the **Close Modal When Clicked** option of the **Modal Backdrop** co
 </p>
 
 #### Enable interaction during transitions
-From the start of transition to the end, interactions of all containers such as clicking on the screen are disabled.
+From the start of transition to the end, all interactions such as clicking on the screen are disabled.
 
-You can change the settings by changing `Enable Interaction In Transition` and `Control Interactions Of All Containers` property of `UnityScreenNavigatorSettings`.
-In default, `Enable Interaction In Transition` is `false` and `Control Interactions Of All Containers` is `true`.
-
-To enable interaction during transitions, set `Enable Interaction In Transition` to `true`.
-And if you want to disable interaction only for the container that is currently transitioning, keep `Enable Interaction In Transition` to `false` and set `Control Interactions Of All Containers` to `false`.
+You can change the settings to enable interaction during the transition.  
+To do this, set `Enable Interaction In Transition` in `UnityScreenNavigatorSettings` to `true`.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/200176139-4de8c94e-60f4-4db9-8abf-7b6d50bea09e.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137836806-6bbbb7dd-cc06-47aa-a1b8-3fe7d427f9fa.png">
 </p>
 
 You can create `UnityScreenNavigatorSettings` from `Assets > Create > Screen Navigator Settings`.
@@ -891,68 +856,8 @@ By default, the part of the screen under the container that is outside the conta
 If you want to show the screen outside the container, uncheck the `Rect Mask 2D` component attached to the container's GameObject.
 
 <p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/137837996-42eacaae-8852-40f4-acfd-41f8bf9110a3.png">
+  <img width=500 src="https://user-images.githubusercontent.com/47441314/137837996-42eacaae-8852-40f4-acfd-41f8bf9110a3.png">
 </p>
-
-#### Get information about playing animation information
-You can get the information about the transition animation currently playing from the following properties of the `Page`, `Modal`, `Sheet` classes.
-
-| Property Name | Description |
-|-|-|
-| IsTransitioning | Whether in transition or not. |
-| TransitionAnimationType | Type of the transition animation. If not in transition, return null. |
-| TransitionAnimationProgress | Progress of the transition animation. |
-| TransitionAnimationProgressChanged | Event when the progress of the transition animation changes. |
-
-#### Use loaded Prefab instances when loading screens
-The `PreloadedAssetLoaderObject` allows you to load preloaded prefab instances directly, instead of using Resources or Addressables when loading the screen.
-You can use it by entering the key and prefab in the Scriptable Object created from Assets > Create > Resource Loader > Preloaded Asset Loader as shown below.
-
-<p align="center">
-  <img width="60%" src="https://user-images.githubusercontent.com/47441314/174422762-5942a833-3a89-43bb-ab5f-a59eecaff1f6.png">
-</p>
-
-I also provide `PreloadedAssetLoader` implementation for runtime.
-
-## FAQ
-
-#### How to make each Screen with Scene instead of Prefab
-You can load the Screen placed in the Scene by implementing `AssetLoader`.
-Implement `IAssetLoader` to load the Scene file that contains the requested screen and return the GameObject of the screen.
-See [Change the loading method of screen resources](#change-the-loading-method-of-screen-resources) for details.
-
-#### How to separate view and logic
-I wrote the blog post below to demonstrate the concept and implementation.
-
-https://light11.hatenadiary.com/entry/2022/01/11/193925
-(Sorry but Japanese only)
-
-#### How to pass data to each screen
-First, as an example, data is passed to the screen when loading is completed in the demo scene, as shown below.
-
-https://github.com/Haruma-K/UnityScreenNavigator/blob/8a115b1b25ac1d9fcf4b1ab6d5f2c1cd1d915ee5/Assets/Demo/Scripts/CharacterModal.cs#L91
-
-However, there are many other possible ways to pass data.
-For example, there may be a case where you want to use a DI Container to set data.
-Therefore, it is the policy of this library not to implement and enforce a specific way.
-
-#### How to reuse popped pages or modals
-Popped pages and modals are immediately destroyed and cannot be reused.
-
-The essence of the desire for reuse can be categorized into the following two types.
-
-1. not wanting to load screen resources each time
-2. want to preserve the state of the screen
-
-Of these, the load time issue can be resolved by [Preloading](#preloading).
-As for state preserving, from the standpoint of maintainability, state and view should be decoupled so that they can be reconstructed.
-
-In addition, in general, from usability standpoint, it is "Tab" transition that should retain state.
-In this library as well, the state is always preserved in transitions using "Sheet" to implement tabs.
-See [Create sheet and transition](#create-sheet-and-transition) for details.
-
-And if reusable, users will need to manage the lifecycle by themselves. 
-In other words, when it is no longer needed, users must call the Cleanup method to destroy instance and clean up the memory.
 
 ## License
 This software is released under the MIT License.  

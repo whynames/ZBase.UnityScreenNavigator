@@ -1,0 +1,23 @@
+{
+  "name": "com.zbase.unityscreennavigator",
+  "displayName": "ZBase.UnityScreenNavigator",
+  "version": "3.0.0",
+  "unity": "2021.3",
+  "license": "MIT",
+  "author": {
+    "name": "Haruki Yano",
+    "url": "https://github.com/Haruma-K"
+  },
+  "type": "tool",
+  "description": "Library for screen transitions, transition animations, transition history stacking, and lifecycle management in Unity's uGUI.",
+  "samples": [
+    {
+      "displayName": "Examples",
+      "description": "A demo project shows how to use UnityScreenNavigator APIs.",
+      "path": "Samples~"
+    }
+  ],
+  "dependencies": {
+    "com.cysharp.unitask": "2.3.3"
+  }
+}
