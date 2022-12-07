@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ZBase.UnityScreenNavigator.Core
 {
     /// <summary>
-    ///     Easing Functions enumeration
+    /// Easing Functions enumeration
     /// </summary>
     public enum EaseType
     {
@@ -45,18 +45,18 @@ namespace ZBase.UnityScreenNavigator.Core
     public static class Easings
     {
         /// <summary>
-        ///     Constant Pi.
+        /// Constant Pi.
         /// </summary>
         private const float PI = Mathf.PI;
 
         /// <summary>
-        ///     Constant Pi / 2.
+        /// Constant Pi / 2.
         /// </summary>
         private const float HALFPI = Mathf.PI / 2.0f;
 
 
         /// <summary>
-        ///     Interpolate using the specified function.
+        /// Interpolate using the specified function.
         /// </summary>
         public static float Interpolate(float p, EaseType function)
         {
@@ -99,7 +99,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the line y = x
+        /// Modeled after the line y = x
         /// </summary>
         public static float Linear(float p)
         {
@@ -107,7 +107,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the parabola y = x^2
+        /// Modeled after the parabola y = x^2
         /// </summary>
         public static float QuadraticEaseIn(float p)
         {
@@ -115,7 +115,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the parabola y = -x^2 + 2x
+        /// Modeled after the parabola y = -x^2 + 2x
         /// </summary>
         public static float QuadraticEaseOut(float p)
         {
@@ -123,9 +123,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise quadratic
-        ///     y = (1/2)((2x)^2)             ; [0, 0.5)
-        ///     y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
+        /// Modeled after the piecewise quadratic
+        /// y = (1/2)((2x)^2)             ; [0, 0.5)
+        /// y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
         /// </summary>
         public static float QuadraticEaseInOut(float p)
         {
@@ -138,7 +138,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the cubic y = x^3
+        /// Modeled after the cubic y = x^3
         /// </summary>
         public static float CubicEaseIn(float p)
         {
@@ -146,7 +146,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the cubic y = (x - 1)^3 + 1
+        /// Modeled after the cubic y = (x - 1)^3 + 1
         /// </summary>
         public static float CubicEaseOut(float p)
         {
@@ -155,9 +155,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise cubic
-        ///     y = (1/2)((2x)^3)       ; [0, 0.5)
-        ///     y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
+        /// Modeled after the piecewise cubic
+        /// y = (1/2)((2x)^3)       ; [0, 0.5)
+        /// y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
         /// </summary>
         public static float CubicEaseInOut(float p)
         {
@@ -171,7 +171,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the quartic x^4
+        /// Modeled after the quartic x^4
         /// </summary>
         public static float QuarticEaseIn(float p)
         {
@@ -179,7 +179,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the quartic y = 1 - (x - 1)^4
+        /// Modeled after the quartic y = 1 - (x - 1)^4
         /// </summary>
         public static float QuarticEaseOut(float p)
         {
@@ -204,7 +204,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the quintic y = x^5
+        /// Modeled after the quintic y = x^5
         /// </summary>
         public static float QuinticEaseIn(float p)
         {
@@ -212,7 +212,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the quintic y = (x - 1)^5 + 1
+        /// Modeled after the quintic y = (x - 1)^5 + 1
         /// </summary>
         public static float QuinticEaseOut(float p)
         {
@@ -221,9 +221,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise quintic
-        ///     y = (1/2)((2x)^5)       ; [0, 0.5)
-        ///     y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
+        /// Modeled after the piecewise quintic
+        /// y = (1/2)((2x)^5)       ; [0, 0.5)
+        /// y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
         /// </summary>
         public static float QuinticEaseInOut(float p)
         {
@@ -237,7 +237,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after quarter-cycle of sine wave
+        /// Modeled after quarter-cycle of sine wave
         /// </summary>
         public static float SineEaseIn(float p)
         {
@@ -245,7 +245,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after quarter-cycle of sine wave (different phase)
+        /// Modeled after quarter-cycle of sine wave (different phase)
         /// </summary>
         public static float SineEaseOut(float p)
         {
@@ -253,7 +253,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after half sine wave
+        /// Modeled after half sine wave
         /// </summary>
         public static float SineEaseInOut(float p)
         {
@@ -261,7 +261,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after shifted quadrant IV of unit circle
+        /// Modeled after shifted quadrant IV of unit circle
         /// </summary>
         public static float CircularEaseIn(float p)
         {
@@ -269,7 +269,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after shifted quadrant II of unit circle
+        /// Modeled after shifted quadrant II of unit circle
         /// </summary>
         public static float CircularEaseOut(float p)
         {
@@ -277,9 +277,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise circular function
-        ///     y = (1/2)(1 - Mathf.Sqrt(1 - 4x^2))           ; [0, 0.5)
-        ///     y = (1/2)(Mathf.Sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
+        /// Modeled after the piecewise circular function
+        /// y = (1/2)(1 - Mathf.Sqrt(1 - 4x^2))           ; [0, 0.5)
+        /// y = (1/2)(Mathf.Sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
         /// </summary>
         public static float CircularEaseInOut(float p)
         {
@@ -292,7 +292,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the exponential function y = 2^(10(x - 1))
+        /// Modeled after the exponential function y = 2^(10(x - 1))
         /// </summary>
         public static float ExponentialEaseIn(float p)
         {
@@ -300,7 +300,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the exponential function y = -2^(-10x) + 1
+        /// Modeled after the exponential function y = -2^(-10x) + 1
         /// </summary>
         public static float ExponentialEaseOut(float p)
         {
@@ -308,9 +308,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise exponential
-        ///     y = (1/2)2^(10(2x - 1))         ; [0,0.5)
-        ///     y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
+        /// Modeled after the piecewise exponential
+        /// y = (1/2)2^(10(2x - 1))         ; [0,0.5)
+        /// y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
         /// </summary>
         public static float ExponentialEaseInOut(float p)
         {
@@ -328,7 +328,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the damped sine wave y = sin(13pi/2*x)*Mathf.Pow(2, 10 * (x - 1))
+        /// Modeled after the damped sine wave y = sin(13pi/2*x)*Mathf.Pow(2, 10 * (x - 1))
         /// </summary>
         public static float ElasticEaseIn(float p)
         {
@@ -336,7 +336,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*Mathf.Pow(2, -10x) + 1
+        /// Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*Mathf.Pow(2, -10x) + 1
         /// </summary>
         public static float ElasticEaseOut(float p)
         {
@@ -344,9 +344,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise exponentially-damped sine wave:
-        ///     y = (1/2)*sin(13pi/2*(2*x))*Mathf.Pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
-        ///     y = (1/2)*(sin(-13pi/2*((2x-1)+1))*Mathf.Pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
+        /// Modeled after the piecewise exponentially-damped sine wave:
+        /// y = (1/2)*sin(13pi/2*(2*x))*Mathf.Pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
+        /// y = (1/2)*(sin(-13pi/2*((2x-1)+1))*Mathf.Pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
         /// </summary>
         public static float ElasticEaseInOut(float p)
         {
@@ -359,7 +359,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
+        /// Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
         /// </summary>
         public static float BackEaseIn(float p)
         {
@@ -367,7 +367,7 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
+        /// Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
         /// </summary>
         public static float BackEaseOut(float p)
         {
@@ -376,9 +376,9 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         /// <summary>
-        ///     Modeled after the piecewise overshooting cubic function:
-        ///     y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
-        ///     y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
+        /// Modeled after the piecewise overshooting cubic function:
+        /// y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
+        /// y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
         /// </summary>
         public static float BackEaseInOut(float p)
         {

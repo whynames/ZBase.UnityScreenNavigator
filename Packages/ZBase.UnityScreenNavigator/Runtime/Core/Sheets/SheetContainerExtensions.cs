@@ -5,7 +5,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
     public static class SheetContainerExtensions
     {
         /// <summary>
-        ///     Add callbacks.
+        /// Add callbacks.
         /// </summary>
         /// <param name="self"></param>
         /// <param name="onBeforeShow"></param>

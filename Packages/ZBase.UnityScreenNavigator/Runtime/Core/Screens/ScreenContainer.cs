@@ -25,8 +25,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         private IAssetLoader _assetLoader;
 
         /// <summary>
-        ///     By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
-        ///     If this property is set, it is used instead.
+        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
+        /// If this property is set, it is used instead.
         /// </summary>
         public IAssetLoader AssetLoader
         {
@@ -92,10 +92,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         #region STATIC_METHODS
 
         /// <summary>
-        /// Get the <see cref="ScreenContainer" /> that manages the screen to which <see cref="transform" /> belongs.
+        /// Get the <see cref="ScreenContainer" /> that manages the screen to which <paramref name="transform"/> belongs.
         /// </summary>
         /// <param name="transform"></param>
-        /// <param name="useCache">Use the previous result for the <see cref="transform" />.</param>
+        /// <param name="useCache">Use the previous result for the <paramref name="transform"/>.</param>
         /// <returns></returns>
         public static ScreenContainer Of(Transform transform, bool useCache = true)
         {
@@ -103,10 +103,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Get the <see cref="ScreenContainer" /> that manages the screen to which <see cref="rectTransform" /> belongs.
+        /// Get the <see cref="ScreenContainer" /> that manages the screen to which <paramref name="rectTransform"/> belongs.
         /// </summary>
         /// <param name="rectTransform"></param>
-        /// <param name="useCache">Use the previous result for the <see cref="rectTransform" />.</param>
+        /// <param name="useCache">Use the previous result for the <paramref name="rectTransform"/>.</param>
         /// <returns></returns>
         public static ScreenContainer Of(RectTransform rectTransform, bool useCache = true)
         {
@@ -130,7 +130,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Find the <see cref="ScreenContainer" /> of <see cref="containerName" />.
+        /// Find the <see cref="ScreenContainer" /> of <paramref name="containerName"/>.
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
@@ -146,7 +146,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Find the <see cref="ScreenContainer" /> of <see cref="containerName" />.
+        /// Find the <see cref="ScreenContainer" /> of <paramref name="containerName"/>.
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
@@ -166,10 +166,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <summary>
         /// Create a new <see cref="ScreenContainer"/> as a layer.
         /// </summary>
-        /// <param name="layerName"></param>
-        /// <param name="layer"></param>
-        /// <param name="layerType"></param>
-        /// <returns></returns>
         public static async UniTask<ScreenContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
         {
             var root = new GameObject(
@@ -203,31 +199,23 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <summary>
         /// Add a callback receiver.
         /// </summary>
-        /// <param name="callbackReceiver"></param>
         public void AddCallbackReceiver(IScreenContainerCallbackReceiver callbackReceiver)
         {
             _callbackReceivers.Add(callbackReceiver);
         }
 
         /// <summary>
-        ///     Remove a callback receiver.
+        /// Remove a callback receiver.
         /// </summary>
-        /// <param name="callbackReceiver"></param>
         public void RemoveCallbackReceiver(IScreenContainerCallbackReceiver callbackReceiver)
         {
             _callbackReceivers.Remove(callbackReceiver);
         }
 
         /// <summary>
-        ///     Push new page.
+        /// Push an instance of <typeparamref name="TScreen"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <param name="stack"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <typeparam name="TScreen"></typeparam>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Push<TScreen>(ScreenOptions options, params object[] args)
             where TScreen : Screen
         {
@@ -235,25 +223,18 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Push new screen.
+        /// Push an instance of <see cref="Screen"/>.
         /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Push(ScreenOptions options, params object[] args)
         {
             PushAndForget<Screen>(options, args).Forget();
         }
 
         /// <summary>
-        ///     Push new page.
+        /// Push an instance of <typeparamref name="TScreen"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <param name="stack"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <typeparam name="TScreen"></typeparam>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PushAsync<TScreen>(ScreenOptions options, params object[] args)
             where TScreen : Screen
         {
@@ -261,10 +242,9 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Push new screen.
+        /// Push an instance of <see cref="Screen"/>.
         /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PushAsync(ScreenOptions options, params object[] args)
         {
             await PushAsyncInternal<Screen>(options, args);
@@ -409,30 +389,23 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Pop current screen.
+        /// Pop current instance of <see cref="Screen"/>.
         /// </summary>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Pop(bool playAnimation, params object[] args)
         {
             PopAndForget(playAnimation, args).Forget();
         }
 
-        /// <summary>
-        /// Pop current screen.
-        /// </summary>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
         private async UniTaskVoid PopAndForget(bool playAnimation, params object[] args)
         {
             await PopAsync(playAnimation, args);
         }
 
         /// <summary>
-        /// Pop current screen.
+        /// Pop current instance of <see cref="Screen"/>.
         /// </summary>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PopAsync(bool playAnimation, params object[] args)
         {
             if (_screens.Count == 0)
@@ -509,6 +482,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
         }
 
+        /// <summary>
+        /// Preload a prefab of <see cref="Screen"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void Preload(string resourcePath, bool loadAsync = true)
         {
             PreloadAndForget(resourcePath, loadAsync).Forget();
@@ -519,6 +496,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             await PreloadAsync(resourcePath, loadAsync);
         }
 
+        /// <summary>
+        /// Preload a prefab of <see cref="Screen"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true)
         {
             if (_preloadedResourceHandles.ContainsKey(resourcePath))

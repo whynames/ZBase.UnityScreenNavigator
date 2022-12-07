@@ -3,7 +3,7 @@
 namespace ZBase.UnityScreenNavigator.Core
 {
     /// <summary>
-    ///     Base class for transition animation with MonoBehaviour.
+    /// Base class for transition animation with MonoBehaviour.
     /// </summary>
     public abstract class TransitionAnimationBehaviour : MonoBehaviour, ITransitionAnimation
     {

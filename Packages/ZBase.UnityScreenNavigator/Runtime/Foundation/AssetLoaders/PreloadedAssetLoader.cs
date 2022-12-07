@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
 {
     /// <summary>
-    ///     <see cref="IAssetLoader" /> that allows you to register preloaded assets.
+    /// <see cref="IAssetLoader" /> that allows you to register preloaded assets.
     /// </summary>
     public sealed class PreloadedAssetLoader : IAssetLoader
     {
@@ -54,8 +54,8 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
         }
 
         /// <summary>
-        ///     Add a object to <see cref="PreloadedObjects" />. The asset name is used as the key.
-        ///     If you want to set your own key, add item to <see cref="PreloadedObjects" /> directly.
+        /// Add a object to <see cref="PreloadedObjects" />. The asset name is used as the key.
+        /// If you want to set your own key, add item to <see cref="PreloadedObjects" /> directly.
         /// </summary>
         /// <param name="obj"></param>
         public void AddObject(Object obj)

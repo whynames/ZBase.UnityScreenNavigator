@@ -5,7 +5,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
     public static class ModalContainerExtensions
     {
         /// <summary>
-        ///     Add callbacks.
+        /// Add callbacks.
         /// </summary>
         /// <param name="self"></param>
         /// <param name="onBeforePush"></param>
@@ -27,7 +27,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     Add callbacks.
+        /// Add callbacks.
         /// </summary>
         /// <param name="self"></param>
         /// <param name="modal"></param>

@@ -3,7 +3,7 @@
 namespace ZBase.UnityScreenNavigator.Core
 {
     /// <summary>
-    ///     Base class for transition animation with ScriptableObject.
+    /// Base class for transition animation with ScriptableObject.
     /// </summary>
     public abstract class TransitionAnimationObject : ScriptableObject, ITransitionAnimation
     {

@@ -7,7 +7,7 @@ using System.Threading;
 namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
 {
     /// <summary>
-    ///     The queue that will sort the items in order of priority.
+    /// The queue that will sort the items in order of priority.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class PriorityQueue<T> : IEnumerable<T>, IEnumerable, ICollection, IReadOnlyCollection<T>
@@ -30,8 +30,8 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         public int Count => _nodes.Count;
 
         /// <summary>
-        ///     Add objects based on priority.
-        ///     If the priority is the same, the object added earlier will be placed in front.
+        /// Add objects based on priority.
+        /// If the priority is the same, the object added earlier will be placed in front.
         /// </summary>
         /// <param name="item"></param>
         /// <param name="priority"></param>
@@ -70,7 +70,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         }
         
         /// <summary>
-        ///     Get an object from the front of the queue.
+        /// Get an object from the front of the queue.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -86,7 +86,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         }
         
         /// <summary>
-        ///     Get and remove an object from the front of the queue.
+        /// Get and remove an object from the front of the queue.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -103,7 +103,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         }
 
         /// <summary>
-        ///     Clear all objects.
+        /// Clear all objects.
         /// </summary>
         public void Clear()
         {

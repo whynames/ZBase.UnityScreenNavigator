@@ -30,18 +30,18 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         public bool IsTransitioning { get; private set; }
 
         /// <summary>
-        ///     Return the transition animation type currently playing.
-        ///     If not in transition, return null.
+        /// Return the transition animation type currently playing.
+        /// If not in transition, return null.
         /// </summary>
         public ActivityTransitionAnimationType? TransitionAnimationType { get; private set; }
 
         /// <summary>
-        ///     Progress of the transition animation.
+        /// Progress of the transition animation.
         /// </summary>
         public float TransitionAnimationProgress { get; private set; }
 
         /// <summary>
-        ///     Event when the transition animation progress changes.
+        /// Event when the transition animation progress changes.
         /// </summary>
         public event Action<float> TransitionAnimationProgressChanged;
 

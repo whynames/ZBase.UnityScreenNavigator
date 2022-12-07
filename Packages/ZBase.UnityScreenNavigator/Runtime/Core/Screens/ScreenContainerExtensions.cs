@@ -5,7 +5,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
     public static class ScreenContainerExtensions
     {
         /// <summary>
-        ///     Add callbacks.
+        /// Add callbacks.
         /// </summary>
         /// <param name="self"></param>
         /// <param name="onBeforePush"></param>
@@ -28,7 +28,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        ///     Add callbacks.
+        /// Add callbacks.
         /// </summary>
         /// <param name="self"></param>
         /// <param name="screen"></param>

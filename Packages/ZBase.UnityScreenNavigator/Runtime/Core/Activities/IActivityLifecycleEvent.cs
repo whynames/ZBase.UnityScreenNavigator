@@ -23,7 +23,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         void DidShow(Memory<object> args);
 
         /// <summary>
-        ///         /// <summary>
+        ///     /// <summary>
         /// Called just before this activity is displayed by the Hide transition.
         /// </summary>
         /// <returns></returns>

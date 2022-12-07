@@ -129,8 +129,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         }
 
         /// <summary>
-        ///     By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
-        ///     If this property is set, it is used instead.
+        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
+        /// If this property is set, it is used instead.
         /// </summary>
         public IAssetLoader AssetLoader
         {
@@ -238,23 +238,39 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             return -1;
         }
 
+        /// <summary>
+        /// Show an instance of <typeparamref name="TActivity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void Show<TActivity>(ActivityOptions options, params object[] args)
             where TActivity : Activity
         {
             ShowAndForget<TActivity>(options, args).Forget();
         }
 
+        /// <summary>
+        /// Show an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void Show(ActivityOptions options, params object[] args)
         {
             ShowAndForget<Activity>(options, args).Forget();
         }
 
+        /// <summary>
+        /// Show an instance of <typeparamref name="TActivity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask ShowAsync<TActivity>(ActivityOptions options, params object[] args)
             where TActivity : Activity
         {
             await ShowAsyncInternal<TActivity>(options, args);
         }
 
+        /// <summary>
+        /// Show an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask ShowAsync(ActivityOptions options, params object[] args)
         {
             await ShowAsyncInternal<Activity>(options, args);
@@ -355,6 +371,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
         }
 
+        /// <summary>
+        /// Hide an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void Hide(string resourcePath, bool playAnimation = true, params object[] args)
         {
             HideAndForget(resourcePath, playAnimation, args).Forget();
@@ -365,6 +385,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             await HideAsync(resourcePath, playAnimation, args);
         }
 
+        /// <summary>
+        /// Hide an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask HideAsync(string resourcePath, bool playAnimation = true, params object[] args)
         {
             if (TryGet(resourcePath, out var activity) == false)
@@ -431,6 +455,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
         }
 
+        /// <summary>
+        /// Hide all instances of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void HideAll(bool playAnimation = true)
         {
             HideAllAndForget(playAnimation).Forget();
@@ -441,6 +469,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             await HideAllAsync(playAnimation);
         }
 
+        /// <summary>
+        /// Hide all instances of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask HideAllAsync(bool playAnimation = true)
         {
             var keys = Pool<List<string>>.Shared.Rent();
@@ -456,6 +488,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             Pool<List<string>>.Shared.Return(keys);
         }
 
+        /// <summary>
+        /// Preload a prefab of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void Preload(string resourcePath, bool loadAsync = true)
         {
             PreloadAndForget(resourcePath, loadAsync).Forget();
@@ -466,14 +502,15 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             await PreloadAsync(resourcePath, loadAsync);
         }
 
+        /// <summary>
+        /// Preload a prefab of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true)
         {
             if (_preloadHandles.ContainsKey(resourcePath))
             {
-                Debug.LogError(
-                    $"The resource at `{resourcePath}` has already been preloaded."
-                );
-
+                Debug.LogError($"The resource at `{resourcePath}` has already been preloaded.");
                 return;
             }
 

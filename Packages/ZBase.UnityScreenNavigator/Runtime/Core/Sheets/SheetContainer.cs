@@ -28,8 +28,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private IAssetLoader _assetLoader;
 
         /// <summary>
-        ///     By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
-        ///     If this property is set, it is used instead.
+        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
+        /// If this property is set, it is used instead.
         /// </summary>
         public IAssetLoader AssetLoader
         {
@@ -53,12 +53,12 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     True if in transition.
+        /// True if in transition.
         /// </summary>
         public bool IsInTransition { get; private set; }
 
         /// <summary>
-        ///     Registered sheets.
+        /// Registered sheets.
         /// </summary>
         public IReadOnlyDictionary<int, Sheet> Sheets => _sheets;
 
@@ -116,10 +116,10 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Get the <see cref="SheetContainer" /> that manages the sheet to which <see cref="transform" /> belongs.
+        /// Get the <see cref="SheetContainer" /> that manages the sheet to which <paramref name="transform"/> belongs.
         /// </summary>
         /// <param name="transform"></param>
-        /// <param name="useCache">Use the previous result for the <see cref="transform" />.</param>
+        /// <param name="useCache">Use the previous result for the <paramref name="transform"/>.</param>
         /// <returns></returns>
         public static SheetContainer Of(Transform transform, bool useCache = true)
         {
@@ -127,10 +127,10 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Get the <see cref="SheetContainer" /> that manages the sheet to which <see cref="rectTransform" /> belongs.
+        /// Get the <see cref="SheetContainer" /> that manages the sheet to which <paramref name="rectTransform"/> belongs.
         /// </summary>
         /// <param name="rectTransform"></param>
-        /// <param name="useCache">Use the previous result for the <see cref="rectTransform" />.</param>
+        /// <param name="useCache">Use the previous result for the <paramref name="rectTransform"/>.</param>
         /// <returns></returns>
         public static SheetContainer Of(RectTransform rectTransform, bool useCache = true)
         {
@@ -154,7 +154,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Find the <see cref="SheetContainer" /> of <see cref="containerName" />.
+        /// Find the <see cref="SheetContainer" /> of <paramref name="containerName"/>.
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
@@ -170,7 +170,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Find the <see cref="SheetContainer" /> of <see cref="containerName" />.
+        /// Find the <see cref="SheetContainer" /> of <paramref name="containerName"/>.
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
@@ -188,7 +188,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Add a callback receiver.
+        /// Add a callback receiver.
         /// </summary>
         /// <param name="callbackReceiver"></param>
         public void AddCallbackReceiver(ISheetContainerCallbackReceiver callbackReceiver)
@@ -197,7 +197,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Remove a callback receiver.
+        /// Remove a callback receiver.
         /// </summary>
         /// <param name="callbackReceiver"></param>
         public void RemoveCallbackReceiver(ISheetContainerCallbackReceiver callbackReceiver)
@@ -206,13 +206,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Register a sheet.
+        /// Register an instance of <typeparamref name="TSheet"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>Fire-and-forget</remarks>
         public void Register<TSheet>(SheetOptions options, params object[] args)
             where TSheet : Sheet
         {
@@ -220,26 +216,18 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Register a sheet.
+        /// Register an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>Fire-and-forget</remarks>
         public void Register(SheetOptions options, params object[] args)
         {
             RegisterAndForget<Sheet>(options, args).Forget();
         }
 
         /// <summary>
-        ///     Register a sheet.
+        /// Register an instance of <typeparamref name="TSheet"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask<int> RegisterAsync<TSheet>(SheetOptions options, params object[] args)
             where TSheet : Sheet
         {
@@ -247,13 +235,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Register a sheet.
+        /// Register an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask<int> RegisterAsync(SheetOptions options, params object[] args)
         {
             return await RegisterAsyncInternal<Sheet>(options, args);
@@ -313,44 +297,36 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Show a sheet.
+        /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Show(string resourcePath, bool playAnimation, params object[] args)
         {
             ShowAndForget(resourcePath, playAnimation, args).Forget();
         }
 
         /// <summary>
-        ///     Show a sheet.
+        /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="sheetId"></param>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Show(int sheetId, bool playAnimation, params object[] args)
         {
             ShowAndForget(sheetId, playAnimation, args).Forget();
         }
 
         /// <summary>
-        ///     Show a sheet.
+        /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask ShowAsync(string resourcePath, bool playAnimation, params object[] args)
         {
             await ShowAsyncInternal(resourcePath, playAnimation, args);
         }
 
         /// <summary>
-        ///     Show a sheet.
+        /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="sheetId"></param>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask ShowAsync(int sheetId, bool playAnimation, params object[] args)
         {
             await ShowAsyncInternal(sheetId, playAnimation, args);
@@ -441,9 +417,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Hide a sheet.
+        /// Hide an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="playAnimation"></param>
+        /// <remarks>Fire-and-forget</remarks>
         public void Hide(bool playAnimation, params object[] args)
         {
             HideAndForget(playAnimation, args).Forget();
@@ -455,9 +431,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Hide a sheet.
+        /// Hide an instance of <see cref="Sheet"/>.
         /// </summary>
-        /// <param name="playAnimation"></param>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask HideAsync(bool playAnimation, params object[] args)
         {
             if (IsInTransition)

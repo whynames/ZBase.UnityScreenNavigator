@@ -6,7 +6,7 @@ using System.Threading;
 namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
 {
     /// <summary>
-    ///     The list that will sort the items in order of priority.
+    /// The list that will sort the items in order of priority.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class PriorityList<T> : IEnumerable<T>, IEnumerable, ICollection, IReadOnlyCollection<T>
@@ -29,8 +29,8 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         public int Count => _nodes.Count;
 
         /// <summary>
-        ///     Add objects based on priority.
-        ///     If the priority is the same, the object added earlier will be placed in front.
+        /// Add objects based on priority.
+        /// If the priority is the same, the object added earlier will be placed in front.
         /// </summary>
         /// <param name="item"></param>
         /// <param name="priority"></param>
@@ -69,7 +69,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         }
         
         /// <summary>
-        ///     Remove the first appeared one of the specified values.
+        /// Remove the first appeared one of the specified values.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
@@ -98,7 +98,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         }
 
         /// <summary>
-        ///     Clear all objects.
+        /// Clear all objects.
         /// </summary>
         public void Clear()
         {

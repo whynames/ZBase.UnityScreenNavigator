@@ -28,8 +28,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         private IAssetLoader _assetLoader;
 
         /// <summary>
-        ///     By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
-        ///     If this property is set, it is used instead.
+        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
+        /// If this property is set, it is used instead.
         /// </summary>
         public IAssetLoader AssetLoader
         {
@@ -38,12 +38,12 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     True if in transition.
+        /// True if in transition.
         /// </summary>
         public bool IsInTransition { get; private set; }
 
         /// <summary>
-        ///     Stacked modals.
+        /// Stacked modals.
         /// </summary>
         public IReadOnlyList<Modal> Modals => _modals;
 
@@ -97,7 +97,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     Get the <see cref="ModalContainer" /> that manages the modal to which <see cref="transform" /> belongs.
+        /// Get the <see cref="ModalContainer" /> that manages the modal to which <see cref="transform" /> belongs.
         /// </summary>
         /// <param name="transform"></param>
         /// <param name="useCache">Use the previous result for the <see cref="transform" />.</param>
@@ -108,10 +108,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     Get the <see cref="ModalContainer" /> that manages the modal to which <see cref="rectTransform" /> belongs.
+        /// Get the <see cref="ModalContainer" /> that manages the modal to which <paramref name="rectTransform"/> belongs.
         /// </summary>
         /// <param name="rectTransform"></param>
-        /// <param name="useCache">Use the previous result for the <see cref="rectTransform" />.</param>
+        /// <param name="useCache">Use the previous result for the <paramref name="rectTransform"/>.</param>
         /// <returns></returns>
         public static ModalContainer Of(RectTransform rectTransform, bool useCache = true)
         {
@@ -135,7 +135,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Find the <see cref="ModalContainer" /> of <see cref="containerName" />.
+        /// Find the <see cref="ModalContainer" /> of <paramref name="containerName"/>.
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
@@ -151,7 +151,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Find the <see cref="ModalContainer" /> of <see cref="containerName" />.
+        /// Find the <see cref="ModalContainer" /> of <paramref name="containerName"/>.
         /// </summary>
         /// <param name="containerName"></param>
         /// <returns></returns>
@@ -169,12 +169,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Create a new <see cref="ModalContainer" /> as a layer
+        /// Create a new <see cref="ModalContainer" /> as a layer.
         /// </summary>
-        /// <param name="layerName"></param>
-        /// <param name="layer"></param>
-        /// <param name="layerType"></param>
-        /// <returns></returns>
         public static async UniTask<ModalContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
         {
             var root = new GameObject(
@@ -204,7 +200,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     Add a callback receiver.
+        /// Add a callback receiver.
         /// </summary>
         /// <param name="callbackReceiver"></param>
         public void AddCallbackReceiver(IModalContainerCallbackReceiver callbackReceiver)
@@ -213,7 +209,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     Remove a callback receiver.
+        /// Remove a callback receiver.
         /// </summary>
         /// <param name="callbackReceiver"></param>
         public void RemoveCallbackReceiver(IModalContainerCallbackReceiver callbackReceiver)
@@ -222,13 +218,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        ///     Push new modal.
+        /// Push an instance of <typeparamref name="TModal"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Push<TModal>(ModalOptions options, params object[] args)
             where TModal : Modal
         {
@@ -236,23 +228,18 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Push new modal.
+        /// Push an instance of <see cref="Modal"/>.
         /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Push(ModalOptions options, params object[] args)
         {
             PushAndForget<Modal>(options, args).Forget();
         }
 
         /// <summary>
-        ///     Push new modal.
+        /// Push an instance of <typeparamref name="TModal"/>.
         /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <param name="onLoad"></param>
-        /// <param name="loadAsync"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PushAsync<TModal>(ModalOptions options, params object[] args)
             where TModal : Modal
         {
@@ -260,10 +247,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Push new modal.
+        /// Push an instance of <see cref="Modal"/>.
         /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PushAsync(ModalOptions options, params object[] args)
         {
             await PushAsyncInternal<Modal>(options, args);
@@ -384,30 +370,23 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Pop current modal.
+        /// Push an instance of <see cref="Modal"/>.
         /// </summary>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Fire-and-forget</remarks>
         public void Pop(bool playAnimation, params object[] args)
         {
             PopAndForget(playAnimation, args).Forget();
         }
 
-        /// <summary>
-        /// Pop current modal.
-        /// </summary>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
         private async UniTaskVoid PopAndForget(bool playAnimation, params object[] args)
         {
             await PopAsync(playAnimation, args);
         }
 
         /// <summary>
-        /// Pop current modal.
+        /// Push an instance of <see cref="Modal"/>.
         /// </summary>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PopAsync(bool playAnimation, params object[] args)
         {
             if (_modals.Count == 0)
@@ -495,6 +474,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
         }
 
+        /// <summary>
+        /// Preload a prefab of <see cref="Modal"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
         public void Preload(string resourcePath, bool loadAsync = true)
         {
             PreloadAndForget(resourcePath, loadAsync).Forget();
@@ -505,6 +488,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await PreloadAsync(resourcePath, loadAsync);
         }
 
+        /// <summary>
+        /// Preload a prefab of <see cref="Modal"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
         public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true)
         {
             if (_preloadedResourceHandles.ContainsKey(resourcePath))
