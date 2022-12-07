@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     [CreateAssetMenu(fileName = "SimpleTransitionAnimation", menuName = "Screen Navigator/Animations/Simple Transition Animation")]
     public sealed class SimpleTransitionAnimationObject : TransitionAnimationObject
@@ -56,9 +56,16 @@ namespace ZBase.UnityScreenNavigator.Core.Shared
             _canvasGroup.alpha = alpha;
         }
 
-        public void SetParams(float? duration = null, EaseType? easeType = null, SheetAlignment? beforeAlignment = null,
-            Vector3? beforeScale = null, float? beforeAlpha = null, SheetAlignment? afterAlignment = null,
-            Vector3? afterScale = null, float? afterAlpha = null)
+        public void SetParams(
+              float? duration = null
+            , EaseType? easeType = null
+            , SheetAlignment? beforeAlignment = null
+            , Vector3? beforeScale = null
+            , float? beforeAlpha = null
+            , SheetAlignment? afterAlignment = null
+            , Vector3? afterScale = null
+            , float? afterAlpha = null
+        )
         {
             if (duration.HasValue)
             {

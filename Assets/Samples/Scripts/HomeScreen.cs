@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Activities;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core.Screens;
-using ZBase.UnityScreenNavigator.Core.Shared.Views;
+using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace Demo.Scripts
 {

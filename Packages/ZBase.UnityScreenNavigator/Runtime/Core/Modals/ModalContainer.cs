@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using ZBase.UnityScreenNavigator.Core.Shared;
-using ZBase.UnityScreenNavigator.Core.Shared.Views;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
@@ -81,7 +80,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(LayerName);
 
-            using var keysToRemove = new ValueList<int>(s_instanceCacheByTransform.Count);
+            using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
 
             foreach (var cache in s_instanceCacheByTransform)
             {

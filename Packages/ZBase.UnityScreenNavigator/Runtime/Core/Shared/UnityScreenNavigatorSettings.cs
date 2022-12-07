@@ -9,7 +9,7 @@ using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using UnityEditor;
 #endif
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     internal sealed class UnityScreenNavigatorSettings : ScriptableObject
     {

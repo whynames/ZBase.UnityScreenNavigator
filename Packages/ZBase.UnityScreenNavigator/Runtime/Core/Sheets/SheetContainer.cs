@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using ZBase.UnityScreenNavigator.Core.Shared;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
@@ -100,7 +99,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             _assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(_name);
 
-            using var keysToRemove = new ValueList<int>(s_instanceCacheByTransform.Count);
+            using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
 
             foreach (var cache in s_instanceCacheByTransform)
             {

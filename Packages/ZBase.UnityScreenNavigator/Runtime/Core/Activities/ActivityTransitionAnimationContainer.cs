@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using ZBase.UnityScreenNavigator.Core.Shared;
 using ZBase.UnityScreenNavigator.Foundation;
 using Object = UnityEngine.Object;
 

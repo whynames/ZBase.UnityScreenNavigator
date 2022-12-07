@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Serialization;
-using ZBase.UnityScreenNavigator.Core.Shared;
 using ZBase.UnityScreenNavigator.Foundation;
 using Object = UnityEngine.Object;
 

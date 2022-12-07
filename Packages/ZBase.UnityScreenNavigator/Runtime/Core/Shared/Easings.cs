@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     /// <summary>
     ///     Easing Functions enumeration
@@ -62,7 +62,6 @@ namespace ZBase.UnityScreenNavigator.Core.Shared
         {
             switch (function)
             {
-                default:
                 case EaseType.Linear: return Linear(p);
                 case EaseType.QuadraticEaseOut: return QuadraticEaseOut(p);
                 case EaseType.QuadraticEaseIn: return QuadraticEaseIn(p);
@@ -95,6 +94,8 @@ namespace ZBase.UnityScreenNavigator.Core.Shared
                 case EaseType.BounceEaseOut: return BounceEaseOut(p);
                 case EaseType.BounceEaseInOut: return BounceEaseInOut(p);
             }
+
+            return Linear(p);
         }
 
         /// <summary>

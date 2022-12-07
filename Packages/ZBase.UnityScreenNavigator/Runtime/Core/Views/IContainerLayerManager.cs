@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared.Views
+namespace ZBase.UnityScreenNavigator.Core.Views
 {
     /// <summary>
     /// Manages layers of UI views.

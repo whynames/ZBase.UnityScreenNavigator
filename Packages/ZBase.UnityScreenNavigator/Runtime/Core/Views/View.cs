@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using ZBase.UnityScreenNavigator.Foundation;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared.Views
+namespace ZBase.UnityScreenNavigator.Core.Views
 {
     [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
     public abstract class View : UIBehaviour, IView

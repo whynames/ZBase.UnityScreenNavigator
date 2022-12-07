@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using ZBase.UnityScreenNavigator.Core.Shared;
+using ZBase.UnityScreenNavigator.Core;
 
 namespace Demo.Scripts
 {

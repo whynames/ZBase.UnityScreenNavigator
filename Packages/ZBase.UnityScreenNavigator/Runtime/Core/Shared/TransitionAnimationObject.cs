@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     /// <summary>
     ///     Base class for transition animation with ScriptableObject.

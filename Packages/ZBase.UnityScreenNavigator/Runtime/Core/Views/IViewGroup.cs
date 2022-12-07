@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared.Views
+namespace ZBase.UnityScreenNavigator.Core.Views
 {
     public interface IViewGroup : IView
     {

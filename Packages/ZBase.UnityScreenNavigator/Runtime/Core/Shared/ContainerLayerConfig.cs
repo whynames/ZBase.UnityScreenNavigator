@@ -1,7 +1,7 @@
 ﻿using System;
 using ZBase.UnityScreenNavigator.Foundation;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     [Serializable]
     public class ContainerLayerConfig

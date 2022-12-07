@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     public class MonoBehaviourDestroyedEventDispatcher : MonoBehaviour
     {

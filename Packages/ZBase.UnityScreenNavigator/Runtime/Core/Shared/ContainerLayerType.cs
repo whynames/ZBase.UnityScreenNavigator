@@ -1,4 +1,4 @@
-﻿namespace ZBase.UnityScreenNavigator.Core.Shared
+﻿namespace ZBase.UnityScreenNavigator.Core
 {
     public enum ContainerLayerType
     {

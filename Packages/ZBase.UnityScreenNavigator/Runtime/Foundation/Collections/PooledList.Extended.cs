@@ -3,18 +3,18 @@ using System.Buffers;
 
 namespace ZBase.UnityScreenNavigator.Foundation.Collections
 {
-    partial struct ValueList<T> : IDisposable
+    partial struct PooledList<T> : IDisposable
     {
-        public ValueList(T[] items) : this(items.AsSpan(), ArrayPool<T>.Shared)
+        public PooledList(T[] items) : this(items.AsSpan(), ArrayPool<T>.Shared)
         { }
 
-        public ValueList(T[] items, ArrayPool<T> pool) : this(items.AsSpan(), pool)
+        public PooledList(T[] items, ArrayPool<T> pool) : this(items.AsSpan(), pool)
         { }
 
-        public ValueList(in ReadOnlySpan<T> span) : this(span, ArrayPool<T>.Shared)
+        public PooledList(in ReadOnlySpan<T> span) : this(span, ArrayPool<T>.Shared)
         { }
 
-        public ValueList(in ReadOnlySpan<T> span, ArrayPool<T> pool)
+        public PooledList(in ReadOnlySpan<T> span, ArrayPool<T> pool)
         {
             _pool = pool ?? ArrayPool<T>.Shared;
 
@@ -35,7 +35,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
             _version = 0;
         }
 
-        public void ConvertAll<TOut>(ValueList<TOut> output, Converter<T, TOut> converter)
+        public void ConvertAll<TOut>(PooledList<TOut> output, Converter<T, TOut> converter)
         {
             if (converter == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.converter);
@@ -46,7 +46,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
             }
         }
 
-        public void FindAll(ValueList<T> output, Predicate<T> match)
+        public void FindAll(PooledList<T> output, Predicate<T> match)
         {
             if (match == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);

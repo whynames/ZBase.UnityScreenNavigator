@@ -23,7 +23,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
     //
     [DebuggerDisplay("Count = {Count}")]
     [Serializable]
-    public partial struct ValueList<T> : IList<T>, IReadOnlyList<T>, IDeserializationCallback
+    internal partial struct PooledList<T> : IList<T>, IReadOnlyList<T>, IDeserializationCallback
     {
         private const int DefaultCapacity = 4;
 
@@ -41,13 +41,13 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
         // of zero. Upon adding the first element to the list the capacity is
         // increased to DefaultCapacity, and then increased in multiples of two
         // as required.
-        public ValueList(int capacity) : this(capacity, ArrayPool<T>.Shared)
+        public PooledList(int capacity) : this(capacity, ArrayPool<T>.Shared)
         { }
 
-        public ValueList(IEnumerable<T> collection) : this(collection, ArrayPool<T>.Shared)
+        public PooledList(IEnumerable<T> collection) : this(collection, ArrayPool<T>.Shared)
         { }
 
-        public ValueList(ArrayPool<T> pool)
+        public PooledList(ArrayPool<T> pool)
         {
             _size = 0;
             _items = s_emptyArray;
@@ -59,7 +59,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
         // initially empty, but will have room for the given number of elements
         // before any reallocations are required.
         //
-        public ValueList(int capacity, ArrayPool<T> pool)
+        public PooledList(int capacity, ArrayPool<T> pool)
         {
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
@@ -74,7 +74,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
         // size and capacity of the new list will both be equal to the size of the
         // given collection.
         //
-        public ValueList(IEnumerable<T> collection, ArrayPool<T> pool)
+        public PooledList(IEnumerable<T> collection, ArrayPool<T> pool)
         {
             if (collection == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
@@ -341,14 +341,14 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
             return default;
         }
 
-        public ValueList<T> FindAll(Predicate<T> match)
+        public PooledList<T> FindAll(Predicate<T> match)
         {
             if (match == null)
             {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
             }
 
-            var list = new ValueList<T>();
+            var list = new PooledList<T>();
             for (var i = 0; i < _size; i++)
             {
                 if (match(_items[i]))
@@ -493,7 +493,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
         IEnumerator IEnumerable.GetEnumerator()
             => new Enumerator(this);
 
-        public ValueList<T> GetRange(int index, int count)
+        public PooledList<T> GetRange(int index, int count)
         {
             if (index < 0)
             {
@@ -510,7 +510,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
                 ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);
             }
 
-            var list = new ValueList<T>(count);
+            var list = new PooledList<T>(count);
             Array.Copy(_items, index, list._items, 0, count);
             list._size = count;
             return list;
@@ -601,7 +601,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException();
             }
 
-            if (collection is ValueList<T> otherList)
+            if (collection is PooledList<T> otherList)
             {
                 var count = otherList.Count;
                 if (_items == otherList._items)
@@ -984,12 +984,12 @@ namespace ZBase.UnityScreenNavigator.Foundation.Collections
 
         public struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            private readonly ValueList<T> _list;
+            private readonly PooledList<T> _list;
             private int _index;
             private readonly int _version;
             private T? _current;
 
-            internal Enumerator(ValueList<T> list)
+            internal Enumerator(PooledList<T> list)
             {
                 _list = list;
                 _index = 0;

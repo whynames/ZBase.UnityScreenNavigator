@@ -1,4 +1,4 @@
-﻿using ZBase.UnityScreenNavigator.Core.Shared.Views;
+﻿using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Activities

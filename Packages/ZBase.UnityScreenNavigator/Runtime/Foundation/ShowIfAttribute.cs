@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ZBase.UnityScreenNavigator.Foundation
 {
     [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
-    public class ShowIfAttribute : PropertyAttribute
+    internal class ShowIfAttribute : PropertyAttribute
     {
         public readonly string ConditionField;
 

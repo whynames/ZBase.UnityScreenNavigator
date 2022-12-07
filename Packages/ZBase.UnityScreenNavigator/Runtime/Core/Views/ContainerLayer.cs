@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared.Views
+namespace ZBase.UnityScreenNavigator.Core.Views
 {
     public abstract class ContainerLayer : Window, IContainerLayer
     {

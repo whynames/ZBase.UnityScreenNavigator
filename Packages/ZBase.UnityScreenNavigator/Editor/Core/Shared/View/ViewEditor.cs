@@ -1,5 +1,5 @@
 ﻿using UnityEditor;
-using ZBase.UnityScreenNavigator.Core.Shared.Views;
+using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace ZBase.UnityScreenNavigator.Editor.Core.Shared.Views
 {

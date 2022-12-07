@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Foundation;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared.Views
+namespace ZBase.UnityScreenNavigator.Core.Views
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform), typeof(Canvas))]

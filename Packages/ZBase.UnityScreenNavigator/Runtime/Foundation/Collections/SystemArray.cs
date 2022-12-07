@@ -1,6 +1,6 @@
 ﻿namespace ZBase.UnityScreenNavigator.Foundation.Collections
 {
-    public static class SystemArray
+    internal static class SystemArray
     {
         /// <summary>Gets the maximum number of elements that may be contained in an array.</summary>
         /// <returns>The maximum count of elements allowed in any array.</returns>

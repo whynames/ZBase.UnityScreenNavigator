@@ -1,5 +1,4 @@
 using System;
-using ZBase.UnityScreenNavigator.Core.Shared;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {

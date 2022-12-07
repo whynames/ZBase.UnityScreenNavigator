@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Shared
+namespace ZBase.UnityScreenNavigator.Core
 {
     public enum SheetAlignment
     {
@@ -16,33 +16,21 @@ namespace ZBase.UnityScreenNavigator.Core.Shared
     {
         public static Vector3 ToPosition(this SheetAlignment self, RectTransform rectTransform)
         {
-            Vector3 position;
             var rect = rectTransform.rect;
             var width = rect.width;
             var height = rect.height;
             var z = rectTransform.localPosition.z;
+
             switch (self)
             {
-                case SheetAlignment.Left:
-                    position = new Vector3(-width, 0, z);
-                    break;
-                case SheetAlignment.Top:
-                    position = new Vector3(0, height, z);
-                    break;
-                case SheetAlignment.Right:
-                    position = new Vector3(width, 0, z);
-                    break;
-                case SheetAlignment.Bottom:
-                    position = new Vector3(0, -height, z);
-                    break;
-                case SheetAlignment.Center:
-                    position = new Vector3(0, 0, z);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(self), self, null);
+                case SheetAlignment.Left: return new Vector3(-width, 0, z);
+                case SheetAlignment.Top: return new Vector3(0, height, z);
+                case SheetAlignment.Right: return new Vector3(width, 0, z);
+                case SheetAlignment.Bottom: return new Vector3(0, -height, z);
+                case SheetAlignment.Center: return new Vector3(0, 0, z);
             }
 
-            return position;
+            throw new ArgumentOutOfRangeException(nameof(self), self, null);
         }
     }
 }
