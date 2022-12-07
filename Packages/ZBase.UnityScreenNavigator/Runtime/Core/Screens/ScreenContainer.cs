@@ -142,6 +142,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 return instance;
             }
 
+            Debug.LogError($"Cannot find any {nameof(ScreenContainer)} by name `{containerName}`");
             return null;
         }
 
@@ -152,14 +153,15 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <returns></returns>
         public static bool TryFind(string containerName, out ScreenContainer container)
         {
-            container = null;
-
             if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
+                return true;
             }
 
-            return container;
+            Debug.LogError($"Cannot find any {nameof(ScreenContainer)} by name `{containerName}`");
+            container = default;
+            return false;
         }
 
         /// <summary>
@@ -303,9 +305,9 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
-            if (assetLoadHandle.IsDone == false)
+            while (assetLoadHandle.IsDone == false)
             {
-                await assetLoadHandle.Task;
+                await UniTask.NextFrame();
             }
 
             if (assetLoadHandle.Status == AssetLoadStatus.Failed)
@@ -320,6 +322,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 Debug.LogError(
                     $"Cannot transition because {typeof(TScreen).Name} component is not " +
                     $"attached to the specified resource \"{resourcePath}\"."
+                    , instance
                 );
 
                 return;

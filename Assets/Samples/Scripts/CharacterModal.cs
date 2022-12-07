@@ -5,8 +5,6 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core.Shared.Views;
 using ZBase.UnityScreenNavigator.Core.Sheets;
-using ZBase.UnityScreenNavigator.Foundation.Collections;
-using ZBase.UnityScreenNavigator.Foundation.Coroutine;
 
 namespace Demo.Scripts
 {
@@ -32,52 +30,54 @@ namespace Demo.Scripts
 
         public override async UniTask Initialize(Memory<object> args)
         {
-            using var imageSheetHandles = new ValueList<AsyncProcessHandle>(4);
+            var imageContainer = _imageContainer;
+            var imageSheets = _imageSheets;
 
-            for (var i = 0; i < ImageCount; i++)
+            for (var index = 0; index < ImageCount; index++)
             {
-                var index = i;
                 var options = new SheetOptions(
                     resourcePath: ResourceKey.CharacterModalImageSheetPrefab(),
                     onLoaded: (sheetId, sheet) => {
-                        _imageSheets[index] = (sheetId, (CharacterModalImageSheet)sheet);
+                        imageSheets[index] = (sheetId, (CharacterModalImageSheet)sheet);
                     }
                 );
-                var handle = _imageContainer.Register(options);
-                imageSheetHandles.Add(handle);
-            }
 
-            foreach (var handle in imageSheetHandles) await handle;
+                await imageContainer.RegisterAsync(options, args);
+            }
 
             _expandButton.onClick.AddListener(OnExpandButtonClicked);
         }
 
         public override async UniTask WillPushEnter(Memory<object> args)
         {
+            var imageContainer = _imageContainer;
+            var imageSheets = _imageSheets;
+
             for (var i = 0; i < ImageCount; i++)
             {
-                _imageSheets[i].sheet.Setup(_characterId, i + 1);
+                imageSheets[i].sheet.Setup(_characterId, i + 1);
             }
 
-            await _imageContainer.Show(_imageSheets[0].sheetId, false);
+            await imageContainer.ShowAsync(imageSheets[0].sheetId, false, args);
+
             _selectedRank = 1;
 
             thumbnailGrid.Setup(_characterId);
             thumbnailGrid.ThumbnailClicked += x =>
             {
-                if (_imageContainer.IsInTransition)
+                if (imageContainer.IsInTransition)
                 {
                     return;
                 }
 
-                var targetSheet = _imageSheets[x];
-                if (_imageContainer.ActiveSheet.Equals(targetSheet.sheet))
+                var targetSheet = imageSheets[x];
+                if (imageContainer.ActiveSheet.Equals(targetSheet.sheet))
                 {
                     return;
                 }
 
                 var sheetId = targetSheet.sheetId;
-                _imageContainer.Show(sheetId, true);
+                imageContainer.Show(sheetId, true);
                 _selectedRank = x + 1;
             };
         }
@@ -96,8 +96,8 @@ namespace Demo.Scripts
                     var characterImageModal = (CharacterImageModal) modal;
                     characterImageModal.Setup(_characterId, _selectedRank);
                 });
-            ModalContainer.Find(ContainerKey.Modals)
-                .Push(options);
+
+            ModalContainer.Find(ContainerKey.Modals).Push(options);
         }
     }
 }

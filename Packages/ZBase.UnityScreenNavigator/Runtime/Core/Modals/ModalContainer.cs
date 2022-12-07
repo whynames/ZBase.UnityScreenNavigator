@@ -147,6 +147,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 return instance;
             }
 
+            Debug.LogError($"Cannot find any {nameof(ModalContainer)} by name `{containerName}`");
             return null;
         }
 
@@ -157,14 +158,15 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <returns></returns>
         public static bool TryFind(string containerName, out ModalContainer container)
         {
-            container = null;
-
             if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
+                return true;
             }
 
-            return container;
+            Debug.LogError($"Cannot find any {nameof(ModalContainer)} by name `{containerName}`");
+            container = default;
+            return false;
         }
 
         /// <summary>
@@ -301,9 +303,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
-            if (assetLoadHandle.IsDone == false)
+            while (assetLoadHandle.IsDone == false)
             {
-                await assetLoadHandle.Task;
+                await UniTask.NextFrame();
             }
 
             if (assetLoadHandle.Status == AssetLoadStatus.Failed)
@@ -322,6 +324,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 Debug.LogError(
                     $"Cannot transition because {typeof(TModal).Name} component is not " +
                     $"attached to the specified resource `{resourcePath}`."
+                    , instance
                 );
 
                 return;

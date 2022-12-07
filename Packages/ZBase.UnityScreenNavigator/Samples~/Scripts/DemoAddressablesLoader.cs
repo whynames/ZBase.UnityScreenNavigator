@@ -5,6 +5,7 @@ namespace Demo.Scripts
     public class DemoAddressablesLoader : AssetLoaderObject
     {
         private readonly AddressableAssetLoader _loader = new();
+
         public override AssetLoadHandle<T> Load<T>(string key)
         {
             return _loader.Load<T>(GetResourceKey(key));

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,7 +8,6 @@ using ZBase.UnityScreenNavigator.Core.Shared;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
-using ZBase.UnityScreenNavigator.Foundation.Coroutine;
 
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
@@ -83,21 +82,25 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
         protected override void OnDestroy()
         {
-            foreach (var sheet in _sheets.Values)
-            {
-                Destroy(sheet.gameObject);
-            }
+            var sheets = _sheets;
+            var assetLoadHandles = _assetLoadHandles;
 
-            foreach (var assetLoadHandle in _assetLoadHandles.Values)
+            foreach (var sheet in sheets.Values)
             {
-                AssetLoader.Release(assetLoadHandle.Id);
+                var sheetId = sheet.GetInstanceID();
+
+                Destroy(sheet.gameObject);
+
+                if (assetLoadHandles.TryGetValue(sheetId, out var assetLoadHandle))
+                {
+                    AssetLoader.Release(assetLoadHandle.Id);
+                }
             }
 
             _assetLoadHandles.Clear();
-
             s_instanceCacheByName.Remove(_name);
 
-            using var keysToRemove = new ValueList<int>(4);
+            using var keysToRemove = new ValueList<int>(s_instanceCacheByTransform.Count);
 
             foreach (var cache in s_instanceCacheByTransform)
             {
@@ -132,20 +135,22 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// <returns></returns>
         public static SheetContainer Of(RectTransform rectTransform, bool useCache = true)
         {
-            var hashCode = rectTransform.GetInstanceID();
+            var id = rectTransform.GetInstanceID();
 
-            if (useCache && s_instanceCacheByTransform.TryGetValue(hashCode, out var container))
+            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
             {
                 return container;
             }
 
             container = rectTransform.GetComponentInParent<SheetContainer>();
-            if (container != null)
+            
+            if (container)
             {
-                s_instanceCacheByTransform.Add(hashCode, container);
+                s_instanceCacheByTransform.Add(id, container);
                 return container;
             }
 
+            Debug.LogError($"Cannot find any parent {nameof(SheetContainer)} component", rectTransform);
             return null;
         }
 
@@ -161,6 +166,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 return instance;
             }
 
+            Debug.LogError($"Cannot find any {nameof(SheetContainer)} by name `{containerName}`");
             return null;
         }
 
@@ -171,14 +177,15 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// <returns></returns>
         public static bool TryFind(string containerName, out SheetContainer container)
         {
-            container = null;
-
             if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
+                return true;
             }
 
-            return container;
+            Debug.LogError($"Cannot find any {nameof(SheetContainer)} by name `{containerName}`");
+            container = default;
+            return false;
         }
 
         /// <summary>
@@ -200,37 +207,6 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         /// <summary>
-        ///     Show a sheet.
-        /// </summary>
-        /// <param name="resourcePath"></param>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
-        public AsyncProcessHandle Show(string resourcePath, bool playAnimation, params object[] args)
-        {
-            return CoroutineManager.Run<Sheet>(ShowRoutine(resourcePath, playAnimation, args));
-        }
-
-        /// <summary>
-        ///     Show a sheet.
-        /// </summary>
-        /// <param name="sheetId"></param>
-        /// <param name="playAnimation"></param>
-        /// <returns></returns>
-        public AsyncProcessHandle Show(int sheetId, bool playAnimation, params object[] args)
-        {
-            return CoroutineManager.Run<Sheet>(ShowRoutine(sheetId, playAnimation, args));
-        }
-
-        /// <summary>
-        ///     Hide a sheet.
-        /// </summary>
-        /// <param name="playAnimation"></param>
-        public AsyncProcessHandle Hide(bool playAnimation)
-        {
-            return CoroutineManager.Run<Sheet>(HideRoutine(playAnimation));
-        }
-
-        /// <summary>
         ///     Register a sheet.
         /// </summary>
         /// <param name="resourcePath"></param>
@@ -238,10 +214,10 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// <param name="loadAsync"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public AsyncProcessHandle Register<TSheet>(SheetOptions options, params object[] args)
+        public void Register<TSheet>(SheetOptions options, params object[] args)
             where TSheet : Sheet
         {
-            return CoroutineManager.Run<Sheet>(RegisterRoutine<TSheet>(options, args));
+            RegisterAndForget<TSheet>(options, args).Forget();
         }
 
         /// <summary>
@@ -252,12 +228,45 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// <param name="loadAsync"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public AsyncProcessHandle Register(SheetOptions options, params object[] args)
+        public void Register(SheetOptions options, params object[] args)
         {
-            return CoroutineManager.Run<Sheet>(RegisterRoutine<Sheet>(options, args));
+            RegisterAndForget<Sheet>(options, args).Forget();
         }
 
-        private IEnumerator RegisterRoutine<TSheet>(SheetOptions options, Memory<object> args)
+        /// <summary>
+        ///     Register a sheet.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="onLoad"></param>
+        /// <param name="loadAsync"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public async UniTask<int> RegisterAsync<TSheet>(SheetOptions options, params object[] args)
+            where TSheet : Sheet
+        {
+            return await RegisterAsyncInternal<TSheet>(options, args);
+        }
+
+        /// <summary>
+        ///     Register a sheet.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="onLoad"></param>
+        /// <param name="loadAsync"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public async UniTask<int> RegisterAsync(SheetOptions options, params object[] args)
+        {
+            return await RegisterAsyncInternal<Sheet>(options, args);
+        }
+
+        private async UniTaskVoid RegisterAndForget<TSheet>(SheetOptions options, Memory<object> args)
+            where TSheet : Sheet
+        {
+            await RegisterAsyncInternal<TSheet>(options, args);
+        }
+
+        private async UniTask<int> RegisterAsyncInternal<TSheet>(SheetOptions options, Memory<object> args)
             where TSheet : Sheet
         {
             var resourcePath = options.resourcePath;
@@ -271,9 +280,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
-            while (!assetLoadHandle.IsDone)
+            while (assetLoadHandle.IsDone == false)
             {
-                yield return null;
+                await UniTask.NextFrame();
             }
 
             if (assetLoadHandle.Status == AssetLoadStatus.Failed)
@@ -282,12 +291,14 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             var instance = Instantiate(assetLoadHandle.Result);
-            var sheet = instance.GetOrAddComponent<TSheet>();
 
-            if (sheet == null)
+            if (instance.TryGetOrAddComponent<TSheet>(out var sheet) == false)
             {
-                throw new InvalidOperationException(
-                    $"Cannot register because the \"{typeof(TSheet).Name}\" component is not attached to the specified resource \"{resourcePath}\".");
+                Debug.LogError(
+                    $"Cannot register because the \"{typeof(TSheet).Name}\" component is not " +
+                    $"attached to the specified resource \"{resourcePath}\"."
+                    , instance
+                );
             }
 
             var sheetId = sheet.GetInstanceID();
@@ -297,39 +308,88 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             options.onLoaded?.Invoke(sheetId, sheet);
 
-            var afterLoadHandle = sheet.AfterLoad((RectTransform)transform, args);
+            await sheet.AfterLoadAsync((RectTransform)transform, args);
 
-            while (!afterLoadHandle.IsTerminated)
-            {
-                yield return null;
-            }
-
-            yield return sheetId;
+            return sheetId;
         }
 
-        private IEnumerator ShowRoutine(string resourcePath, bool playAnimation, Memory<object> args)
+        /// <summary>
+        ///     Show a sheet.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="playAnimation"></param>
+        /// <returns></returns>
+        public void Show(string resourcePath, bool playAnimation, params object[] args)
+        {
+            ShowAndForget(resourcePath, playAnimation, args).Forget();
+        }
+
+        /// <summary>
+        ///     Show a sheet.
+        /// </summary>
+        /// <param name="sheetId"></param>
+        /// <param name="playAnimation"></param>
+        /// <returns></returns>
+        public void Show(int sheetId, bool playAnimation, params object[] args)
+        {
+            ShowAndForget(sheetId, playAnimation, args).Forget();
+        }
+
+        /// <summary>
+        ///     Show a sheet.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="playAnimation"></param>
+        /// <returns></returns>
+        public async UniTask ShowAsync(string resourcePath, bool playAnimation, params object[] args)
+        {
+            await ShowAsyncInternal(resourcePath, playAnimation, args);
+        }
+
+        /// <summary>
+        ///     Show a sheet.
+        /// </summary>
+        /// <param name="sheetId"></param>
+        /// <param name="playAnimation"></param>
+        /// <returns></returns>
+        public async UniTask ShowAsync(int sheetId, bool playAnimation, params object[] args)
+        {
+            await ShowAsyncInternal(sheetId, playAnimation, args);
+        }
+
+        private async UniTaskVoid ShowAndForget(string resourcePath, bool playAnimation, Memory<object> args)
+        {
+            await ShowAsyncInternal(resourcePath, playAnimation, args);
+        }
+
+        private async UniTaskVoid ShowAndForget(int sheetId, bool playAnimation, Memory<object> args)
+        {
+            await ShowAsyncInternal(sheetId, playAnimation, args);
+        }
+
+        private async UniTask ShowAsyncInternal(string resourcePath, bool playAnimation, Memory<object> args)
         {
             var sheetId = _sheetNameToId[resourcePath];
-            yield return ShowRoutine(sheetId, playAnimation, args);
+            await ShowAsyncInternal(sheetId, playAnimation, args);
         }
 
-        private IEnumerator ShowRoutine(int sheetId, bool playAnimation, Memory<object> args)
+        private async UniTask ShowAsyncInternal(int sheetId, bool playAnimation, Memory<object> args)
         {
             if (IsInTransition)
             {
-                throw new InvalidOperationException(
-                    "Cannot transition because there is a sheet already in transition.");
+                Debug.LogError("Cannot transition because there is a sheet already in transition.");
+                return;
             }
 
             if (_activeSheetId.HasValue && _activeSheetId.Value.Equals(sheetId))
             {
-                throw new InvalidOperationException(
-                    $"Cannot transition because the sheet {sheetId} is already active.");
+                Debug.LogWarning($"Cannot transition because the sheet {sheetId} is already active.");
+                return;
             }
 
             IsInTransition = true;
             
-            if (!UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition)
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
@@ -340,48 +400,30 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
             {
-                callbackReceiver.BeforeShow(enterSheet, exitSheet);
+                callbackReceiver.BeforeShow(enterSheet, exitSheet, args);
             }
 
-            using var preprocessHandles = new ValueList<AsyncProcessHandle>(2);
-            if (exitSheet != null)
+            if (exitSheet)
             {
-                preprocessHandles.Add(exitSheet.BeforeExit(args));
+                await exitSheet.BeforeExitAsync(args);
             }
 
-            preprocessHandles.Add(enterSheet.BeforeEnter(args));
-
-            foreach (var coroutineHandle in preprocessHandles)
-            {
-                while (!coroutineHandle.IsTerminated)
-                {
-                    yield return null;
-                }
-            }
-
+            await enterSheet.BeforeEnterAsync(args);
+            
             // Play Animation
-            using var animationHandles = new ValueList<AsyncProcessHandle>(2);
-            if (exitSheet != null)
+            if (exitSheet)
             {
-                animationHandles.Add(exitSheet.Exit(playAnimation, enterSheet));
+                await exitSheet.ExitAsync(playAnimation, enterSheet);
             }
 
-            animationHandles.Add(enterSheet.Enter(playAnimation, exitSheet));
-
-            foreach (var handle in animationHandles)
-            {
-                while (!handle.IsTerminated)
-                {
-                    yield return null;
-                }
-            }
+            await enterSheet.EnterAsync(playAnimation, exitSheet);
 
             // End Transition
             _activeSheetId = sheetId;
             IsInTransition = false;
 
             // Postprocess
-            if (exitSheet != null)
+            if (exitSheet)
             {
                 exitSheet.AfterExit(args);
             }
@@ -390,32 +432,50 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             foreach (var callbackReceiver in _callbackReceivers)
             {
-                callbackReceiver.AfterShow(enterSheet, exitSheet);
+                callbackReceiver.AfterShow(enterSheet, exitSheet, args);
             }
             
-            if (!UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition)
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
         }
 
-        private IEnumerator HideRoutine(bool playAnimation)
+        /// <summary>
+        ///     Hide a sheet.
+        /// </summary>
+        /// <param name="playAnimation"></param>
+        public void Hide(bool playAnimation, params object[] args)
+        {
+            HideAndForget(playAnimation, args).Forget();
+        }
+
+        private async UniTaskVoid HideAndForget(bool playAnimation, params object[] args)
+        {
+            await HideAsync(playAnimation, args);
+        }
+
+        /// <summary>
+        ///     Hide a sheet.
+        /// </summary>
+        /// <param name="playAnimation"></param>
+        public async UniTask HideAsync(bool playAnimation, params object[] args)
         {
             if (IsInTransition)
             {
-                throw new InvalidOperationException(
-                    "Cannot transition because there is a sheet already in transition.");
+                Debug.LogError("Cannot transition because there is a sheet already in transition.");
+                return;
             }
 
-            if (!_activeSheetId.HasValue)
+            if (_activeSheetId.HasValue == false)
             {
-                throw new InvalidOperationException(
-                    "Cannot transition because there is no active sheet.");
+                Debug.LogWarning("Cannot transition because there is no active sheet.");
+                return;
             }
 
             IsInTransition = true;
             
-            if (!UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition)
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
@@ -425,34 +485,27 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
             {
-                callbackReceiver.BeforeHide(exitSheet);
+                callbackReceiver.BeforeHide(exitSheet, args);
             }
 
-            var preprocessHandle = exitSheet.BeforeExit(null);
-            while (!preprocessHandle.IsTerminated)
-            {
-                yield return preprocessHandle;
-            }
+            await exitSheet.BeforeExitAsync(args);
 
             // Play Animation
-            var animationHandle = exitSheet.Exit(playAnimation, null);
-            while (!animationHandle.IsTerminated)
-            {
-                yield return null;
-            }
+            await exitSheet.ExitAsync(playAnimation, null);
 
             // End Transition
             _activeSheetId = null;
             IsInTransition = false;
 
             // Postprocess
-            exitSheet.AfterExit(null);
+            exitSheet.AfterExit(args);
+
             foreach (var callbackReceiver in _callbackReceivers)
             {
-                callbackReceiver.AfterHide(exitSheet);
+                callbackReceiver.AfterHide(exitSheet, args);
             }
             
-            if (!UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition)
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }

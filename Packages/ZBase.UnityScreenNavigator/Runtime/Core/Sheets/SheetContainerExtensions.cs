@@ -12,13 +12,17 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// <param name="onAfterShow"></param>
         /// <param name="onBeforeHide"></param>
         /// <param name="onAfterHide"></param>
-        public static void AddCallbackReceiver(this SheetContainer self,
-            Action<(Sheet enterSheet, Sheet exitSheet)> onBeforeShow = null,
-            Action<(Sheet enterSheet, Sheet exitSheet)> onAfterShow = null,
-            Action<Sheet> onBeforeHide = null, Action<Sheet> onAfterHide = null)
+        public static void AddCallbackReceiver(this SheetContainer self
+            , Action<Sheet, Sheet, Memory<object>> onBeforeShow = null
+            , Action<Sheet, Sheet, Memory<object>> onAfterShow = null
+            , Action<Sheet, Memory<object>> onBeforeHide = null
+            , Action<Sheet, Memory<object>> onAfterHide = null
+        )
         {
-            var callbackReceiver =
-                new AnonymousSheetContainerCallbackReceiver(onBeforeShow, onAfterShow, onBeforeHide, onAfterHide);
+            var callbackReceiver = new AnonymousSheetContainerCallbackReceiver(
+                onBeforeShow, onAfterShow, onBeforeHide, onAfterHide
+            );
+
             self.AddCallbackReceiver(callbackReceiver);
         }
     }

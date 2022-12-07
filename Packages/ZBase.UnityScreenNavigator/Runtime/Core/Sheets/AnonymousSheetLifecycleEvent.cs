@@ -6,11 +6,14 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     public sealed class AnonymousSheetLifecycleEvent : ISheetLifecycleEvent
     {
+        public event Action<Memory<object>> OnDidEnter;
+        public event Action<Memory<object>> OnDidExit;
+
         public AnonymousSheetLifecycleEvent(
-            Func<Memory<object>, UniTask> initialize = null,
-            Func<Memory<object>, UniTask> onWillEnter = null, Action<Memory<object>> onDidEnter = null,
-            Func<Memory<object>, UniTask> onWillExit = null, Action<Memory<object>> onDidExit = null,
-            Func<UniTask> onCleanup = null
+              Func<Memory<object>, UniTask> initialize = null
+            , Func<Memory<object>, UniTask> onWillEnter = null, Action<Memory<object>> onDidEnter = null
+            , Func<Memory<object>, UniTask> onWillExit = null, Action<Memory<object>> onDidExit = null
+            , Func<UniTask> onCleanup = null
         )
         {
             if (initialize != null)
@@ -71,8 +74,5 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             foreach (var onCleanup in OnCleanup)
                 await onCleanup.Invoke();
         }
-
-        public event Action<Memory<object>> OnDidEnter;
-        public event Action<Memory<object>> OnDidExit;
     }
 }

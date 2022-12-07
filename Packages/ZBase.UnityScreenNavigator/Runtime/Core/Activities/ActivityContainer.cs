@@ -13,8 +13,15 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
     [RequireComponent(typeof(RectMask2D))]
     public class ActivityContainer : ContainerLayer
     {
-        private static readonly Dictionary<int, ActivityContainer> InstanceCacheByTransform = new();
-        private static readonly Dictionary<string, ActivityContainer> InstanceCacheByName = new();
+        private static readonly Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
+        private static readonly Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
+
+        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadHandles = new();
+        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+        private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
+        private readonly Dictionary<string, Activity> _activities = new();
+
+        private IAssetLoader _assetLoader;
 
         /// <summary>
         /// Get the <see cref="ActivityContainer" /> that manages the screen to which <see cref="transform" /> belongs.
@@ -36,7 +43,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         public static ActivityContainer Of(RectTransform rectTransform, bool useCache = true)
         {
             var id = rectTransform.GetInstanceID();
-            if (useCache && InstanceCacheByTransform.TryGetValue(id, out var container))
+            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
             {
                 return container;
             }
@@ -45,7 +52,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
             if (container)
             {
-                InstanceCacheByTransform.Add(id, container);
+                s_instanceCacheByTransform.Add(id, container);
                 return container;
             }
 
@@ -60,11 +67,12 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <returns></returns>
         public static ActivityContainer Find(string containerName)
         {
-            if (InstanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
             {
                 return instance;
             }
 
+            Debug.LogError($"Cannot find any {nameof(ActivityContainer)} by name `{containerName}`");
             return null;
         }
 
@@ -75,14 +83,15 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <returns></returns>
         public static bool TryFind(string containerName, out ActivityContainer container)
         {
-            container = null;
-
-            if (InstanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
+                return true;
             }
 
-            return container;
+            Debug.LogError($"Cannot find any {nameof(ActivityContainer)} by name `{containerName}`");
+            container = default;
+            return false;
         }
 
         /// <summary>
@@ -114,18 +123,11 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
             if (string.IsNullOrWhiteSpace(layerConfig.name) == false)
             {
-                InstanceCacheByName.Add(layerConfig.name, container);
+                s_instanceCacheByName.Add(layerConfig.name, container);
             }
 
             return container;
         }
-
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadHandles = new();
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
-        private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly Dictionary<string, Activity> _activities = new();
-
-        private IAssetLoader _assetLoader;
 
         /// <summary>
         ///     By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
@@ -294,9 +296,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
-            if (assetLoadHandle.IsDone == false)
+            while (assetLoadHandle.IsDone == false)
             {
-                await assetLoadHandle.Task;
+                await UniTask.NextFrame();
             }
 
             if (assetLoadHandle.Status == AssetLoadStatus.Failed)
@@ -311,7 +313,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 Debug.LogError(
                     $"Cannot transition because the {typeof(TActivity).Name} component is not " +
                     $"attached to the specified resource `{resourcePath}`."
-                    , activity
+                    , instance
                 );
 
                 return;

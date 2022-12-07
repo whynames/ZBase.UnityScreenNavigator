@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Shared;
 using ZBase.UnityScreenNavigator.Core.Shared.Views;
 using ZBase.UnityScreenNavigator.Foundation;
-using ZBase.UnityScreenNavigator.Foundation.Animation;
-using ZBase.UnityScreenNavigator.Foundation.Coroutine;
 using ZBase.UnityScreenNavigator.Foundation.PriorityCollection;
-using System.Linq;
 
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
@@ -93,7 +88,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             _lifecycleEvents.Remove(lifecycleEvent);
         }
 
-        internal AsyncProcessHandle AfterLoad(RectTransform parentTransform, Memory<object> args)
+        internal async UniTask AfterLoadAsync(RectTransform parentTransform, Memory<object> args)
         {
             _lifecycleEvents.Add(this, 0);
             SetIdentifer();
@@ -119,17 +114,11 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             RectTransform.SetSiblingIndex(siblingIndex);
             gameObject.SetActive(false);
 
-            return CoroutineManager.Run<Sheet>(
-                CreateCoroutine(_lifecycleEvents.Select(x => x.Initialize(args)))
-            );
+            var tasks = _lifecycleEvents.Select(x => x.Initialize(args));
+            await WaitForAsync(tasks);
         }
 
-        internal AsyncProcessHandle BeforeEnter(Memory<object> args)
-        {
-            return CoroutineManager.Run<Sheet>(BeforeEnterRoutine(args));
-        }
-
-        private IEnumerator BeforeEnterRoutine(Memory<object> args)
+        internal async UniTask BeforeEnterAsync(Memory<object> args)
         {
             IsTransitioning = true;
             TransitionAnimationType = SheetTransitionAnimationType.Enter;
@@ -139,36 +128,26 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             Alpha = 0.0f;
 
-            var handle = CoroutineManager.Run<Sheet>(
-                CreateCoroutine(_lifecycleEvents.Select(x => x.WillEnter(args)))
-            );
-
-            while (!handle.IsTerminated)
-            {
-                yield return null;
-            }
+            var tasks = _lifecycleEvents.Select(x => x.WillEnter(args));
+            await WaitForAsync(tasks);
         }
 
-        internal AsyncProcessHandle Enter(bool playAnimation, Sheet partnerSheet)
-        {
-            return CoroutineManager.Run<Sheet>(EnterRoutine(playAnimation, partnerSheet));
-        }
-
-        private IEnumerator EnterRoutine(bool playAnimation, Sheet partnerSheet)
+        internal async UniTask EnterAsync(bool playAnimation, Sheet partnerSheet)
         {
             Alpha = 1.0f;
 
             if (playAnimation)
             {
-                var anim = _animationContainer.GetAnimation(true, partnerSheet?.Identifier);
-                if (anim == null)
+                var anim = GetAnimation(true, partnerSheet);
+
+                if (partnerSheet)
                 {
-                    anim = UnityScreenNavigatorSettings.Instance.GetDefaultSheetTransitionAnimation(true);
+                    anim.SetPartner(partnerSheet.RectTransform);
                 }
 
-                anim.SetPartner(partnerSheet?.transform as RectTransform);
                 anim.Setup(RectTransform);
-                yield return CoroutineManager.Run<Sheet>(anim.CreatePlayRoutine(TransitionProgressReporter));
+
+                await anim.PlayAsync(TransitionProgressReporter);
             }
 
             RectTransform.FillParent((RectTransform)Parent);
@@ -185,12 +164,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             TransitionAnimationType = null;
         }
 
-        internal AsyncProcessHandle BeforeExit(Memory<object> args)
-        {
-            return CoroutineManager.Run<Sheet>(BeforeExitRoutine(args));
-        }
-
-        private IEnumerator BeforeExitRoutine(Memory<object> args)
+        internal async UniTask BeforeExitAsync(Memory<object> args)
         {
             IsTransitioning = true;
             TransitionAnimationType = SheetTransitionAnimationType.Exit;
@@ -200,31 +174,24 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             Alpha = 1.0f;
 
-            var handle = CoroutineManager.Run<Sheet>(CreateCoroutine(_lifecycleEvents.Select(x => x.WillExit(args))));
-            while (!handle.IsTerminated)
-            {
-                yield return null;
-            }
+            var tasks = _lifecycleEvents.Select(x => x.WillExit(args));
+            await WaitForAsync(tasks);
         }
 
-        internal AsyncProcessHandle Exit(bool playAnimation, Sheet partnerSheet)
-        {
-            return CoroutineManager.Run<Sheet>(ExitRoutine(playAnimation, partnerSheet));
-        }
-
-        private IEnumerator ExitRoutine(bool playAnimation, Sheet partnerSheet)
+        internal async UniTask ExitAsync(bool playAnimation, Sheet partnerSheet)
         {
             if (playAnimation)
             {
-                var anim = _animationContainer.GetAnimation(false, partnerSheet?.Identifier);
-                if (anim == null)
+                var anim = GetAnimation(false, partnerSheet);
+
+                if (partnerSheet)
                 {
-                    anim = UnityScreenNavigatorSettings.Instance.GetDefaultSheetTransitionAnimation(false);
+                    anim.SetPartner(partnerSheet.RectTransform);
                 }
 
-                anim.SetPartner(partnerSheet?.transform as RectTransform);
                 anim.Setup(RectTransform);
-                yield return CoroutineManager.Run<Sheet>(anim.CreatePlayRoutine(TransitionProgressReporter));
+
+                await anim.PlayAsync(TransitionProgressReporter);
             }
 
             Alpha = 0.0f;
@@ -241,43 +208,29 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             gameObject.SetActive(false);
         }
 
-        internal AsyncProcessHandle BeforeRelease()
+        internal async UniTask BeforeReleaseAsync()
         {
-            return CoroutineManager.Run<Sheet>(CreateCoroutine(_lifecycleEvents.Select(x => x.Cleanup())));
-        }
-
-        private IEnumerator CreateCoroutine(IEnumerable<UniTask> targets)
-        {
-            foreach (var target in targets)
-            {
-                var handle = CoroutineManager.Run<Sheet>(CreateCoroutine(target));
-                if (!handle.IsTerminated)
-                {
-                    yield return handle;
-                }
-            }
-        }
-
-        private IEnumerator CreateCoroutine(UniTask target)
-        {
-            async void WaitTaskAndCallback(UniTask task, Action callback)
-            {
-                await task;
-                callback?.Invoke();
-            }
-            
-            var isCompleted = false;
-            WaitTaskAndCallback(target, () =>
-            {
-                isCompleted = true;
-            });
-            return new WaitUntil(() => isCompleted);
+            var tasks = _lifecycleEvents.Select(x => x.Cleanup());
+            await WaitForAsync(tasks);
         }
 
         private void SetTransitionProgress(float progress)
         {
             TransitionAnimationProgress = progress;
             TransitionAnimationProgressChanged?.Invoke(progress);
+        }
+
+        private ITransitionAnimation GetAnimation(bool enter, Sheet partner)
+        {
+            var partnerIdentifier = partner == true ? partner.Identifier : string.Empty;
+            var anim = _animationContainer.GetAnimation(enter, partnerIdentifier);
+
+            if (anim == null)
+            {
+                return UnityScreenNavigatorSettings.Instance.GetDefaultSheetTransitionAnimation(enter);
+            }
+
+            return anim;
         }
     }
 }
