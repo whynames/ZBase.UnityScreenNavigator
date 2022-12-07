@@ -52,7 +52,7 @@ namespace Demo.Scripts
             _expandButton.onClick.AddListener(OnExpandButtonClicked);
         }
 
-        public override async UniTask WillPushEnter()
+        public override async UniTask WillPushEnter(Memory<object> args)
         {
             for (var i = 0; i < ImageCount; i++)
             {
@@ -91,7 +91,7 @@ namespace Demo.Scripts
         private void OnExpandButtonClicked()
         {
             var options = new WindowOptions(ResourceKey.CharacterImageModalPrefab(), true,
-                onLoaded: modal =>
+                onLoaded: (modal, args) =>
                 {
                     var characterImageModal = (CharacterImageModal) modal;
                     characterImageModal.Setup(_characterId, _selectedRank);

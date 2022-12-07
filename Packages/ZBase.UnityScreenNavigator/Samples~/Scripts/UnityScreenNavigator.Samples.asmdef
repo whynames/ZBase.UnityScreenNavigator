@@ -3,9 +3,9 @@
     "rootNamespace": "",
     "references": [
         "DOTween.Modules",
-        "UnityScreenNavigator",
         "UniTask",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "ZBase.UnityScreenNavigator"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

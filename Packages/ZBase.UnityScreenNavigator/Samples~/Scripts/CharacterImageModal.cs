@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +20,7 @@ namespace Demo.Scripts
             _characterId = characterId;
             _rank = rank;
         }
-        public override async UniTask WillPushEnter()
+        public override async UniTask WillPushEnter(Memory<object> args)
         {
             var resourceKey = ResourceKey.CharacterSprite(_characterId, _rank);
             var handle = DemoAssetLoader.AssetLoader.LoadAsync<Sprite>(resourceKey);

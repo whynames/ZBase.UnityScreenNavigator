@@ -15,11 +15,11 @@ namespace Demo.Scripts
             return _loader.LoadAsync<T>(GetResourceKey(key));
         }
 
-        public override void Release(AssetLoadHandle handle)
+        public override void Release(AssetLoadHandleId handleId)
         {
-            _loader.Release(handle);
+            _loader.Release(handleId);
         }
-        
+
         private string GetResourceKey(string key)
         {
             return $"prefab_demo_{key}";

@@ -14,29 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sheetEnterAnimation: {fileID: 0}
   _sheetExitAnimation: {fileID: 0}
-  _pagePushEnterAnimation: {fileID: 0}
-  _pagePushExitAnimation: {fileID: 0}
-  _pagePopEnterAnimation: {fileID: 0}
-  _pagePopExitAnimation: {fileID: 0}
+  _screenPushEnterAnimation: {fileID: 0}
+  _screenPushExitAnimation: {fileID: 0}
+  _screenPopEnterAnimation: {fileID: 0}
+  _screenPopExitAnimation: {fileID: 0}
   _modalEnterAnimation: {fileID: 0}
   _modalExitAnimation: {fileID: 0}
   _modalBackdropEnterAnimation: {fileID: 0}
   _modalBackdropExitAnimation: {fileID: 0}
-  _modalBackdropPrefab: {fileID: 4672728316167856403, guid: 30228440436e2a248b41c61d678f615e,
-    type: 3}
+  _activityEnterAnimation: {fileID: 0}
+  _activityExitAnimation: {fileID: 0}
+  _modalBackdropPrefab: {fileID: 0}
   _assetLoader: {fileID: 0}
   _enableInteractionInTransition: 0
   useBlocksRaycastsInsteadOfInteractable: 1
-  _containerLayers:
-  - name: GAMEPLAY_CONTAINER
-    layer: 0
-    layerType: 2
-  - name: MAIN_CONTAINER
-    layer: 1
-    layerType: 1
-  - name: MODAL_CONTAINER
-    layer: 2
-    layerType: 0
-  - name: TUTORIAL_CONTAINER
-    layer: 3
-    layerType: 2

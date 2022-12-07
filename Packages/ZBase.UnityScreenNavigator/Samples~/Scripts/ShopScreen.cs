@@ -41,7 +41,7 @@ namespace Demo.Scripts
                 {
                     await UniTask.Yield();
                 }
-                
+
                 var sheetId = _itemGridSheetIds[i];
 
                 async void ShowSheet()

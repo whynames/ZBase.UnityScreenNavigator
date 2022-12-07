@@ -1,5 +1,4 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Activities;
 using ZBase.UnityScreenNavigator.Core.Modals;
@@ -49,7 +48,7 @@ namespace Demo.Scripts
             }
 
             var options = new WindowOptions(ResourceKey.TopPagePrefab(), false, loadAsync: false);
-            await manager.Find<ScreenContainer>(ContainerKey.Screens).Push(options);
+            await manager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
         }
     }
 }

@@ -20,12 +20,12 @@ namespace Demo.Scripts
             _shopButton.onClick.AddListener(OnShopButtonClicked);
 
             // Preload the "Shop" page prefab.
-            await ScreenContainer.Of(transform).Preload(ResourceKey.ShopPagePrefab());
+            await ScreenContainer.Of(transform).PreloadAsync(ResourceKey.ShopPagePrefab());
             // Simulate loading time.
             await UniTask.Delay(TimeSpan.FromSeconds(1));
         }
 
-        public override void DidPushEnter()
+        public override void DidPushEnter(Memory<object> args)
         {
             ActivityContainer.Find(ContainerKey.Activities).Hide(ResourceKey.LoadingActivity());
         }

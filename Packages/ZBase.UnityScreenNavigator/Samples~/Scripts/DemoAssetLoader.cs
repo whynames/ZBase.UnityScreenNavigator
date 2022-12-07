@@ -6,7 +6,7 @@ namespace Demo.Scripts
     public sealed class DemoAssetLoader
     {
         private static IAssetLoader _defaultAssetLoader;
-        
+
         public static IAssetLoader AssetLoader
         {
             get
