@@ -12,8 +12,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
     [RequireComponent(typeof(RectMask2D))]
     public class ActivityContainer : ContainerLayer
     {
-        private static readonly Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
-        private static readonly Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
+        private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
 
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadHandles = new();
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
@@ -21,6 +21,14 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         private readonly Dictionary<string, Activity> _activities = new();
 
         private IAssetLoader _assetLoader;
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            s_instanceCacheByTransform = new();
+            s_instanceCacheByName = new();
+        }
 
         /// <summary>
         /// Get the <see cref="ActivityContainer" /> that manages the screen to which <see cref="transform" /> belongs.

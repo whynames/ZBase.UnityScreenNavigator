@@ -13,8 +13,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
     [RequireComponent(typeof(RectMask2D))]
     public sealed class ScreenContainer : ContainerLayer
     {
-        private static readonly Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
-        private static readonly Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
+        private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
 
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
@@ -45,6 +45,14 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         public IReadOnlyList<Screen> Screens => _screens;
 
         public Window Current => _screens[^1];
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            s_instanceCacheByTransform = new();
+            s_instanceCacheByName = new();
+        }
 
         protected override void Awake()
         {

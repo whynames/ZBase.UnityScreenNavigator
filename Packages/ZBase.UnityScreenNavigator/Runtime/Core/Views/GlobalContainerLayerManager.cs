@@ -8,6 +8,13 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     {
         public static GlobalContainerLayerManager Root;
 
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            Root = null;
+        }
+
         protected override void Start()
         {
             base.Start();

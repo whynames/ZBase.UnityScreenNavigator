@@ -13,8 +13,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
     [RequireComponent(typeof(RectMask2D))]
     public sealed class ModalContainer : ContainerLayer
     {
-        private static readonly Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();
-        private static readonly Dictionary<string, ModalContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();
+        private static Dictionary<string, ModalContainer> s_instanceCacheByName = new();
 
         [SerializeField] private ModalBackdrop _overrideBackdropPrefab;
 
@@ -48,6 +48,14 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         public IReadOnlyList<Modal> Modals => _modals;
 
         public Window Current => _modals[^1];
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            s_instanceCacheByTransform = new();
+            s_instanceCacheByName = new();
+        }
 
         protected override void Awake()
         {

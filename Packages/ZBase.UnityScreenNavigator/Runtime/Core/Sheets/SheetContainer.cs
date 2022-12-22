@@ -13,8 +13,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
     [RequireComponent(typeof(RectMask2D))]
     public sealed class SheetContainer : UIBehaviour
     {
-        private static readonly Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
-        private static readonly Dictionary<string, SheetContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
+        private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
 
         [SerializeField] private string _name;
 
@@ -66,6 +66,14 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         {
             get => _canvasGroup.interactable;
             set => _canvasGroup.interactable = value;
+        }
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            s_instanceCacheByTransform = new();
+            s_instanceCacheByName = new();
         }
 
         protected override void Awake()
