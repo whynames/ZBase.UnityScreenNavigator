@@ -286,8 +286,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             if (instance.TryGetOrAddComponent<TSheet>(out var sheet) == false)
             {
                 Debug.LogError(
-                    $"Cannot register because the \"{typeof(TSheet).Name}\" component is not " +
-                    $"attached to the specified resource \"{resourcePath}\"."
+                    $"Cannot register because the `{typeof(TSheet).Name}` component is not " +
+                    $"attached to the specified resource `{resourcePath}`."
                     , instance
                 );
             }
@@ -363,7 +363,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
             else
             {
-                Debug.LogError($"\"{resourcePath}\" must be registered before showing.");
+                Debug.LogError($"`{resourcePath}` must be registered before showing.");
             }
         }
 

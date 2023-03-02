@@ -308,7 +308,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 Debug.LogError(
                     $"Cannot transition because {typeof(TScreen).Name} component is not " +
-                    $"attached to the specified resource \"{resourcePath}\"."
+                    $"attached to the specified resource `{resourcePath}`."
                     , instance
                 );
 
