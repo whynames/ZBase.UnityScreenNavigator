@@ -304,6 +304,11 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             return sheetId;
         }
 
+        public bool TryGetSheetId(string resourcePath, out int sheetId)
+        {
+            return _sheetNameToId.TryGetValue(resourcePath, out sheetId);
+        }
+
         /// <summary>
         /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
@@ -352,8 +357,14 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
         private async UniTask ShowAsyncInternal(string resourcePath, bool playAnimation, Memory<object> args)
         {
-            var sheetId = _sheetNameToId[resourcePath];
-            await ShowAsyncInternal(sheetId, playAnimation, args);
+            if (TryGetSheetId(resourcePath, out var sheetId))
+            {
+                await ShowAsyncInternal(sheetId, playAnimation, args);
+            }
+            else
+            {
+                Debug.LogError($"\"{resourcePath}\" must be registered before showing.");
+            }
         }
 
         private async UniTask ShowAsyncInternal(int sheetId, bool playAnimation, Memory<object> args)
