@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using Object = UnityEngine.Object;
 
@@ -13,11 +14,13 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
             _value = value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(AssetLoadHandleId other)
         {
             return _value == other._value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
         {
             if (obj is AssetLoadHandleId other)
@@ -28,11 +31,19 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {
             return _value.GetHashCode();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString()
+        {
+            return _value.ToString();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator AssetLoadHandleId(uint value)
         {
             return new AssetLoadHandleId(value);
