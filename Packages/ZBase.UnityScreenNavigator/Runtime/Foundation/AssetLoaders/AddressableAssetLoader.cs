@@ -14,6 +14,8 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
 
         private uint _nextControlId;
 
+        public bool SuppressErrorLogOnRelease { get; set; }
+
         public AssetLoadHandle<T> Load<T>(string key)
             where T : Object
         {
@@ -74,9 +76,12 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
         {
             if (_controlIdToHandles.TryGetValue(handleId, out var handle) == false)
             {
-                UnityEngine.Debug.LogError(
-                    $"There is no asset that has been requested for release (Handle.Id: {handleId})."
-                );
+                if (SuppressErrorLogOnRelease == false)
+                {
+                    UnityEngine.Debug.LogError(
+                        $"There is no asset that has been requested for release (Handle.Id: {handleId})."
+                    );
+                }
 
                 return;
             }
