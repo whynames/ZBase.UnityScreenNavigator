@@ -307,7 +307,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             var backdrop = Instantiate(_backdropPrefab);
-            backdrop.Setup(RectTransform, options.backdropAlpha);
+            backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
             _backdrops.Add(backdrop);
 
             var instance = Instantiate(assetLoadHandle.Result);

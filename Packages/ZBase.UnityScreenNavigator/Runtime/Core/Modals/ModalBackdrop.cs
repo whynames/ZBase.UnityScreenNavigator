@@ -23,35 +23,20 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             _rectTransform = (RectTransform)transform;
             _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
 
-            if (_closeModalWhenClicked)
-            {
-                if (TryGetComponent<Image>(out var image) == false)
-                {
-                    image = gameObject.AddComponent<Image>();
-                    image.color = Color.clear;
-                }
-
-                if (TryGetComponent<Button>(out var button) == false)
-                {
-                    button = gameObject.AddComponent<Button>();
-                    button.transition = Selectable.Transition.None;
-                }
-
-                button.onClick.AddListener(() => {
-                    var modalContainer = ModalContainer.Of(transform);
-                    if (modalContainer.IsInTransition)
-                        return;
-                    modalContainer.Pop(true);
-                });
-            }
+            SetCloseModalOnClick(_closeModalWhenClicked);
 
             _image = GetComponent<Image>();
             _originalAlpha = _image ? _image.color.a : 1f;
         }
 
-        public void Setup(RectTransform parentTransform, float? alpha)
+        public void Setup(
+              RectTransform parentTransform
+            , in float? alpha
+            , in bool? closeModalWhenClick
+        )
         {
             SetAlpha(alpha);
+            SetCloseModalOnClick(closeModalWhenClick);
 
             _parentTransform = parentTransform;
             _rectTransform.FillParent(_parentTransform);
@@ -60,7 +45,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             gameObject.SetActive(false);
         }
 
-        private void SetAlpha(float? value)
+        private void SetAlpha(in float? value)
         {
             var image = _image;
 
@@ -79,6 +64,49 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             var color = image.color;
             color.a = alpha;
             image.color = color;
+        }
+
+        private void SetCloseModalOnClick(in bool? value)
+        {
+            if (value.HasValue)
+            {
+                _closeModalWhenClicked = value.Value;
+            }
+
+            if (_closeModalWhenClicked)
+            {
+                if (TryGetComponent<Image>(out var image) == false)
+                {
+                    image = gameObject.AddComponent<Image>();
+                    image.color = Color.clear;
+                }
+
+                if (TryGetComponent<Button>(out var button) == false)
+                {
+                    button = gameObject.AddComponent<Button>();
+                    button.transition = Selectable.Transition.None;
+                }
+
+                button.onClick.AddListener(CloseModalOnClick);
+            }
+            else
+            {
+                if (TryGetComponent<Button>(out var button))
+                {
+                    button.onClick.RemoveListener(CloseModalOnClick);
+                    Destroy(button);
+                }
+            }
+        }
+
+        private void CloseModalOnClick()
+        {
+            var modalContainer = ModalContainer.Of(transform);
+
+            if (modalContainer.IsInTransition)
+                return;
+
+            modalContainer.Pop(true);
         }
 
         internal async UniTask EnterAsync(bool playAnimation)
