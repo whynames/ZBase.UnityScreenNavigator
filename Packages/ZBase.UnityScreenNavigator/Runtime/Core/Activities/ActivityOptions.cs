@@ -10,9 +10,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         public readonly WindowOptions options;
 
         public ActivityOptions(
-            in WindowOptions options
-            , SortingLayerId? sortingLayer = null
-            , int? orderInLayer = null
+              in WindowOptions options
+            , in SortingLayerId? sortingLayer = null
+            , in int? orderInLayer = null
         )
         {
             this.options = options;
@@ -25,8 +25,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             , bool playAnimation = true
             , OnLoadCallback onLoaded = null
             , bool loadAsync = true
-            , SortingLayerId? sortingLayer = null
-            , int? orderInLayer = null
+            , in SortingLayerId? sortingLayer = null
+            , in int? orderInLayer = null
         )
         {
             this.options = new(resourcePath, playAnimation, onLoaded, loadAsync);
