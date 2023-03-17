@@ -44,7 +44,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// </summary>
         public IReadOnlyList<Screen> Screens => _screens;
 
-        public Window Current => _screens[^1];
+        public Screen Current => _screens[^1];
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
