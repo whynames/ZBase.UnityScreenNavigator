@@ -21,7 +21,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
         private readonly List<ModalBackdrop> _backdrops = new();
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly List<Modal> _modals = new();
+        private readonly List<ViewRef<Modal>> _modals = new();
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
 
         private ModalBackdrop _backdropPrefab;
@@ -45,9 +45,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <summary>
         /// Stacked modals.
         /// </summary>
-        public IReadOnlyList<Modal> Modals => _modals;
+        public IReadOnlyList<ViewRef<Modal>> Modals => _modals;
 
-        public Modal Current => _modals[^1];
+        public ViewRef<Modal> Current => _modals[^1];
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -74,7 +74,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             for (var i = 0; i < count; i++)
             {
-                var modal = modals[i];
+                var modal = modals[i].View;
                 var modalId = modal.GetInstanceID();
 
                 Destroy(modal.gameObject);
@@ -223,6 +223,36 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
+        /// Searchs through the <see cref="Modals"/> list backward from the last index
+        /// and returns the index of the Modal loaded from <paramref name="resourcePath"/>
+        /// that has been recently pushed into this container if any.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="index">
+        /// Return a value greater or equal to 0 if there is
+        /// a Modal loaded from this <paramref name="resourcePath"/>.
+        /// </param>
+        /// <returns>
+        /// True if there is a Modal loaded from this <paramref name="resourcePath"/>.
+        /// </returns>
+        public bool FindIndexOfRecentlyPushed(string resourcePath, out int index)
+        {
+            var modals = _modals;
+
+            for (var i = modals.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(resourcePath, modals[i].ResourcePath))
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            index = -1;
+            return false;
+        }
+
+        /// <summary>
         /// Push an instance of <typeparamref name="TModal"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
@@ -326,7 +356,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             await enterModal.AfterLoadAsync(RectTransform, args);
 
-            var exitModal = _modals.Count == 0 ? null : _modals[^1];
+            var exitModal = _modals.Count == 0 ? null : _modals[^1].View;
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -352,7 +382,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.EnterAsync(true, options.options.playAnimation, exitModal);
 
             // End Transition
-            _modals.Add(enterModal);
+            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath));
             IsInTransition = false;
 
             // Postprocess
@@ -413,11 +443,14 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 Interactable = false;
             }
 
-            var exitModal = _modals[^1];
+            var lastModalIndex = _modals.Count - 1;
+            var exitModal = _modals[lastModalIndex].View;
             var exitModalId = exitModal.GetInstanceID();
-            var enterModal = _modals.Count == 1 ? null : _modals[^2];
-            var backdrop = _backdrops[^1];
-            _backdrops.RemoveAt(_backdrops.Count - 1);
+            var enterModal = _modals.Count == 1 ? null : _modals[^2].View;
+
+            var lastBackdropIndex = _backdrops.Count - 1;
+            var backdrop = _backdrops[lastBackdropIndex];
+            _backdrops.RemoveAt(lastBackdropIndex);
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -443,7 +476,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await backdrop.ExitAsync(playAnimation);
 
             // End Transition
-            _modals.RemoveAt(_modals.Count - 1);
+            _modals.RemoveAt(lastModalIndex);
             IsInTransition = false;
 
             // Postprocess

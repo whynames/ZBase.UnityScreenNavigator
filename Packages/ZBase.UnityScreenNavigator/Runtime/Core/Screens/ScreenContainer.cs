@@ -18,7 +18,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly List<Screen> _screens = new();
+        private readonly List<ViewRef<Screen>> _screens = new();
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
 
         private bool _isActiveScreenStacked;
@@ -42,9 +42,9 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <summary>
         /// Stacked screens.
         /// </summary>
-        public IReadOnlyList<Screen> Screens => _screens;
+        public IReadOnlyList<ViewRef<Screen>> Screens => _screens;
 
-        public Screen Current => _screens[^1];
+        public ViewRef<Screen> Current => _screens[^1];
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -67,7 +67,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             for (var i = 0; i < count; i++)
             {
-                var screen = screens[i];
+                var screen = screens[i].View;
                 var screenId = screen.GetInstanceID();
 
                 Destroy(screen.gameObject);
@@ -218,6 +218,36 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
+        /// Searchs through the <see cref="Screens"/> list backward from the last index
+        /// and returns the index of the Screen loaded from <paramref name="resourcePath"/>
+        /// that has been recently pushed into this container if any.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="index">
+        /// Return a value greater or equal to 0 if there is
+        /// a Screen loaded from this <paramref name="resourcePath"/>.
+        /// </param>
+        /// <returns>
+        /// True if there is a Screen loaded from this <paramref name="resourcePath"/>.
+        /// </returns>
+        public bool FindIndexOfRecentlyPushed(string resourcePath, out int index)
+        {
+            var screens = _screens;
+
+            for (var i = screens.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(resourcePath, screens[i].ResourcePath))
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            index = -1;
+            return false;
+        }
+
+        /// <summary>
         /// Push an instance of <typeparamref name="TScreen"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
@@ -318,7 +348,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             await enterScreen.AfterLoadAsync(RectTransform, args);
 
-            var exitScreen = _screens.Count == 0 ? null : _screens[^1];
+            var exitScreen = _screens.Count == 0 ? null : _screens[^1].View;
             var exitScreenId = exitScreen == null ? (int?) null : exitScreen.GetInstanceID();
 
             // Preprocess
@@ -348,7 +378,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 _screens.RemoveAt(_screens.Count - 1);
             }
 
-            _screens.Add(enterScreen);
+            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath));
             IsInTransition = false;
 
             // Postprocess
@@ -432,9 +462,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 Interactable = false;
             }
 
-            var exitScreen = _screens[^1];
+            var lastScreen = _screens.Count - 1;
+            var exitScreen = _screens[lastScreen].View;
             var exitScreenId = exitScreen.GetInstanceID();
-            var enterScreen = _screens.Count == 1 ? null : _screens[^2];
+            var enterScreen = _screens.Count == 1 ? null : _screens[^2].View;
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -458,7 +489,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             // End Transition
-            _screens.RemoveAt(_screens.Count - 1);
+            _screens.RemoveAt(lastScreen);
             IsInTransition = false;
 
             // Postprocess
