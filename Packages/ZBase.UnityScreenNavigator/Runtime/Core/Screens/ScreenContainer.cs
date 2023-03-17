@@ -248,6 +248,33 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
+        /// Searchs through the <see cref="Screens"/> list backward from the last index
+        /// and remove the Screen loaded from <paramref name="resourcePath"/>
+        /// that has been recently pushed into this container if any.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="screen">
+        /// Returns the Screen loaded from this <paramref name="resourcePath"/> after it is removed.
+        /// </param>
+        /// <returns>
+        /// True if there is a Screen loaded from this <paramref name="resourcePath"/>.
+        /// </returns>
+        public bool RemoveRecentlyPushed(string resourcePath, out Screen screen)
+        {
+            if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
+            {
+                screen = default;
+                return false;
+            }
+
+            screen = _screens[index].View;
+            this.transform.RemoveChild(screen.transform);
+            _screens.RemoveAt(index);
+
+            return true;
+        }
+
+        /// <summary>
         /// Push an instance of <typeparamref name="TScreen"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>

@@ -253,6 +253,33 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
+        /// Searchs through the <see cref="Modals"/> list backward from the last index
+        /// and remove the Modal loaded from <paramref name="resourcePath"/>
+        /// that has been recently pushed into this container if any.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <param name="modal">
+        /// Returns the Modal loaded from this <paramref name="resourcePath"/> after it is removed.
+        /// </param>
+        /// <returns>
+        /// True if there is a Modal loaded from this <paramref name="resourcePath"/>.
+        /// </returns>
+        public bool RemoveRecentlyPushed(string resourcePath, out Modal modal)
+        {
+            if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
+            {
+                modal = default;
+                return false;
+            }
+
+            modal = _modals[index].View;
+            this.transform.RemoveChild(modal.transform);
+            _modals.RemoveAt(index);
+
+            return true;
+        }
+
+        /// <summary>
         /// Push an instance of <typeparamref name="TModal"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
