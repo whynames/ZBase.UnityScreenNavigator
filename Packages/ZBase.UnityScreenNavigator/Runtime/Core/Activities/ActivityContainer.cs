@@ -166,7 +166,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             _callbackReceivers.Remove(callbackReceiver);
         }
 
-        public void Add(string resourcePath, Activity activity)
+        private void Add(string resourcePath, Activity activity)
         {
             if (resourcePath == null)
                 throw new ArgumentNullException(nameof(resourcePath));
@@ -187,7 +187,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 transform.AddChild(transform);
         }
 
-        public bool Remove(string resourcePath)
+        private bool Remove(string resourcePath)
         {
             if (resourcePath == null)
                 throw new ArgumentNullException(nameof(resourcePath));
