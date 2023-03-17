@@ -199,11 +199,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             var container = root.AddComponent<ModalContainer>();
             await container.InitializeAsync(layerConfig, manager);
 
-            if (string.IsNullOrWhiteSpace(layerConfig.name) == false)
-            {
-                s_instanceCacheByName.Add(layerConfig.name, container);
-            }
-            
+            s_instanceCacheByName.Add(container.LayerName, container);
             return container;
         }
 

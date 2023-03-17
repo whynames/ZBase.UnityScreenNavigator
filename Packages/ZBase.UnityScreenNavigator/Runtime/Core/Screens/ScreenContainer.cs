@@ -193,12 +193,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             var container = root.AddComponent<ScreenContainer>();
             await container.InitializeAsync(layerConfig, manager);
-            
-            if (string.IsNullOrWhiteSpace(layerConfig.name) == false)
-            {
-                s_instanceCacheByName.Add(layerConfig.name, container);
-            }
 
+            s_instanceCacheByName.Add(container.LayerName, container);
             return container;
         }
 

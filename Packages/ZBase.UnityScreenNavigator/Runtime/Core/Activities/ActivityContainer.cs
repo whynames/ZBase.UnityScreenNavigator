@@ -128,11 +128,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             var container = root.GetOrAddComponent<ActivityContainer>();
             await container.InitializeAsync(layerConfig, manager);
 
-            if (string.IsNullOrWhiteSpace(layerConfig.name) == false)
-            {
-                s_instanceCacheByName.Add(layerConfig.name, container);
-            }
-
+            s_instanceCacheByName.Add(container.LayerName, container);
             return container;
         }
 
