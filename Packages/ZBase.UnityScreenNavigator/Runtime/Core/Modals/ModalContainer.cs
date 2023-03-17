@@ -223,7 +223,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Searchs through the <see cref="Modals"/> list backward from the last index
+        /// Searches through the <see cref="Modals"/> stack
         /// and returns the index of the Modal loaded from <paramref name="resourcePath"/>
         /// that has been recently pushed into this container if any.
         /// </summary>
@@ -253,8 +253,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         /// <summary>
-        /// Searchs through the <see cref="Modals"/> list backward from the last index
-        /// and remove the Modal loaded from <paramref name="resourcePath"/>
+        /// Searches through the <see cref="Modals"/> stack
+        /// and destroys the Modal loaded from <paramref name="resourcePath"/>
         /// that has been recently pushed into this container if any.
         /// </summary>
         /// <param name="resourcePath"></param>
@@ -264,19 +264,28 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <returns>
         /// True if there is a Modal loaded from this <paramref name="resourcePath"/>.
         /// </returns>
-        public bool RemoveRecentlyPushed(string resourcePath, out Modal modal)
+        public void DestroyRecentlyPushed(string resourcePath)
         {
             if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
             {
-                modal = default;
-                return false;
+                return;
             }
 
-            modal = _modals[index].View;
-            this.transform.RemoveChild(modal.transform);
+            var modal = _modals[index].View;
+            var modalId = modal.GetInstanceID();
             _modals.RemoveAt(index);
 
-            return true;
+            var backdrop = _backdrops[index];
+            _backdrops.RemoveAt(index);
+
+            Destroy(modal.gameObject);
+            Destroy(backdrop.gameObject);
+
+            if (_assetLoadHandles.TryGetValue(modalId, out var loadHandle))
+            {
+                AssetLoader.Release(loadHandle.Id);
+                _assetLoadHandles.Remove(modalId);
+            }
         }
 
         /// <summary>

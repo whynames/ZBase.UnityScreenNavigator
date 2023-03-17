@@ -218,7 +218,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Searchs through the <see cref="Screens"/> list backward from the last index
+        /// Searches through the <see cref="Screens"/> stack
         /// and returns the index of the Screen loaded from <paramref name="resourcePath"/>
         /// that has been recently pushed into this container if any.
         /// </summary>
@@ -248,8 +248,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <summary>
-        /// Searchs through the <see cref="Screens"/> list backward from the last index
-        /// and remove the Screen loaded from <paramref name="resourcePath"/>
+        /// Searches through the <see cref="Screens"/> stack
+        /// and destroys the Screen loaded from <paramref name="resourcePath"/>
         /// that has been recently pushed into this container if any.
         /// </summary>
         /// <param name="resourcePath"></param>
@@ -259,19 +259,24 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <returns>
         /// True if there is a Screen loaded from this <paramref name="resourcePath"/>.
         /// </returns>
-        public bool RemoveRecentlyPushed(string resourcePath, out Screen screen)
+        public void DestroyRecentlyPushed(string resourcePath)
         {
             if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
             {
-                screen = default;
-                return false;
+                return;
             }
 
-            screen = _screens[index].View;
-            this.transform.RemoveChild(screen.transform);
+            var screen = _screens[index].View;
+            var screenId = screen.GetInstanceID();
             _screens.RemoveAt(index);
 
-            return true;
+            Destroy(screen.gameObject);
+
+            if (_assetLoadHandles.TryGetValue(screenId, out var loadHandle))
+            {
+                AssetLoader.Release(loadHandle.Id);
+                _assetLoadHandles.Remove(screenId);
+            }
         }
 
         /// <summary>
