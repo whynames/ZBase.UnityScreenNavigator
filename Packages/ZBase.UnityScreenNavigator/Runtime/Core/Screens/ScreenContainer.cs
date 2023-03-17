@@ -253,15 +253,20 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// that has been recently pushed into this container if any.
         /// </summary>
         /// <param name="resourcePath"></param>
-        /// <param name="screen">
-        /// Returns the Screen loaded from this <paramref name="resourcePath"/> after it is removed.
-        /// </param>
+        /// <param name="ignoreTopmost">Do not destroy if it is the topmost screen.</param>
         /// <returns>
         /// True if there is a Screen loaded from this <paramref name="resourcePath"/>.
         /// </returns>
-        public void DestroyRecentlyPushed(string resourcePath)
+        public void DestroyRecentlyPushed(string resourcePath, bool ignoreTopmost = true)
         {
+            var topIndex = _screens.Count - 1;
+
             if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
+            {
+                return;
+            }
+
+            if (ignoreTopmost && topIndex == index)
             {
                 return;
             }
