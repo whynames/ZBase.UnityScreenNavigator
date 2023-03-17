@@ -101,6 +101,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 }
             }
 
+            sheets.Clear();
             _assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(_name);
 

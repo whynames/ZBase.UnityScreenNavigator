@@ -78,6 +78,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 }
             }
 
+            screens.Clear();
             assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(LayerName);
 

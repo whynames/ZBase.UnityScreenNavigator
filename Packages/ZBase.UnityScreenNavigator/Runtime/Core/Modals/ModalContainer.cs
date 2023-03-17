@@ -85,6 +85,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 }
             }
 
+            modals.Clear();
             assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(LayerName);
 
