@@ -232,6 +232,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// </returns>
         public bool FindIndexOfRecentlyPushed(string resourcePath, out int index)
         {
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
             var screens = _screens;
 
             for (var i = screens.Count - 1; i >= 0; i--)
@@ -259,6 +264,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// </returns>
         public void DestroyRecentlyPushed(string resourcePath, bool ignoreFront = true)
         {
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
             var frontIndex = _screens.Count - 1;
 
             if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
@@ -281,6 +291,124 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 AssetLoader.Release(loadHandle.Id);
                 _assetLoadHandles.Remove(screenId);
+            }
+        }
+
+        /// <summary>
+        /// Bring an instance of <see cref="Screen"/> to the front.
+        /// </summary>
+        /// <param name="ignoreFront">Ignore if the screen is already in the front.</param>
+        /// <remarks>Fire-and-forget</remarks>
+        public void BringToFront(ScreenOptions options, bool ignoreFront, params object[] args)
+        {
+            BringToFrontAndForget(options, ignoreFront, args).Forget();
+        }
+
+        /// <summary>
+        /// Bring an instance of <see cref="Screen"/> to the front.
+        /// </summary>
+        /// <param name="ignoreFront">Ignore if the screen is already in the front.</param>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask BringToFrontAsync(ScreenOptions options, bool ignoreFront, params object[] args)
+        {
+            await BringToFrontAsyncInternal(options, ignoreFront, args);
+        }
+
+        private async UniTaskVoid BringToFrontAndForget(ScreenOptions options, bool ignoreFront, Memory<object> args)
+        {
+            await BringToFrontAsyncInternal(options, ignoreFront, args);
+        }
+
+        private async UniTask BringToFrontAsyncInternal(ScreenOptions options, bool ignoreFront, Memory<object> args)
+        {
+            var resourcePath = options.options.resourcePath;
+
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
+            var frontIndex = _screens.Count - 1;
+
+            if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
+            {
+                return;
+            }
+
+            if (ignoreFront && frontIndex == index)
+            {
+                return;
+            }
+
+            var enterScreen = _screens[index].View;
+            var screenId = enterScreen.GetInstanceID();
+            _screens.RemoveAt(index);
+
+            RectTransform.RemoveChild(enterScreen.transform);
+
+            options.options.onLoaded?.Invoke(enterScreen, args);
+
+            await enterScreen.AfterLoadAsync(RectTransform, args);
+
+            var exitScreen = _screens.Count == 0 ? null : _screens[^1].View;
+            var exitScreenId = exitScreen == null ? (int?) null : exitScreen.GetInstanceID();
+
+            // Preprocess
+            foreach (var callbackReceiver in _callbackReceivers)
+            {
+                callbackReceiver.BeforePush(enterScreen, exitScreen, args);
+            }
+
+            if (exitScreen)
+            {
+                await exitScreen.BeforeExitAsync(true, args);
+            }
+
+            await enterScreen.BeforeEnterAsync(true, args);
+
+            // Play Animations
+            if (exitScreen)
+            {
+                await exitScreen.ExitAsync(true, options.options.playAnimation, enterScreen);
+            }
+
+            await enterScreen.EnterAsync(true, options.options.playAnimation, exitScreen);
+
+            // End Transition
+            if (_isActiveScreenStacked == false && exitScreenId.HasValue)
+            {
+                _screens.RemoveAt(_screens.Count - 1);
+            }
+
+            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath));
+            IsInTransition = false;
+
+            // Postprocess
+            if (exitScreen)
+            {
+                exitScreen.AfterExit(true, args);
+            }
+
+            enterScreen.AfterEnter(true, args);
+
+            foreach (var callbackReceiver in _callbackReceivers)
+            {
+                callbackReceiver.AfterPush(enterScreen, exitScreen, args);
+            }
+
+            // Unload unused Screen
+            if (_isActiveScreenStacked == false && exitScreenId.HasValue)
+            {
+                await exitScreen.BeforeReleaseAsync();
+
+                DestroyAndForget(exitScreen, exitScreenId.Value).Forget();
+            }
+
+            _isActiveScreenStacked = options.stack;
+
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            {
+                Interactable = true;
             }
         }
 

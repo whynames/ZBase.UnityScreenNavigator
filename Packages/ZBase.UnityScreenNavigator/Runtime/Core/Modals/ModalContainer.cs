@@ -242,6 +242,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// </returns>
         public bool FindIndexOfRecentlyPushed(string resourcePath, out int index)
         {
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
             var modals = _modals;
 
             for (var i = modals.Count - 1; i >= 0; i--)
@@ -269,6 +274,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// </returns>
         public void DestroyRecentlyPushed(string resourcePath, bool ignoreFront = true)
         {
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
             var frontIndex = _modals.Count - 1;
 
             if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
@@ -295,6 +305,117 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             {
                 AssetLoader.Release(loadHandle.Id);
                 _assetLoadHandles.Remove(modalId);
+            }
+        }
+
+        /// <summary>
+        /// Bring an instance of <see cref="Modal"/> to the front.
+        /// </summary>
+        /// <param name="ignoreFront">Ignore if the modal is already in the front.</param>
+        /// <remarks>Fire-and-forget</remarks>
+        public void BringToFront(ModalOptions options, bool ignoreFront, params object[] args)
+        {
+            BringToFrontAndForget(options, ignoreFront, args).Forget();
+        }
+
+        /// <summary>
+        /// Bring an instance of <see cref="Modal"/> to the front.
+        /// </summary>
+        /// <param name="ignoreFront">Ignore if the modal is already in the front.</param>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask BringToFrontAsync(ModalOptions options, bool ignoreFront, params object[] args)
+        {
+            await BringToFrontAsyncInternal(options, ignoreFront, args);
+        }
+
+        private async UniTaskVoid BringToFrontAndForget(ModalOptions options, bool ignoreFront, Memory<object> args)
+        {
+            await BringToFrontAsyncInternal(options, ignoreFront, args);
+        }
+
+        private async UniTask BringToFrontAsyncInternal(ModalOptions options, bool ignoreFront, Memory<object> args)
+        {
+            var resourcePath = options.options.resourcePath;
+
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
+            var frontIndex = _modals.Count - 1;
+
+            if (FindIndexOfRecentlyPushed(resourcePath, out var index) == false)
+            {
+                return;
+            }
+
+            if (ignoreFront && frontIndex == index)
+            {
+                return;
+            }
+
+            var enterModal = _modals[index].View;
+            var modalId = enterModal.GetInstanceID();
+            _modals.RemoveAt(index);
+
+            var backdrop = _backdrops[index];
+            _backdrops.RemoveAt(index);
+
+            RectTransform.RemoveChild(enterModal.transform);
+            RectTransform.RemoveChild(backdrop.transform);
+
+            backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
+            _backdrops.Add(backdrop);
+            
+            options.options.onLoaded?.Invoke(enterModal, args);
+
+            await enterModal.AfterLoadAsync(RectTransform, args);
+
+            var exitModal = _modals.Count == 0 ? null : _modals[^1].View;
+
+            // Preprocess
+            foreach (var callbackReceiver in _callbackReceivers)
+            {
+                callbackReceiver.BeforePush(enterModal, exitModal, args);
+            }
+
+            if (exitModal)
+            {
+                await exitModal.BeforeExitAsync(true, args);
+            }
+
+            await enterModal.BeforeEnterAsync(true, args);
+
+            // Play Animation
+            await backdrop.EnterAsync(options.options.playAnimation);
+
+            if (exitModal)
+            {
+                await exitModal.ExitAsync(true, options.options.playAnimation, enterModal);
+            }
+
+            await enterModal.EnterAsync(true, options.options.playAnimation, exitModal);
+
+            // End Transition
+            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath));
+            IsInTransition = false;
+
+            // Postprocess
+            if (exitModal)
+            {
+                exitModal.AfterExit(true, args);
+            }
+
+            enterModal.AfterEnter(true, args);
+
+            foreach (var callbackReceiver in _callbackReceivers)
+            {
+                callbackReceiver.AfterPush(enterModal, exitModal, args);
+            }
+
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            {
+                Interactable = true;
             }
         }
 
