@@ -47,7 +47,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// </summary>
         public IReadOnlyList<Modal> Modals => _modals;
 
-        public Window Current => _modals[^1];
+        public Modal Current => _modals[^1];
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
