@@ -180,7 +180,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             _activities.Add(resourcePath, activity);
 
             if (activity.TryGetTransform(out var transform))
-                transform.AddChild(transform);
+            {
+                this.transform.AddChild(transform);
+            }
         }
 
         private bool Remove(string resourcePath)
@@ -191,7 +193,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             if (_activities.TryGetValue(resourcePath, out var activity))
             {
                 if (activity.TryGetTransform(out var transform))
-                    transform.RemoveChild(transform);
+                {
+                    this.transform.RemoveChild(transform);
+                }
 
                 return _activities.Remove(resourcePath);
             }
@@ -231,12 +235,15 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         protected virtual int GetChildIndex(Transform child)
         {
-            Transform myTransform = transform;
+            var myTransform = this.transform;
             var count = myTransform.childCount;
+
             for (var i = count - 1; i >= 0; i--)
             {
                 if (myTransform.GetChild(i).Equals(child))
+                {
                     return i;
+                }
             }
 
             return -1;
