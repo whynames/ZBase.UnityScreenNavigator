@@ -14,8 +14,12 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         public Canvas Canvas { get; private set; }
 
+        protected ContainerLayerConfig Config { get; private set; }
+
         protected async UniTask InitializeAsync(ContainerLayerConfig config, IContainerLayerManager manager)
         {
+            Config = config ?? throw new ArgumentNullException(nameof(config));
+
             ContainerLayerManager = manager ?? throw new ArgumentNullException(nameof(manager));
             ContainerLayerManager.Add(this);
 
