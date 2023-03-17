@@ -47,6 +47,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// </summary>
         public IReadOnlyList<ViewRef<Modal>> Modals => _modals;
 
+        /// <summary>
+        /// Stacked backdrops.
+        /// </summary>
+        public IReadOnlyList<ModalBackdrop> Backdrops => _backdrops;
+
         public ViewRef<Modal> Current => _modals[^1];
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
