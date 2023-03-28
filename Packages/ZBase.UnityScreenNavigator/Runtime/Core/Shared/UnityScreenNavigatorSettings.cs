@@ -45,7 +45,7 @@ namespace ZBase.UnityScreenNavigator.Core
         [SerializeField] private AssetLoaderObject _assetLoader;
 
         [SerializeField] private bool _enableInteractionInTransition;
-        
+
         private IAssetLoader _defaultAssetLoader;
         private ModalBackdrop _defaultModalBackdrop;
 
@@ -152,27 +152,15 @@ namespace ZBase.UnityScreenNavigator.Core
         {
             get
             {
-#if UNITY_EDITOR
                 if (_instance == false)
                 {
-                    var asset = PlayerSettings.GetPreloadedAssets()
-                        .OfType<UnityScreenNavigatorSettings>()
-                        .FirstOrDefault();
-
+                    var asset = Resources.FindObjectsOfTypeAll<UnityScreenNavigatorSettings>().FirstOrDefault();
                     _instance = asset ? asset : CreateInstance<UnityScreenNavigatorSettings>();
                 }
 
                 return _instance;
-
-#else
-                if (_instance == false)
-                {
-                    _instance = CreateInstance<UnityScreenNavigatorSettings>();
-                }
-
-                return _instance;
-#endif
             }
+
             private set => _instance = value;
         }
 
