@@ -46,6 +46,8 @@ namespace ZBase.UnityScreenNavigator.Core
 
         [SerializeField] private bool _enableInteractionInTransition;
 
+        [SerializeField] private bool _disableModalBackdrop;
+        
         private IAssetLoader _defaultAssetLoader;
         private ModalBackdrop _defaultModalBackdrop;
 
@@ -140,6 +142,8 @@ namespace ZBase.UnityScreenNavigator.Core
         }
 
         public bool EnableInteractionInTransition => _enableInteractionInTransition;
+
+        public bool DisableModalBackdrop => _disableModalBackdrop;
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
