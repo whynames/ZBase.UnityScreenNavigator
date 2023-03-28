@@ -141,6 +141,13 @@ namespace ZBase.UnityScreenNavigator.Core
 
         public bool EnableInteractionInTransition => _enableInteractionInTransition;
 
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            _instance = null;
+        }
+
         public static UnityScreenNavigatorSettings Instance
         {
             get
