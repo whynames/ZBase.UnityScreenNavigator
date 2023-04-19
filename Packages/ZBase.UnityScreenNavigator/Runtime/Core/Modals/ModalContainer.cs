@@ -59,7 +59,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             for (var i = 0; i < modalCount; i++)
             {
-                var modal = modals[i].View;
+                var modal = modals[i];
                 DestroyAndForget(modal).Forget();
             }
 
@@ -70,7 +70,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             for (var i = 0; i < backdropCount; i++)
             {
-                var backdrop = backdrops[i].View;
+                var backdrop = backdrops[i];
                 DestroyAndForget(backdrop).Forget();
             }
 
@@ -282,7 +282,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 return;
             }
 
-            var modal = _modals[index].View;
+            var modal = _modals[index];
             _modals.RemoveAt(index);
 
             ViewRef<ModalBackdrop>? backdrop = null;
@@ -297,7 +297,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             if (backdrop.HasValue)
             {
-                DestroyAndForget(backdrop.Value.View).Forget();
+                DestroyAndForget(backdrop.Value).Forget();
             }
         }
 
@@ -611,7 +611,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             var lastModalIndex = _modals.Count - 1;
-            var exitModal = _modals[lastModalIndex].View;
+            var exitModalRef = _modals[lastModalIndex];
+            var exitModal = exitModalRef.View;
             exitModal.Settings = Settings;
 
             var enterModal = _modals.Count == 1 ? null : _modals[^2].View;
@@ -679,11 +680,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             // Unload unused Modal
             await exitModal.BeforeReleaseAsync();
 
-            DestroyAndForget(exitModal).Forget();
+            DestroyAndForget(exitModalRef).Forget();
 
             if (backdrop.HasValue)
             {
-                DestroyAndForget(backdrop.Value.View).Forget();
+                DestroyAndForget(backdrop.Value).Forget();
             }
 
             if (Settings.EnableInteractionInTransition == false)

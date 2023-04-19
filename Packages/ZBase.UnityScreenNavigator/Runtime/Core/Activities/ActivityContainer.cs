@@ -189,7 +189,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             return _activities.TryGetValue(resourcePath, out activity);
         }
 
-        public bool TryGet<T>(string resourcePath, out T activity) where T : Activity
+        public bool TryGet<T>(string resourcePath, out T activity)
+            where T : Activity
         {
             if (_activities.TryGetValue(resourcePath, out var otherActivity))
             {
@@ -208,7 +209,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         {
             foreach (var kv in _activities)
             {
-                DestroyAndForget(kv.Value).Forget();
+                DestroyAndForget(new ViewRef(kv.Value, kv.Key)).Forget();
             }
 
             _activities.Clear();
@@ -394,7 +395,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             // Unload unused Activity
             await activity.BeforeReleaseAsync();
 
-            DestroyAndForget(activity).Forget();
+            DestroyAndForget(new ViewRef(activity, resourcePath)).Forget();
 
             if (Settings.EnableInteractionInTransition == false)
             {

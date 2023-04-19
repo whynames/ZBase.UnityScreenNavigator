@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
@@ -10,7 +10,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     public abstract class ContainerLayer : Window, IContainerLayer
     {
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _viewIdToHandle = new();
+        private readonly Dictionary<string, Queue<GameObject>> _resourcePathToPool = new();
 
         private IAssetLoader _assetLoader;
 
@@ -30,6 +31,11 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         {
             get => _assetLoader ?? Settings.AssetLoader;
             set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        protected bool EnablePooling
+        {
+            get => Settings.EnablePooling;
         }
 
         protected ContainerLayerConfig Config { get; private set; }
@@ -58,10 +64,40 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             Canvas = canvas;
 
+            InitializePool(canvas);
             OnInitialize();
         }
 
         protected virtual void OnInitialize() { }
+
+        private void InitializePool(Canvas canvas)
+        {
+            if (EnablePooling == false)
+            {
+                return;
+            }
+
+            var parentTransform = this.transform.parent;
+
+            var poolGO = new GameObject(
+                $"[Pool] {this.name}"
+                , typeof(Canvas)
+                , typeof(CanvasGroup)
+            );
+
+            PoolTransform = poolGO.GetOrAddComponent<RectTransform>();
+            PoolTransform.SetParent(parentTransform, false);
+
+            var poolCanvas = poolGO.GetComponent<Canvas>();
+            poolCanvas.overrideSorting = true;
+            poolCanvas.sortingLayerID = canvas.sortingLayerID;
+            poolCanvas.sortingOrder = canvas.sortingOrder;
+
+            var poolCanvasGroup = poolGO.GetComponent<CanvasGroup>();
+            poolCanvasGroup.alpha = 0f;
+            poolCanvasGroup.blocksRaycasts = false;
+            poolCanvasGroup.interactable = false;
+        }
 
         /// <summary>
         /// Preload a prefab of <see cref="Activity"/>.
@@ -135,6 +171,11 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         protected async UniTask<T> GetViewAsync<T>(string resourcePath, bool loadAsync)
             where T : View
         {
+            if (EnablePooling && GetFromPool<T>(resourcePath, out var existView))
+            {
+                return existView;
+            }
+
             var assetLoadHandle = loadAsync
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
@@ -164,24 +205,73 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             view.Settings = Settings;
 
             var id = view.GetInstanceID();
-            _assetLoadHandles.Add(id, assetLoadHandle);
+            _viewIdToHandle[id] = assetLoadHandle;
 
             return view;
         }
 
-        protected async UniTaskVoid DestroyAndForget(UIBehaviour view)
+        protected async UniTaskVoid DestroyAndForget(ViewRef viewRef)
         {
+            if (EnablePooling)
+            {
+                ReturnToPool(viewRef);
+                return;
+            }
+
+            var view = viewRef.View;
             var id = view.GetInstanceID();
 
             Destroy(view.gameObject);
-
             await UniTask.NextFrame();
 
-            if (_assetLoadHandles.TryGetValue(id, out var loadHandle))
+            if (_viewIdToHandle.TryGetValue(id, out var loadHandle))
             {
                 AssetLoader.Release(loadHandle.Id);
-                _assetLoadHandles.Remove(id);
+                _viewIdToHandle.Remove(id);
             }
+        }
+
+        private bool GetFromPool<T>(string resourcePath, out T view)
+            where T : View
+        {
+            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool)
+                && pool.TryDequeue(out var go)
+            )
+            {
+                if (go.TryGetComponent<T>(out view))
+                {
+                    view.Settings = Settings;
+                    go.SetActive(true);
+                    return true;
+                }
+
+                Destroy(go);
+            }
+
+            view = default;
+            return false;
+        }
+
+        private void ReturnToPool(ViewRef viewRef)
+        {
+            var resourcePathToPool = _resourcePathToPool;
+
+            if (resourcePathToPool.TryGetValue(viewRef.ResourcePath, out var pool) == false)
+            {
+                resourcePathToPool[viewRef.ResourcePath] = pool = new Queue<GameObject>();
+            }
+
+            var view = viewRef.View;
+
+            if (view.Owner == false)
+            {
+                return;
+            }
+
+            view.RectTransform.SetParent(PoolTransform);
+            view.Parent = PoolTransform;
+            view.Owner.SetActive(false);
+            pool.Enqueue(view.Owner);
         }
     }
 }

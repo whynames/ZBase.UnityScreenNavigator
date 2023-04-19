@@ -52,7 +52,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             for (var i = 0; i < count; i++)
             {
-                var screen = screens[i].View;
+                var screen = screens[i];
                 DestroyAndForget(screen).Forget();
             }
 
@@ -258,7 +258,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 return;
             }
 
-            var screen = _screens[index].View;
+            var screen = _screens[index];
             _screens.RemoveAt(index);
 
             DestroyAndForget(screen).Forget();
@@ -322,8 +322,9 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             await enterScreen.AfterLoadAsync(RectTransform, args);
 
-            var exitScreen = _screens.Count == 0 ? null : _screens[^1].View;
-            var exitScreenId = exitScreen == null ? (int?) null : exitScreen.GetInstanceID();
+            ViewRef<Screen>? exitScreenRef = _screens.Count == 0 ? null : _screens[^1];
+            Screen exitScreen = exitScreenRef.HasValue ? exitScreenRef.Value.View : null;
+            var exitScreenId = exitScreen == false ? (int?) null : exitScreen.GetInstanceID();
 
             if (exitScreen)
             {
@@ -374,11 +375,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             // Unload unused Screen
-            if (_isActiveScreenStacked == false && exitScreenId.HasValue)
+            if (_isActiveScreenStacked == false && exitScreenRef.HasValue)
             {
                 await exitScreen.BeforeReleaseAsync();
 
-                DestroyAndForget(exitScreen).Forget();
+                DestroyAndForget(exitScreenRef.Value).Forget();
             }
 
             _isActiveScreenStacked = options.stack;
@@ -461,7 +462,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             await enterScreen.AfterLoadAsync(RectTransform, args);
 
-            var exitScreen = _screens.Count == 0 ? null : _screens[^1].View;
+            ViewRef<Screen>? exitScreenRef = _screens.Count == 0 ? null : _screens[^1];
+            Screen exitScreen = exitScreenRef.HasValue ? exitScreenRef.Value.View : null;
             var exitScreenId = exitScreen == null ? (int?) null : exitScreen.GetInstanceID();
 
             if (exitScreen)
@@ -513,11 +515,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             // Unload unused Screen
-            if (_isActiveScreenStacked == false && exitScreenId.HasValue)
+            if (_isActiveScreenStacked == false && exitScreenRef.HasValue)
             {
                 await exitScreen.BeforeReleaseAsync();
 
-                DestroyAndForget(exitScreen).Forget();
+                DestroyAndForget(exitScreenRef.Value).Forget();
             }
 
             _isActiveScreenStacked = options.stack;
@@ -568,7 +570,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             var lastScreen = _screens.Count - 1;
-            var exitScreen = _screens[lastScreen].View;
+            var exitScreenRef = _screens[lastScreen];
+            var exitScreen = exitScreenRef.View;
             exitScreen.Settings = Settings;
 
             var enterScreen = _screens.Count == 1 ? null : _screens[^2].View;
@@ -619,7 +622,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             // Unload unused Screen
             await exitScreen.BeforeReleaseAsync();
 
-            DestroyAndForget(exitScreen).Forget();
+            DestroyAndForget(exitScreenRef).Forget();
 
             _isActiveScreenStacked = true;
             

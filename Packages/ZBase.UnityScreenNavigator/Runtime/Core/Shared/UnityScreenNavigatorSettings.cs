@@ -61,6 +61,8 @@ namespace ZBase.UnityScreenNavigator.Core
 
         [SerializeField] private AssetLoaderObject _assetLoader;
 
+        [SerializeField] private bool _enablePooling;
+
         [SerializeField] private bool _enableInteractionInTransition;
 
         [SerializeField] private bool _disableModalBackdrop;
@@ -148,6 +150,8 @@ namespace ZBase.UnityScreenNavigator.Core
                 return _defaultAssetLoader;
             }
         }
+
+        public bool EnablePooling => _enablePooling;
 
         public bool EnableInteractionInTransition => _enableInteractionInTransition;
 
