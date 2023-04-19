@@ -73,7 +73,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     
         public virtual GameObject Owner
         {
-            get { return IsDestroyed() ? null : gameObject; }
+            get { return IsDestroyed() ? null : this.gameObject; }
         }
 
         public virtual bool ActiveSelf

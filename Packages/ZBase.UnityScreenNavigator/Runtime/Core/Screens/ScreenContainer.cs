@@ -47,13 +47,15 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
         protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             var screens = _screens;
             var count = screens.Count;
 
             for (var i = 0; i < count; i++)
             {
                 var (screen, resourcePath) = screens[i];
-                DestroyAndForget(new ViewRef(screen, resourcePath, true)).Forget();
+                DestroyAndForget(new ViewRef(screen, resourcePath, PoolingPolicy.DisablePooling)).Forget();
             }
 
             screens.Clear();
@@ -358,7 +360,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 _screens.RemoveAt(_screens.Count - 1);
             }
 
-            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath, options.options.ignorePoolingSetting));
+            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath, options.options.poolingPolicy));
             IsInTransition = false;
 
             // Postprocess
@@ -457,7 +459,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 Interactable = false;
             }
 
-            var enterScreen = await GetViewAsync<TScreen>(resourcePath, options.options.loadAsync);
+            var enterScreen = await GetViewAsync<TScreen>(resourcePath, options.options);
             options.options.onLoaded?.Invoke(enterScreen, args);
 
             await enterScreen.AfterLoadAsync(RectTransform, args);
@@ -498,7 +500,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 _screens.RemoveAt(_screens.Count - 1);
             }
 
-            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath, options.options.ignorePoolingSetting));
+            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath, options.options.poolingPolicy));
             IsInTransition = false;
 
             // Postprocess

@@ -4,17 +4,17 @@ namespace ZBase.UnityScreenNavigator.Core
 {
     public readonly struct ViewRef<T> where T : View
     {
-        public readonly bool IgnorePoolingSetting;
+        public readonly PoolingPolicy PoolingPolicy;
         public readonly T View;
         public readonly string ResourcePath;
 
         public ViewRef(
               T view
             , string resourcePath
-            , bool ignorePoolingSetting
+            , PoolingPolicy poolingPolicy
         )
         {
-            IgnorePoolingSetting = ignorePoolingSetting;
+            PoolingPolicy = poolingPolicy;
             View = view;
             ResourcePath = resourcePath;
         }
@@ -28,31 +28,31 @@ namespace ZBase.UnityScreenNavigator.Core
         public void Deconstruct(
               out T view
             , out string resourcePath
-            , out bool ignorePoolingSetting
+            , out PoolingPolicy poolingPolicy
         )
         {
             view = View;
             resourcePath = ResourcePath;
-            ignorePoolingSetting = IgnorePoolingSetting;
+            poolingPolicy = PoolingPolicy;
         }
 
         public static implicit operator ViewRef(ViewRef<T> value)
-            => new ViewRef(value.View, value.ResourcePath, value.IgnorePoolingSetting);
+            => new ViewRef(value.View, value.ResourcePath, value.PoolingPolicy);
     }
 
     public readonly struct ViewRef
     {
-        public readonly bool IgnorePoolingSetting;
+        public readonly PoolingPolicy PoolingPolicy;
         public readonly View View;
         public readonly string ResourcePath;
 
         public ViewRef(
               View view
             , string resourcePath
-            , bool ignorePoolingSetting
+            , PoolingPolicy poolingPolicy
         )
         {
-            IgnorePoolingSetting = ignorePoolingSetting;
+            PoolingPolicy = poolingPolicy;
             View = view;
             ResourcePath = resourcePath;
         }
@@ -66,12 +66,12 @@ namespace ZBase.UnityScreenNavigator.Core
         public void Deconstruct(
               out View view
             , out string resourcePath
-            , out bool ignorePoolingSetting
+            , out PoolingPolicy poolingPolicy
         )
         {
             view = View;
             resourcePath = ResourcePath;
-            ignorePoolingSetting = IgnorePoolingSetting;
+            poolingPolicy = PoolingPolicy;
         }
     }
 }

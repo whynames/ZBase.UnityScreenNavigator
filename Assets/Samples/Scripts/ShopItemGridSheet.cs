@@ -101,7 +101,7 @@ namespace Demo.Scripts
             var options = new WindowOptions(
                   ResourceKey.CharacterModalPrefab()
                 , playAnimation: true
-                , ignorePoolingSetting: true
+                , poolingPolicy: PoolingPolicy.DisablePooling
                 , onLoaded: (modal, args) => {
                     var characterModal = (CharacterModal) modal;
                     characterModal.Setup(_characterId);

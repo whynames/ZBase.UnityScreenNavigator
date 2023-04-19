@@ -54,13 +54,15 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
         protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             var modals = _modals;
             var modalCount = modals.Count;
 
             for (var i = 0; i < modalCount; i++)
             {
                 var (modal, resourcePath) = modals[i];
-                DestroyAndForget(new ViewRef(modal, resourcePath, true)).Forget();
+                DestroyAndForget(new ViewRef(modal, resourcePath, PoolingPolicy.DisablePooling)).Forget();
             }
 
             modals.Clear();
@@ -71,7 +73,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             for (var i = 0; i < backdropCount; i++)
             {
                 var (backdrop, resourcePath) = backdrops[i];
-                DestroyAndForget(new ViewRef(backdrop, resourcePath, true)).Forget();
+                DestroyAndForget(new ViewRef(backdrop, resourcePath, PoolingPolicy.DisablePooling)).Forget();
             }
 
             backdrops.Clear();
@@ -410,7 +412,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.EnterAsync(true, options.options.playAnimation, exitModal);
 
             // End Transition
-            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath, options.options.ignorePoolingSetting));
+            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath, options.options.poolingPolicy));
             IsInTransition = false;
 
             // Postprocess
@@ -504,12 +506,19 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             if (_disableBackdrop == false)
             {
                 var backdropResourcePath = GetBackdropResourcePath(options.modalBackdropResourcePath);
-                backdrop = await GetViewAsync<ModalBackdrop>(backdropResourcePath, options.options.loadAsync);
+                var backdropOptions = new WindowOptions(
+                      resourcePath: backdropResourcePath
+                    , playAnimation: options.options.playAnimation
+                    , loadAsync: options.options.loadAsync
+                    , poolingPolicy: PoolingPolicy.UseSettings
+                );
+
+                backdrop = await GetViewAsync<ModalBackdrop>(backdropResourcePath, backdropOptions);
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
-                _backdrops.Add(new ViewRef<ModalBackdrop>(backdrop, backdropResourcePath, false));
+                _backdrops.Add(new ViewRef<ModalBackdrop>(backdrop, backdropResourcePath, backdropOptions.poolingPolicy));
             }
 
-            var enterModal = await GetViewAsync<TModal>(resourcePath, options.options.loadAsync);
+            var enterModal = await GetViewAsync<TModal>(resourcePath, options.options);
             options.options.onLoaded?.Invoke(enterModal, args);
 
             await enterModal.AfterLoadAsync(RectTransform, args);
@@ -549,7 +558,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.EnterAsync(true, options.options.playAnimation, exitModal);
 
             // End Transition
-            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath, options.options.ignorePoolingSetting));
+            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath, options.options.poolingPolicy));
             IsInTransition = false;
 
             // Postprocess

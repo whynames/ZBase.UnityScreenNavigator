@@ -143,7 +143,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             _callbackReceivers.Remove(callbackReceiver);
         }
 
-        private void Add(string resourcePath, Activity activity, bool ignorePoolingSetting)
+        private void Add(string resourcePath, Activity activity, PoolingPolicy poolingPolicy)
         {
             if (resourcePath == null)
                 throw new ArgumentNullException(nameof(resourcePath));
@@ -158,7 +158,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 return;
             }
 
-            viewRef = new ViewRef<Activity>(activity, resourcePath, ignorePoolingSetting);
+            viewRef = new ViewRef<Activity>(activity, resourcePath, poolingPolicy);
             _activities.Add(resourcePath, viewRef);
 
             if (activity.TryGetTransform(out var transform))
@@ -208,9 +208,11 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             foreach (var (activity, resourcePath) in _activities.Values)
             {
-                DestroyAndForget(new ViewRef(activity, resourcePath, true)).Forget();
+                DestroyAndForget(new ViewRef(activity, resourcePath, PoolingPolicy.DisablePooling)).Forget();
             }
 
             _activities.Clear();
@@ -301,8 +303,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 Interactable = false;
             }
 
-            var activity = await GetViewAsync<TActivity>(resourcePath, options.options.loadAsync);
-            Add(resourcePath, activity, options.options.ignorePoolingSetting);
+            var activity = await GetViewAsync<TActivity>(resourcePath, options.options);
+            Add(resourcePath, activity, options.options.poolingPolicy);
             options.options.onLoaded?.Invoke(activity, args);
 
             await activity.AfterLoadAsync(RectTransform, args);
@@ -397,7 +399,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             // Unload unused Activity
             await activity.BeforeReleaseAsync();
 
-            DestroyAndForget(new ViewRef(activity, resourcePath, viewRef.IgnorePoolingSetting)).Forget();
+            DestroyAndForget(new ViewRef(activity, resourcePath, viewRef.PoolingPolicy)).Forget();
 
             if (Settings.EnableInteractionInTransition == false)
             {

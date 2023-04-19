@@ -27,10 +27,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             , bool loadAsync = true
             , in SortingLayerId? sortingLayer = null
             , in int? orderInLayer = null
-            , bool ignorePoolingSetting = false
+            , PoolingPolicy poolingPolicy = PoolingPolicy.UseSettings
         )
         {
-            this.options = new(resourcePath, playAnimation, onLoaded, loadAsync, ignorePoolingSetting);
+            this.options = new(resourcePath, playAnimation, onLoaded, loadAsync, poolingPolicy);
             this.sortingLayer = sortingLayer;
             this.orderInLayer = orderInLayer;
         }

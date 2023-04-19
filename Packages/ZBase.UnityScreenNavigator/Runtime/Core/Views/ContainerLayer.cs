@@ -11,7 +11,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     {
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _viewIdToHandle = new();
-        private readonly Dictionary<string, Queue<GameObject>> _resourcePathToPool = new();
+        private readonly Dictionary<string, Queue<View>> _resourcePathToPool = new();
 
         private IAssetLoader _assetLoader;
 
@@ -41,6 +41,19 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         protected ContainerLayerConfig Config { get; private set; }
 
         protected RectTransform PoolTransform { get; private set; }
+
+        protected override void OnDestroy()
+        {
+            foreach (var (resourcePath, pool) in _resourcePathToPool)
+            {
+                while (pool.TryDequeue(out var view))
+                {
+                    DestroyAndForget(new ViewRef(view, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                }
+            }
+
+            _resourcePathToPool.Clear();
+        }
 
         protected void Initialize(ContainerLayerConfig config, IContainerLayerManager manager)
         {
@@ -168,15 +181,15 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             AssetLoader.Release(handle.Id);
         }
 
-        protected async UniTask<T> GetViewAsync<T>(string resourcePath, bool loadAsync)
+        protected async UniTask<T> GetViewAsync<T>(string resourcePath, WindowOptions options)
             where T : View
         {
-            if (EnablePooling && GetFromPool<T>(resourcePath, out var existView))
+            if (GetFromPool<T>(resourcePath, options.poolingPolicy, out var existView))
             {
                 return existView;
             }
 
-            var assetLoadHandle = loadAsync
+            var assetLoadHandle = options.loadAsync
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
@@ -212,7 +225,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         protected async UniTaskVoid DestroyAndForget(ViewRef viewRef)
         {
-            if (EnablePooling && ReturnToPool(viewRef))
+            if (ReturnToPool(viewRef))
             {
                 return;
             }
@@ -220,7 +233,11 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             var view = viewRef.View;
             var id = view.GetInstanceID();
 
-            Destroy(view.gameObject);
+            if (view && view.gameObject)
+            {
+                Destroy(view.gameObject);
+            }
+
             await UniTask.NextFrame();
 
             if (_viewIdToHandle.TryGetValue(id, out var loadHandle))
@@ -230,21 +247,26 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             }
         }
 
-        private bool GetFromPool<T>(string resourcePath, out T view)
+        private bool GetFromPool<T>(string resourcePath, PoolingPolicy poolingPolicy, out T view)
             where T : View
         {
-            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool)
-                && pool.TryDequeue(out var go)
+            if (CanPool(poolingPolicy)
+                && _resourcePathToPool.TryGetValue(resourcePath, out var pool)
+                && pool.TryDequeue(out var typelessView)
             )
             {
-                if (go.TryGetComponent<T>(out view))
+                if (typelessView is T typedView)
                 {
+                    view = typedView;
                     view.Settings = Settings;
-                    go.SetActive(true);
+                    view.Owner.SetActive(true);
                     return true;
                 }
 
-                Destroy(go);
+                if (typelessView && typelessView.gameObject)
+                {
+                    Destroy(typelessView.Owner);
+                }
             }
 
             view = default;
@@ -253,7 +275,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         private bool ReturnToPool(ViewRef viewRef)
         {
-            if (viewRef.IgnorePoolingSetting)
+            if (CanPool(viewRef.PoolingPolicy) == false)
             {
                 return false;
             }
@@ -262,7 +284,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             if (resourcePathToPool.TryGetValue(viewRef.ResourcePath, out var pool) == false)
             {
-                resourcePathToPool[viewRef.ResourcePath] = pool = new Queue<GameObject>();
+                resourcePathToPool[viewRef.ResourcePath] = pool = new Queue<View>();
             }
 
             var view = viewRef.View;
@@ -275,8 +297,19 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             view.RectTransform.SetParent(PoolTransform);
             view.Parent = PoolTransform;
             view.Owner.SetActive(false);
-            pool.Enqueue(view.Owner);
+            pool.Enqueue(view);
             return true;
+        }
+
+        private bool CanPool(PoolingPolicy poolingPolicy)
+        {
+            if (poolingPolicy == PoolingPolicy.DisablePooling)
+                return false;
+
+            if (poolingPolicy == PoolingPolicy.EnablePooling)
+                return true;
+
+            return EnablePooling;
         }
     }
 }

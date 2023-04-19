@@ -8,7 +8,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     {
         public readonly bool loadAsync;
         public readonly bool playAnimation;
-        public readonly bool ignorePoolingSetting;
+        public readonly PoolingPolicy poolingPolicy;
         public readonly string resourcePath;
         public readonly OnLoadCallback onLoaded;
 
@@ -17,12 +17,12 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             , bool playAnimation = true
             , OnLoadCallback onLoaded = null
             , bool loadAsync = true
-            , bool ignorePoolingSetting = false
+            , PoolingPolicy poolingPolicy = PoolingPolicy.UseSettings
         )
         {
             this.loadAsync = loadAsync;
             this.playAnimation = playAnimation;
-            this.ignorePoolingSetting = ignorePoolingSetting;
+            this.poolingPolicy = poolingPolicy;
             this.resourcePath = resourcePath;
             this.onLoaded = onLoaded;
         }
