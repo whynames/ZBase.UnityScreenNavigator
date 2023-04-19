@@ -80,7 +80,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         {
             _callbackReceivers.AddRange(GetComponents<ISheetContainerCallbackReceiver>());
 
-            s_instanceCacheByName.Add(_name, this);
+            s_instanceCacheByName[_name] = this;
             _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
         }
 
