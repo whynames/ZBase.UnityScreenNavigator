@@ -104,10 +104,6 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <summary>
         /// Create a new instance of <see cref="ActivityContainer"/> as a layer
         /// </summary>
-        /// <param name="layerName"></param>
-        /// <param name="layer"></param>
-        /// <param name="layerType"></param>
-        /// <returns></returns>
         public static async UniTask<ActivityContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
         {
             var root = new GameObject(
