@@ -175,6 +175,14 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             return false;
         }
 
+        [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
+        public static async UniTask<ModalContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        {
+            var container = Create(layerConfig, manager);
+            await UniTask.NextFrame();
+            return container;
+        }
+
         /// <summary>
         /// Create a new <see cref="ModalContainer" /> as a layer.
         /// </summary>

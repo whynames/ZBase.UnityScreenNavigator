@@ -98,6 +98,14 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             return false;
         }
 
+        [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
+        public static async UniTask<ActivityContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        {
+            var container = Create(layerConfig, manager);
+            await UniTask.NextFrame();
+            return container;
+        }
+
         /// <summary>
         /// Create a new instance of <see cref="ActivityContainer"/> as a layer
         /// </summary>

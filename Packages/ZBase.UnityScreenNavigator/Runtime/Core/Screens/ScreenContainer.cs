@@ -151,6 +151,14 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             return false;
         }
 
+        [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
+        public static async UniTask<ScreenContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        {
+            var container = Create(layerConfig, manager);
+            await UniTask.NextFrame();
+            return container;
+        }
+
         /// <summary>
         /// Create a new <see cref="ScreenContainer"/> as a layer.
         /// </summary>
