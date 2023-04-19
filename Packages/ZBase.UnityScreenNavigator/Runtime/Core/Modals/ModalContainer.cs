@@ -18,11 +18,12 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
         [SerializeField] private ModalBackdrop _overrideBackdropPrefab;
 
+        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+
         private readonly List<ModalBackdrop> _backdrops = new();
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
 
         private ModalBackdrop _backdropPrefab;
         private IAssetLoader _assetLoader;

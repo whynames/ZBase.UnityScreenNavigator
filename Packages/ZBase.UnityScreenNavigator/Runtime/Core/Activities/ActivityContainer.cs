@@ -15,8 +15,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         private static Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
 
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadHandles = new();
+        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+
         private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<string, Activity> _activities = new();
 
@@ -518,7 +519,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <remarks>Asynchronous</remarks>
         public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true)
         {
-            if (_preloadHandles.ContainsKey(resourcePath))
+            if (_preloadedResourceHandles.ContainsKey(resourcePath))
             {
                 Debug.LogError($"The resource at `{resourcePath}` has already been preloaded.");
                 return;
@@ -528,7 +529,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
-            _preloadHandles.Add(resourcePath, assetLoadHandle);
+            _preloadedResourceHandles.Add(resourcePath, assetLoadHandle);
 
             if (assetLoadHandle.IsDone == false)
             {
@@ -543,12 +544,12 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         public bool IsPreloadRequested(string resourcePath)
         {
-            return _preloadHandles.ContainsKey(resourcePath);
+            return _preloadedResourceHandles.ContainsKey(resourcePath);
         }
 
         public bool IsPreloaded(string resourcePath)
         {
-            if (_preloadHandles.TryGetValue(resourcePath, out var handle) == false)
+            if (_preloadedResourceHandles.TryGetValue(resourcePath, out var handle) == false)
             {
                 return false;
             }
@@ -558,7 +559,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         public void ReleasePreloaded(string resourcePath)
         {
-            if (_preloadHandles.TryGetValue(resourcePath, out var handle) == false)
+            if (_preloadedResourceHandles.TryGetValue(resourcePath, out var handle) == false)
             {
                 Debug.LogError($"The resource at `{resourcePath}` is not preloaded.");
                 return;

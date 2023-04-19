@@ -16,10 +16,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
 
+        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Screen>> _screens = new();
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
 
         private bool _isActiveScreenStacked;
         private IAssetLoader _assetLoader;
