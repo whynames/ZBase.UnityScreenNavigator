@@ -34,15 +34,15 @@ namespace Demo.Scripts
                 switch (layer.layerType)
                 {
                     case ContainerLayerType.Modal:
-                        await ModalContainer.CreateAsync(layer, manager);
+                        ModalContainer.Create(layer, manager);
                         break;
 
                     case ContainerLayerType.Screen:
-                        await ScreenContainer.CreateAsync(layer, manager);
+                        ScreenContainer.Create(layer, manager);
                         break;
 
                     case ContainerLayerType.Activity:
-                        await ActivityContainer.CreateAsync(layer, manager);
+                        ActivityContainer.Create(layer, manager);
                         break;
                 }
             }

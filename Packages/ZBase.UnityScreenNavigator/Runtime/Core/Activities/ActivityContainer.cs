@@ -116,7 +116,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <summary>
         /// Create a new instance of <see cref="ActivityContainer"/> as a layer
         /// </summary>
-        public static async UniTask<ActivityContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        public static ActivityContainer Create(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
         {
             var root = new GameObject(
                   layerConfig.name
@@ -134,7 +134,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             rectTransform.localPosition = Vector3.zero;
 
             var container = root.GetOrAddComponent<ActivityContainer>();
-            await container.InitializeAsync(layerConfig, manager);
+            container.Initialize(layerConfig, manager);
 
             s_instanceCacheByName.Add(container.LayerName, container);
             return container;

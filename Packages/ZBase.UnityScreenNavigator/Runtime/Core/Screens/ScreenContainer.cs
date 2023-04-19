@@ -175,7 +175,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <summary>
         /// Create a new <see cref="ScreenContainer"/> as a layer.
         /// </summary>
-        public static async UniTask<ScreenContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        public static ScreenContainer Create(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
         {
             var root = new GameObject(
                   layerConfig.name
@@ -193,7 +193,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             rectTransform.localPosition = Vector3.zero;
 
             var container = root.AddComponent<ScreenContainer>();
-            await container.InitializeAsync(layerConfig, manager);
+            container.Initialize(layerConfig, manager);
 
             s_instanceCacheByName.Add(container.LayerName, container);
             return container;

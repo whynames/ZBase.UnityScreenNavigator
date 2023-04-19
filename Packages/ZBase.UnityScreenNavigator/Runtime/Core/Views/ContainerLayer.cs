@@ -1,5 +1,4 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
@@ -18,15 +17,13 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         protected UnityScreenNavigatorSettings Settings { get; private set; }
 
-        protected async UniTask InitializeAsync(ContainerLayerConfig config, IContainerLayerManager manager)
+        protected void Initialize(ContainerLayerConfig config, IContainerLayerManager manager)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             Settings = UnityScreenNavigatorSettings.Instance;
 
             ContainerLayerManager = manager ?? throw new ArgumentNullException(nameof(manager));
             ContainerLayerManager.Add(this);
-
-            await UniTask.DelayFrame(1);
 
             LayerName = config.name;
             LayerType = config.layerType;
