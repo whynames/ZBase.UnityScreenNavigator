@@ -90,7 +90,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 return;
             }
 
-            var parentTransform = this.transform.parent;
+            var parentTransform = this.transform.parent.GetComponent<RectTransform>();
 
             var poolGO = new GameObject(
                 $"[Pool] {this.name}"
@@ -100,6 +100,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             PoolTransform = poolGO.GetOrAddComponent<RectTransform>();
             PoolTransform.SetParent(parentTransform, false);
+            PoolTransform.FillParent(parentTransform);
 
             var poolCanvas = poolGO.GetComponent<Canvas>();
             poolCanvas.overrideSorting = true;
