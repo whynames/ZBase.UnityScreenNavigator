@@ -34,7 +34,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// </summary>
         public IAssetLoader AssetLoader
         {
-            get => _assetLoader ?? UnityScreenNavigatorSettings.Instance.AssetLoader;
+            get => _assetLoader ?? Settings.AssetLoader;
             set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
         }
 
@@ -69,9 +69,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             _backdropPrefab = _overrideBackdropPrefab
                 ? _overrideBackdropPrefab
-                : UnityScreenNavigatorSettings.Instance.ModalBackdropPrefab;
+                : Settings.ModalBackdropPrefab;
 
-            _disableBackdrop = UnityScreenNavigatorSettings.Instance.DisableModalBackdrop;
+            _disableBackdrop = Settings.DisableModalBackdrop;
         }
 
         protected override void OnDestroy()
@@ -355,6 +355,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             var enterModal = _modals[index].View;
+            enterModal.Settings = Settings;
+
             var modalId = enterModal.GetInstanceID();
             _modals.RemoveAt(index);
             RectTransform.RemoveChild(enterModal.transform);
@@ -368,6 +370,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 RectTransform.RemoveChild(backdrop.transform);
 
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
+                backdrop.Settings = Settings;
+
                 _backdrops.Add(backdrop);
             }
 
@@ -376,6 +380,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.AfterLoadAsync(RectTransform, args);
 
             var exitModal = _modals.Count == 0 ? null : _modals[^1].View;
+
+            if (exitModal)
+            {
+                exitModal.Settings = Settings;
+            }
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -421,7 +430,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 callbackReceiver.AfterPush(enterModal, exitModal, args);
             }
 
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
@@ -489,7 +498,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             IsInTransition = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
@@ -514,6 +523,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             {
                 backdrop = Instantiate(_backdropPrefab);
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
+                backdrop.Settings = Settings;
+
                 _backdrops.Add(backdrop);
             }
 
@@ -530,6 +541,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 return;
             }
 
+            enterModal.Settings = Settings;
+
             var modalId = enterModal.GetInstanceID();
             _assetLoadHandles.Add(modalId, assetLoadHandle);
             options.options.onLoaded?.Invoke(enterModal, args);
@@ -537,6 +550,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.AfterLoadAsync(RectTransform, args);
 
             var exitModal = _modals.Count == 0 ? null : _modals[^1].View;
+
+            if (exitModal)
+            {
+                exitModal.Settings = Settings;
+            }    
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -582,7 +600,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 callbackReceiver.AfterPush(enterModal, exitModal, args);
             }
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
@@ -622,14 +640,21 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             IsInTransition = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
 
             var lastModalIndex = _modals.Count - 1;
             var exitModal = _modals[lastModalIndex].View;
+            exitModal.Settings = Settings;
+
             var enterModal = _modals.Count == 1 ? null : _modals[^2].View;
+
+            if (enterModal)
+            {
+                enterModal.Settings = Settings;
+            }
 
             ModalBackdrop backdrop = null;
 
@@ -637,6 +662,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             {
                 var lastBackdropIndex = _backdrops.Count - 1;
                 backdrop = _backdrops[lastBackdropIndex];
+                backdrop.Settings = Settings;
                 _backdrops.RemoveAt(lastBackdropIndex);
             }
 
@@ -688,7 +714,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             DestroyAndForget(exitModal, backdrop).Forget();
 
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }

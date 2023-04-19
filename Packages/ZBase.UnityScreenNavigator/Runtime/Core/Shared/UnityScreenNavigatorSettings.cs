@@ -1,20 +1,36 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace ZBase.UnityScreenNavigator.Core
 {
-    internal sealed class UnityScreenNavigatorSettings : ScriptableObject
+    public sealed partial class UnityScreenNavigatorSettings : ScriptableObject
     {
-        private const string DefaultModalBackdropPrefabKey = "DefaultModalBackdrop";
+        private const string DEFAULT_MODAL_BACKDROP_PREFAB_KEY = "DefaultModalBackdrop";
+
         private static UnityScreenNavigatorSettings _instance;
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            _instance = null;
+        }
+
+        public static UnityScreenNavigatorSettings Instance
+        {
+            get
+            {
+                if (_instance == false)
+                {
+                    var asset = Resources.FindObjectsOfTypeAll<UnityScreenNavigatorSettings>().FirstOrDefault();
+                    _instance = asset ? asset : CreateInstance<UnityScreenNavigatorSettings>();
+                }
+
+                return _instance;
+            }
+        }
 
         [SerializeField] private TransitionAnimationObject _sheetEnterAnimation;
 
@@ -114,7 +130,7 @@ namespace ZBase.UnityScreenNavigator.Core
 
                 if (_defaultModalBackdrop == false)
                 {
-                    _defaultModalBackdrop = Resources.Load<ModalBackdrop>(DefaultModalBackdropPrefabKey);
+                    _defaultModalBackdrop = Resources.Load<ModalBackdrop>(DEFAULT_MODAL_BACKDROP_PREFAB_KEY);
                 }
 
                 return _defaultModalBackdrop;
@@ -145,33 +161,6 @@ namespace ZBase.UnityScreenNavigator.Core
 
         public bool DisableModalBackdrop => _disableModalBackdrop;
 
-        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
-        {
-            _instance = null;
-        }
-
-        public static UnityScreenNavigatorSettings Instance
-        {
-            get
-            {
-                if (_instance == false)
-                {
-                    var asset = Resources.FindObjectsOfTypeAll<UnityScreenNavigatorSettings>().FirstOrDefault();
-                    _instance = asset ? asset : CreateInstance<UnityScreenNavigatorSettings>();
-                }
-
-                return _instance;
-            }
-
-            private set => _instance = value;
-        }
-
-        private void OnEnable()
-        {
-            _instance = this;
-        }
 
         public ITransitionAnimation GetDefaultScreenTransitionAnimation(bool push, bool enter)
         {
@@ -202,44 +191,5 @@ namespace ZBase.UnityScreenNavigator.Core
         {
             return enter ? ActivityEnterAnimation : ActivityExitAnimation;
         }
-
-#if UNITY_EDITOR
-
-        [MenuItem("Assets/Create/Screen Navigator/Screen Navigator Settings", priority = -1)]
-        private static void Create()
-        {
-            var asset = PlayerSettings.GetPreloadedAssets().OfType<UnityScreenNavigatorSettings>().FirstOrDefault();
-            if (asset)
-            {
-                var path = AssetDatabase.GetAssetPath(asset);
-                throw new InvalidOperationException($"{nameof(UnityScreenNavigatorSettings)} already exists at {path}");
-            }
-
-            var assetPath = EditorUtility.SaveFilePanelInProject($"Save {nameof(UnityScreenNavigatorSettings)}",
-                nameof(UnityScreenNavigatorSettings),
-                "asset", "", "Assets");
-
-            if (string.IsNullOrEmpty(assetPath))
-            {
-                // Return if canceled.
-                return;
-            }
-
-            // Create folders if needed.
-            var folderPath = Path.GetDirectoryName(assetPath);
-            if (!string.IsNullOrEmpty(folderPath) && !Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-
-            var instance = CreateInstance<UnityScreenNavigatorSettings>();
-            AssetDatabase.CreateAsset(instance, assetPath);
-            var preloadedAssets = PlayerSettings.GetPreloadedAssets().ToList();
-            preloadedAssets.Add(instance);
-            PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
-            AssetDatabase.SaveAssets();
-        }
-#endif
     }
-
 }

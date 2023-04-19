@@ -29,6 +29,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
         }
 
+        public UnityScreenNavigatorSettings Settings { get; set; }
+
         public SheetTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         public bool IsTransitioning { get; private set; }
@@ -226,7 +228,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             if (anim == null)
             {
-                return UnityScreenNavigatorSettings.Instance.GetDefaultSheetTransitionAnimation(enter);
+                return Settings.GetDefaultSheetTransitionAnimation(enter);
             }
 
             return anim;

@@ -138,7 +138,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// </summary>
         public IAssetLoader AssetLoader
         {
-            get => _assetLoader ?? UnityScreenNavigatorSettings.Instance.AssetLoader;
+            get => _assetLoader ?? Settings.AssetLoader;
             set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
         }
 
@@ -313,7 +313,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 return;
             }
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
@@ -344,6 +344,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
                 return;
             }
+
+            activity.Settings = Settings;
 
             var activityId = activity.GetInstanceID();
             activity.Identifier = string.Concat(gameObject.name, activityId.ToString());
@@ -376,7 +378,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 callbackReceiver.AfterShow(activity, args);
             }
 
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
@@ -412,10 +414,12 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 return;
             }
 
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
+
+            activity.Settings = Settings;
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -444,7 +448,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
             DestroyAndForget(activity).Forget();
 
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }

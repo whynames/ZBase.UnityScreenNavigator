@@ -30,7 +30,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// </summary>
         public IAssetLoader AssetLoader
         {
-            get => _assetLoader ?? UnityScreenNavigatorSettings.Instance.AssetLoader;
+            get => _assetLoader ?? Settings.AssetLoader;
             set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
         }
 
@@ -335,6 +335,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             var enterScreen = _screens[index].View;
+            enterScreen.Settings = Settings;
+
             var screenId = enterScreen.GetInstanceID();
             _screens.RemoveAt(index);
 
@@ -346,6 +348,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             var exitScreen = _screens.Count == 0 ? null : _screens[^1].View;
             var exitScreenId = exitScreen == null ? (int?) null : exitScreen.GetInstanceID();
+
+            if (exitScreen)
+            {
+                exitScreen.Settings = Settings;
+            }
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -400,7 +407,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             _isActiveScreenStacked = options.stack;
 
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
@@ -468,7 +475,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             IsInTransition = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
@@ -501,6 +508,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 return;
             }
 
+            enterScreen.Settings = Settings;
+
             var screenId = enterScreen.GetInstanceID();
             _assetLoadHandles.Add(screenId, assetLoadHandle);
             options.options.onLoaded?.Invoke(enterScreen, args);
@@ -509,6 +518,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             var exitScreen = _screens.Count == 0 ? null : _screens[^1].View;
             var exitScreenId = exitScreen == null ? (int?) null : exitScreen.GetInstanceID();
+
+            if (exitScreen)
+            {
+                exitScreen.Settings = Settings;
+            }
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -563,7 +577,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             _isActiveScreenStacked = options.stack;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
@@ -616,15 +630,22 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             IsInTransition = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
 
             var lastScreen = _screens.Count - 1;
             var exitScreen = _screens[lastScreen].View;
+            exitScreen.Settings = Settings;
+
             var exitScreenId = exitScreen.GetInstanceID();
             var enterScreen = _screens.Count == 1 ? null : _screens[^2].View;
+
+            if (enterScreen)
+            {
+                enterScreen.Settings = Settings;
+            }
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -671,7 +692,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             _isActiveScreenStacked = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }

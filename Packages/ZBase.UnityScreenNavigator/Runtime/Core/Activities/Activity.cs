@@ -25,6 +25,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
         }
 
+        public UnityScreenNavigatorSettings Settings { get; set; }
+
         public ActivityTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         public bool IsTransitioning { get; private set; }
@@ -190,7 +192,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
             if (anim == null)
             {
-                return UnityScreenNavigatorSettings.Instance.GetDefaultActivityTransitionAnimation(enter);
+                return Settings.GetDefaultActivityTransitionAnimation(enter);
             }
 
             return anim;

@@ -25,6 +25,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
         private int? _activeSheetId;
         private CanvasGroup _canvasGroup;
+        private UnityScreenNavigatorSettings _settings;
         private IAssetLoader _assetLoader;
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// </summary>
         public IAssetLoader AssetLoader
         {
-            get => _assetLoader ?? UnityScreenNavigatorSettings.Instance.AssetLoader;
+            get => _assetLoader ?? _settings.AssetLoader;
             set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
         }
 
@@ -82,6 +83,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             s_instanceCacheByName[_name] = this;
             _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
+            _settings = UnityScreenNavigatorSettings.Instance;
         }
 
         protected override void OnDestroy()
@@ -290,6 +292,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 );
             }
 
+            sheet.Settings = _settings;
+
             var sheetId = sheet.GetInstanceID();
             _sheets.Add(sheetId, sheet);
             _sheetNameToId[resourcePath] = sheetId;
@@ -381,13 +385,20 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             IsInTransition = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (_settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
 
             var enterSheet = _sheets[sheetId];
+            enterSheet.Settings = _settings;
+
             var exitSheet = _activeSheetId.HasValue ? _sheets[_activeSheetId.Value] : null;
+
+            if (exitSheet)
+            {
+                exitSheet.Settings = _settings;
+            }
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -427,7 +438,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 callbackReceiver.AfterShow(enterSheet, exitSheet, args);
             }
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (_settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
@@ -467,12 +478,13 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             IsInTransition = true;
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (_settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
             }
 
             var exitSheet = _sheets[_activeSheetId.Value];
+            exitSheet.Settings = _settings;
 
             // Preprocess
             foreach (var callbackReceiver in _callbackReceivers)
@@ -497,7 +509,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 callbackReceiver.AfterHide(exitSheet, args);
             }
             
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            if (_settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }

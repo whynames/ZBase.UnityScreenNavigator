@@ -16,6 +16,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         private Image _image;
         private float _originalAlpha;
 
+        public UnityScreenNavigatorSettings Settings { get; set; }
+
         public ModalBackdropTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         private void Awake()
@@ -150,7 +152,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             if (anim == null)
             {
-                return UnityScreenNavigatorSettings.Instance.GetDefaultModalBackdropTransitionAnimation(enter);
+                return Settings.GetDefaultModalBackdropTransitionAnimation(enter);
             }
 
             return anim;
