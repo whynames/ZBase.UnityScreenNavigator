@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Modals;
+using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core
@@ -63,9 +64,11 @@ namespace ZBase.UnityScreenNavigator.Core
         [SerializeField] private bool _enableInteractionInTransition;
 
         [SerializeField] private bool _disableModalBackdrop;
+
+        [EnabledIf(nameof(_disableModalBackdrop), false)]
+        [SerializeField] private string _modalBackdropKey = DEFAULT_MODAL_BACKDROP_PREFAB_KEY;
         
         private IAssetLoader _defaultAssetLoader;
-        private ModalBackdrop _defaultModalBackdrop;
 
         public ITransitionAnimation SheetEnterAnimation => _sheetEnterAnimation
             ? Instantiate(_sheetEnterAnimation)
@@ -119,22 +122,9 @@ namespace ZBase.UnityScreenNavigator.Core
             ? Instantiate(_activityExitAnimation)
             : SimpleTransitionAnimationObject.CreateInstance(afterScale: Vector3.one * 0.3f, afterAlpha: 0.0f);
 
-        public ModalBackdrop ModalBackdropPrefab
+        public string ModalBackdropKey
         {
-            get
-            {
-                if (_modalBackdropPrefab)
-                {
-                    return _modalBackdropPrefab;
-                }
-
-                if (_defaultModalBackdrop == false)
-                {
-                    _defaultModalBackdrop = Resources.Load<ModalBackdrop>(DEFAULT_MODAL_BACKDROP_PREFAB_KEY);
-                }
-
-                return _defaultModalBackdrop;
-            }
+            get => string.IsNullOrWhiteSpace(_modalBackdropKey) ? DEFAULT_MODAL_BACKDROP_PREFAB_KEY : _modalBackdropKey;
         }
 
         public IAssetLoader AssetLoader

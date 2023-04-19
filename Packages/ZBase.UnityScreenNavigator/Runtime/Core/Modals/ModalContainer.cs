@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
-using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
@@ -16,13 +15,13 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         private static Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ModalContainer> s_instanceCacheByName = new();
 
-        [SerializeField] private ModalBackdrop _overrideBackdropPrefab;
+        [SerializeField] private string _overrideBackdropKey;
 
         private readonly List<ModalBackdrop> _backdrops = new();
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
 
-        private ModalBackdrop _backdropPrefab;
+        private string _backdropKey;
         private bool _disableBackdrop;
 
         /// <summary>
@@ -54,11 +53,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         {
             _callbackReceivers.AddRange(GetComponents<IModalContainerCallbackReceiver>());
 
-            _backdropPrefab = _overrideBackdropPrefab
-                ? _overrideBackdropPrefab
-                : Settings.ModalBackdropPrefab;
-
             _disableBackdrop = Settings.DisableModalBackdrop;
+
+            _backdropKey = string.IsNullOrWhiteSpace(_overrideBackdropKey)
+                ? Settings.ModalBackdropKey
+                : _overrideBackdropKey;
         }
 
         protected override void OnDestroy()
@@ -486,10 +485,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             if (_disableBackdrop == false)
             {
-                backdrop = Instantiate(_backdropPrefab);
+                backdrop = await GetViewAsync<ModalBackdrop>(_backdropKey, options.options.loadAsync);
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
-                backdrop.Settings = Settings;
-
                 _backdrops.Add(backdrop);
             }
 

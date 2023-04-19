@@ -1,12 +1,12 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    public sealed class ModalBackdrop : UIBehaviour
+    public sealed class ModalBackdrop : View
     {
         [SerializeField] private ModalBackdropTransitionAnimationContainer _animationContainer;
         [SerializeField] private bool _closeModalWhenClicked;
@@ -16,8 +16,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         private RectTransform _rectTransform;
         private Image _image;
         private float _originalAlpha;
-
-        public UnityScreenNavigatorSettings Settings { get; set; }
 
         public ModalBackdropTransitionAnimationContainer AnimationContainer => _animationContainer;
 

@@ -28,3 +28,4 @@ MonoBehaviour:
   _assetLoader: {fileID: 0}
   _enableInteractionInTransition: 0
   _disableModalBackdrop: 0
+  _modalBackdropKey: prefab_demo_modal_backdrop

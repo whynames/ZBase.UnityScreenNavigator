@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 78457337265729849}
   - component: {fileID: 78457337265729848}
   - component: {fileID: 4672728316167856403}
+  - component: {fileID: 3012687162618884780}
   m_Layer: 5
   m_Name: prefab_demo_modal_backdrop
   m_TagString: Untagged
@@ -89,6 +90,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f61bcc81179c904d97880d6f8f5fdc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _usePrefabNameAsIdentifier: 1
+  _identifier: 
+  _rectTransform: {fileID: 0}
+  _canvasGroup: {fileID: 0}
   _animationContainer:
     _enterAnimation:
       _assetType: 0
@@ -99,3 +104,15 @@ MonoBehaviour:
       _animationBehaviour: {fileID: 0}
       _animationObject: {fileID: 0}
   _closeModalWhenClicked: 0
+--- !u!225 &3012687162618884780
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78457337265729854}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

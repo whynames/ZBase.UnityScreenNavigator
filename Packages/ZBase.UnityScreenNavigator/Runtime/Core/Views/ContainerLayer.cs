@@ -133,7 +133,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         }
 
         protected async UniTask<T> GetViewAsync<T>(string resourcePath, bool loadAsync)
-            where T : Window
+            where T : View
         {
             var assetLoadHandle = loadAsync
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
@@ -163,9 +163,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             view.Settings = Settings;
 
-            var viewId = view.GetInstanceID();
-            view.Identifier = $"{gameObject.name}-{viewId}";
-            _assetLoadHandles.Add(viewId, assetLoadHandle);
+            var id = view.GetInstanceID();
+            _assetLoadHandles.Add(id, assetLoadHandle);
 
             return view;
         }
