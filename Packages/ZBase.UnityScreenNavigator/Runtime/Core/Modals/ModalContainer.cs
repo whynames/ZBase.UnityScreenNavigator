@@ -17,9 +17,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
         [SerializeField] private string _overrideBackdropKey;
 
-        private readonly List<ModalBackdrop> _backdrops = new();
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
+        private readonly List<ModalBackdrop> _backdrops = new();
 
         private string _backdropKey;
         private bool _disableBackdrop;
@@ -63,15 +63,27 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         protected override void OnDestroy()
         {
             var modals = _modals;
-            var count = modals.Count;
+            var modalCount = modals.Count;
 
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < modalCount; i++)
             {
                 var modal = modals[i].View;
                 DestroyAndForget(modal).Forget();
             }
 
             modals.Clear();
+
+            var backdrops = _backdrops;
+            var backdropCount = backdrops.Count;
+
+            for (var i = 0; i < backdropCount; i++)
+            {
+                var backdrop = backdrops[i];
+                DestroyAndForget(backdrop).Forget();
+            }
+
+            backdrops.Clear();
+
             s_instanceCacheByName.Remove(LayerName);
 
             using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
