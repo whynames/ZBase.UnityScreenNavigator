@@ -11,9 +11,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         [SerializeField] private ModalBackdropTransitionAnimationContainer _animationContainer;
         [SerializeField] private bool _closeModalWhenClicked;
 
-        private CanvasGroup _canvasGroup;
-        private RectTransform _parentTransform;
-        private RectTransform _rectTransform;
         private Image _image;
         private float _originalAlpha;
 
@@ -21,9 +18,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
         protected override void Awake()
         {
-            _rectTransform = (RectTransform)transform;
-            _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
-
             SetCloseModalOnClick(_closeModalWhenClicked);
 
             _image = GetComponent<Image>();
@@ -31,7 +25,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         public void Setup(
-              RectTransform parentTransform
+              RectTransform parent
             , in float? alpha
             , in bool? closeModalWhenClick
         )
@@ -39,9 +33,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             SetAlpha(alpha);
             SetCloseModalOnClick(closeModalWhenClick);
 
-            _parentTransform = parentTransform;
-            _rectTransform.FillParent(_parentTransform);
-            _canvasGroup.interactable = _closeModalWhenClicked;
+            Parent = parent;
+            RectTransform.FillParent(Parent);
+            CanvasGroup.interactable = _closeModalWhenClicked;
 
             gameObject.SetActive(false);
         }
@@ -113,35 +107,35 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         internal async UniTask EnterAsync(bool playAnimation)
         {
             gameObject.SetActive(true);
-            _rectTransform.FillParent(_parentTransform);
-            _canvasGroup.alpha = 1f;
+            RectTransform.FillParent(Parent);
+            CanvasGroup.alpha = 1f;
 
             if (playAnimation)
             {
                 var anim = GetAnimation(true);
-                anim.Setup(_rectTransform);
+                anim.Setup(RectTransform);
                 
                 await anim.PlayAsync();
             }
 
-            _rectTransform.FillParent(_parentTransform);
+            RectTransform.FillParent(Parent);
         }
 
         internal async UniTask ExitAsync(bool playAnimation)
         {
             gameObject.SetActive(true);
-            _rectTransform.FillParent(_parentTransform);
-            _canvasGroup.alpha = 1f;
+            RectTransform.FillParent(Parent);
+            CanvasGroup.alpha = 1f;
 
             if (playAnimation)
             {
                 var anim = GetAnimation(false);
-                anim.Setup(_rectTransform);
+                anim.Setup(RectTransform);
 
                 await anim.PlayAsync();
             }
 
-            _canvasGroup.alpha = 0f;
+            CanvasGroup.alpha = 0f;
             gameObject.SetActive(false);
         }
 
