@@ -15,9 +15,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
 
         private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly Dictionary<string, Activity> _activities = new();
+        private readonly Dictionary<string, ViewRef<Activity>> _activities = new();
 
-        public IReadOnlyDictionary<string, Activity> Activities => _activities;
+        public IReadOnlyDictionary<string, ViewRef<Activity>> Activities => _activities;
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -143,22 +143,23 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             _callbackReceivers.Remove(callbackReceiver);
         }
 
-        private void Add(string resourcePath, Activity activity)
+        private void Add(string resourcePath, Activity activity, bool ignorePoolingSetting)
         {
             if (resourcePath == null)
                 throw new ArgumentNullException(nameof(resourcePath));
 
-            if (_activities.TryGetValue(resourcePath, out var otherActivity))
+            if (_activities.TryGetValue(resourcePath, out var viewRef))
             {
-                if (activity != otherActivity)
+                if (activity != viewRef.View)
                 {
-                    Debug.LogWarning($"Another {nameof(Activity)} is existing for `{resourcePath}`", otherActivity);
+                    Debug.LogWarning($"Another {nameof(Activity)} is existing for `{resourcePath}`", viewRef.View);
                 }
 
                 return;
             }
 
-            _activities.Add(resourcePath, activity);
+            viewRef = new ViewRef<Activity>(activity, resourcePath, ignorePoolingSetting);
+            _activities.Add(resourcePath, viewRef);
 
             if (activity.TryGetTransform(out var transform))
             {
@@ -184,7 +185,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             return false;
         }
 
-        public bool TryGet(string resourcePath, out Activity activity)
+        public bool TryGet(string resourcePath, out ViewRef<Activity> activity)
         {
             return _activities.TryGetValue(resourcePath, out activity);
         }
@@ -207,9 +208,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         protected override void OnDestroy()
         {
-            foreach (var kv in _activities)
+            foreach (var (activity, resourcePath) in _activities.Values)
             {
-                DestroyAndForget(new ViewRef(kv.Value, kv.Key)).Forget();
+                DestroyAndForget(new ViewRef(activity, resourcePath, true)).Forget();
             }
 
             _activities.Clear();
@@ -285,11 +286,11 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 throw new ArgumentNullException(nameof(resourcePath));
             }
 
-            if (_activities.TryGetValue(resourcePath, out var showingActivity))
+            if (_activities.TryGetValue(resourcePath, out var viewRef))
             {
                 Debug.LogWarning(
                     $"Cannot transition because the {typeof(TActivity).Name} at `{resourcePath}` is already showing."
-                    , showingActivity
+                    , viewRef.View
                 );
 
                 return;
@@ -301,7 +302,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
 
             var activity = await GetViewAsync<TActivity>(resourcePath, options.options.loadAsync);
-            Add(resourcePath, activity);
+            Add(resourcePath, activity, options.options.ignorePoolingSetting);
             options.options.onLoaded?.Invoke(activity, args);
 
             await activity.AfterLoadAsync(RectTransform, args);
@@ -353,7 +354,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <remarks>Asynchronous</remarks>
         public async UniTask HideAsync(string resourcePath, bool playAnimation = true, params object[] args)
         {
-            if (TryGet(resourcePath, out var activity) == false)
+            if (TryGet(resourcePath, out var viewRef) == false)
             {
                 Debug.LogError(
                     $"Cannot transition because there is no activity loaded " +
@@ -368,6 +369,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 Interactable = false;
             }
 
+            var activity = viewRef.View;
             activity.Settings = Settings;
 
             // Preprocess
@@ -395,7 +397,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             // Unload unused Activity
             await activity.BeforeReleaseAsync();
 
-            DestroyAndForget(new ViewRef(activity, resourcePath)).Forget();
+            DestroyAndForget(new ViewRef(activity, resourcePath, viewRef.IgnorePoolingSetting)).Forget();
 
             if (Settings.EnableInteractionInTransition == false)
             {

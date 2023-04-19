@@ -98,11 +98,16 @@ namespace Demo.Scripts
         private void OnFirstThumbButtonClicked()
         {
             var modalContainer = ModalContainer.Find(ContainerKey.Modals);
-            var options = new WindowOptions(ResourceKey.CharacterModalPrefab(), true, onLoaded: (modal, args) =>
-            {
-                var characterModal = (CharacterModal) modal;
-                characterModal.Setup(_characterId);
-            });
+            var options = new WindowOptions(
+                  ResourceKey.CharacterModalPrefab()
+                , playAnimation: true
+                , ignorePoolingSetting: true
+                , onLoaded: (modal, args) => {
+                    var characterModal = (CharacterModal) modal;
+                    characterModal.Setup(_characterId);
+                }
+            );
+
             modalContainer.Push(options);
         }
     }

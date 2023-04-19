@@ -22,9 +22,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             , OnLoadCallback onLoaded = null
             , bool loadAsync = true
             , bool stack = true
+            , bool ignorePoolingSetting = false
         )
         {
-            this.options = new(resourcePath, playAnimation, onLoaded, loadAsync);
+            this.options = new(resourcePath, playAnimation, onLoaded, loadAsync, ignorePoolingSetting);
             this.stack = stack;
         }
 

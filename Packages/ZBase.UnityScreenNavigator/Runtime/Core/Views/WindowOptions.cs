@@ -8,6 +8,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     {
         public readonly bool loadAsync;
         public readonly bool playAnimation;
+        public readonly bool ignorePoolingSetting;
         public readonly string resourcePath;
         public readonly OnLoadCallback onLoaded;
 
@@ -16,10 +17,12 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             , bool playAnimation = true
             , OnLoadCallback onLoaded = null
             , bool loadAsync = true
+            , bool ignorePoolingSetting = false
         )
         {
             this.loadAsync = loadAsync;
             this.playAnimation = playAnimation;
+            this.ignorePoolingSetting = ignorePoolingSetting;
             this.resourcePath = resourcePath;
             this.onLoaded = onLoaded;
         }

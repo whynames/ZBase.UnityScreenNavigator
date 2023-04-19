@@ -212,9 +212,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         protected async UniTaskVoid DestroyAndForget(ViewRef viewRef)
         {
-            if (EnablePooling)
+            if (EnablePooling && ReturnToPool(viewRef))
             {
-                ReturnToPool(viewRef);
                 return;
             }
 
@@ -252,8 +251,13 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             return false;
         }
 
-        private void ReturnToPool(ViewRef viewRef)
+        private bool ReturnToPool(ViewRef viewRef)
         {
+            if (viewRef.IgnorePoolingSetting)
+            {
+                return false;
+            }
+
             var resourcePathToPool = _resourcePathToPool;
 
             if (resourcePathToPool.TryGetValue(viewRef.ResourcePath, out var pool) == false)
@@ -265,13 +269,14 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             if (view.Owner == false)
             {
-                return;
+                return false;
             }
 
             view.RectTransform.SetParent(PoolTransform);
             view.Parent = PoolTransform;
             view.Owner.SetActive(false);
             pool.Enqueue(view.Owner);
+            return true;
         }
     }
 }

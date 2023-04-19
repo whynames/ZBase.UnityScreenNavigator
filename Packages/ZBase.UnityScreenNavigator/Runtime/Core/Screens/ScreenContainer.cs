@@ -52,8 +52,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             for (var i = 0; i < count; i++)
             {
-                var screen = screens[i];
-                DestroyAndForget(screen).Forget();
+                var (screen, resourcePath) = screens[i];
+                DestroyAndForget(new ViewRef(screen, resourcePath, true)).Forget();
             }
 
             screens.Clear();
@@ -358,7 +358,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 _screens.RemoveAt(_screens.Count - 1);
             }
 
-            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath));
+            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath, options.options.ignorePoolingSetting));
             IsInTransition = false;
 
             // Postprocess
@@ -498,7 +498,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 _screens.RemoveAt(_screens.Count - 1);
             }
 
-            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath));
+            _screens.Add(new ViewRef<Screen>(enterScreen, resourcePath, options.options.ignorePoolingSetting));
             IsInTransition = false;
 
             // Postprocess

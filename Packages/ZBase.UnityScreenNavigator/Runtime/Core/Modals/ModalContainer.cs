@@ -59,8 +59,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             for (var i = 0; i < modalCount; i++)
             {
-                var modal = modals[i];
-                DestroyAndForget(modal).Forget();
+                var (modal, resourcePath) = modals[i];
+                DestroyAndForget(new ViewRef(modal, resourcePath, true)).Forget();
             }
 
             modals.Clear();
@@ -70,8 +70,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             for (var i = 0; i < backdropCount; i++)
             {
-                var backdrop = backdrops[i];
-                DestroyAndForget(backdrop).Forget();
+                var (backdrop, resourcePath) = backdrops[i];
+                DestroyAndForget(new ViewRef(backdrop, resourcePath, true)).Forget();
             }
 
             backdrops.Clear();
@@ -410,7 +410,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.EnterAsync(true, options.options.playAnimation, exitModal);
 
             // End Transition
-            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath));
+            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath, options.options.ignorePoolingSetting));
             IsInTransition = false;
 
             // Postprocess
@@ -506,7 +506,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 var backdropResourcePath = GetBackdropResourcePath(options.modalBackdropResourcePath);
                 backdrop = await GetViewAsync<ModalBackdrop>(backdropResourcePath, options.options.loadAsync);
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
-                _backdrops.Add(new ViewRef<ModalBackdrop>(backdrop, backdropResourcePath));
+                _backdrops.Add(new ViewRef<ModalBackdrop>(backdrop, backdropResourcePath, false));
             }
 
             var enterModal = await GetViewAsync<TModal>(resourcePath, options.options.loadAsync);
@@ -549,7 +549,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await enterModal.EnterAsync(true, options.options.playAnimation, exitModal);
 
             // End Transition
-            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath));
+            _modals.Add(new ViewRef<Modal>(enterModal, resourcePath, options.options.ignorePoolingSetting));
             IsInTransition = false;
 
             // Postprocess

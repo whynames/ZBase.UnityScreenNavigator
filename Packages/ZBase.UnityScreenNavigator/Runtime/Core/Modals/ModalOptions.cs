@@ -30,9 +30,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             , in float? backdropAlpha = null
             , in bool? closeWhenClickOnBackdrop = null
             , string modalBackdropResourcePath = null
+            , bool ignorePoolingSetting = false
         )
         {
-            this.options = new(resourcePath, playAnimation, onLoaded, loadAsync);
+            this.options = new(resourcePath, playAnimation, onLoaded, loadAsync, ignorePoolingSetting);
             this.backdropAlpha = backdropAlpha;
             this.closeWhenClickOnBackdrop = closeWhenClickOnBackdrop;
             this.modalBackdropResourcePath = modalBackdropResourcePath;

@@ -4,11 +4,17 @@ namespace ZBase.UnityScreenNavigator.Core
 {
     public readonly struct ViewRef<T> where T : View
     {
+        public readonly bool IgnorePoolingSetting;
         public readonly T View;
         public readonly string ResourcePath;
 
-        public ViewRef(T view, string resourcePath)
+        public ViewRef(
+              T view
+            , string resourcePath
+            , bool ignorePoolingSetting
+        )
         {
+            IgnorePoolingSetting = ignorePoolingSetting;
             View = view;
             ResourcePath = resourcePath;
         }
@@ -19,23 +25,34 @@ namespace ZBase.UnityScreenNavigator.Core
             resourcePath = ResourcePath;
         }
 
-        public static implicit operator ViewRef<T>((T, string) value)
-            => new ViewRef<T>(value.Item1, value.Item2);
-
-        public static implicit operator (T, string)(ViewRef<T> value)
-            => (value.View, value.ResourcePath);
+        public void Deconstruct(
+              out T view
+            , out string resourcePath
+            , out bool ignorePoolingSetting
+        )
+        {
+            view = View;
+            resourcePath = ResourcePath;
+            ignorePoolingSetting = IgnorePoolingSetting;
+        }
 
         public static implicit operator ViewRef(ViewRef<T> value)
-            => new ViewRef(value.View, value.ResourcePath);
+            => new ViewRef(value.View, value.ResourcePath, value.IgnorePoolingSetting);
     }
 
     public readonly struct ViewRef
     {
+        public readonly bool IgnorePoolingSetting;
         public readonly View View;
         public readonly string ResourcePath;
 
-        public ViewRef(View view, string resourcePath)
+        public ViewRef(
+              View view
+            , string resourcePath
+            , bool ignorePoolingSetting
+        )
         {
+            IgnorePoolingSetting = ignorePoolingSetting;
             View = view;
             ResourcePath = resourcePath;
         }
@@ -46,10 +63,15 @@ namespace ZBase.UnityScreenNavigator.Core
             resourcePath = ResourcePath;
         }
 
-        public static implicit operator ViewRef((View, string) value)
-            => new ViewRef(value.Item1, value.Item2);
-
-        public static implicit operator (View, string)(ViewRef value)
-            => (value.View, value.ResourcePath);
+        public void Deconstruct(
+              out View view
+            , out string resourcePath
+            , out bool ignorePoolingSetting
+        )
+        {
+            view = View;
+            resourcePath = ResourcePath;
+            ignorePoolingSetting = IgnorePoolingSetting;
+        }
     }
 }
