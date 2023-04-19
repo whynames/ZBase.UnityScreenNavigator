@@ -16,24 +16,12 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
 
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
         private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
 
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Screen>> _screens = new();
 
         private bool _isActiveScreenStacked;
-        private IAssetLoader _assetLoader;
-
-        /// <summary>
-        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
-        /// If this property is set, it is used instead.
-        /// </summary>
-        public IAssetLoader AssetLoader
-        {
-            get => _assetLoader ?? Settings.AssetLoader;
-            set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
-        }
 
         /// <summary>
         /// True if in transition.
@@ -697,76 +685,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 Interactable = true;
             }
-        }
-
-        /// <summary>
-        /// Preload a prefab of <see cref="Screen"/>.
-        /// </summary>
-        /// <remarks>Fire-and-forget</remarks>
-        public void Preload(string resourcePath, bool loadAsync = true)
-        {
-            PreloadAndForget(resourcePath, loadAsync).Forget();
-        }
-
-        private async UniTaskVoid PreloadAndForget(string resourcePath, bool loadAsync = true)
-        {
-            await PreloadAsync(resourcePath, loadAsync);
-        }
-
-        /// <summary>
-        /// Preload a prefab of <see cref="Screen"/>.
-        /// </summary>
-        /// <remarks>Asynchronous</remarks>
-        public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true)
-        {
-            if (_preloadedResourceHandles.ContainsKey(resourcePath))
-            {
-                Debug.LogError($"The resource at `{resourcePath}` has already been preloaded.");
-                return;
-            }
-
-            var assetLoadHandle = loadAsync
-                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                : AssetLoader.Load<GameObject>(resourcePath);
-
-            _preloadedResourceHandles.Add(resourcePath, assetLoadHandle);
-
-            if (assetLoadHandle.IsDone == false)
-            {
-                await assetLoadHandle.Task;
-            }
-
-            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
-            {
-                throw assetLoadHandle.OperationException;
-            }
-        }
-
-        public bool IsPreloadRequested(string resourcePath)
-        {
-            return _preloadedResourceHandles.ContainsKey(resourcePath);
-        }
-
-        public bool IsPreloaded(string resourcePath)
-        {
-            if (_preloadedResourceHandles.TryGetValue(resourcePath, out var handle) == false)
-            {
-                return false;
-            }
-
-            return handle.Status == AssetLoadStatus.Success;
-        }
-
-        public void ReleasePreloaded(string resourcePath)
-        {
-            if (_preloadedResourceHandles.TryGetValue(resourcePath, out var handle) == false)
-            {
-                Debug.LogError($"The resource {resourcePath} is not preloaded.");
-                return;
-            }
-
-            _preloadedResourceHandles.Remove(resourcePath);
-            AssetLoader.Release(handle.Id);
         }
     }
 }
