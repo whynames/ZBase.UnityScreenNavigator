@@ -22,6 +22,18 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         private IAssetLoader _assetLoader;
 
+        /// <summary>
+        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
+        /// If this property is set, it is used instead.
+        /// </summary>
+        public IAssetLoader AssetLoader
+        {
+            get => _assetLoader ?? Settings.AssetLoader;
+            set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        public IReadOnlyDictionary<string, Activity> Activities => _activities;
+
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
@@ -127,18 +139,6 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             s_instanceCacheByName.Add(container.LayerName, container);
             return container;
         }
-
-        /// <summary>
-        /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
-        /// If this property is set, it is used instead.
-        /// </summary>
-        public IAssetLoader AssetLoader
-        {
-            get => _assetLoader ?? Settings.AssetLoader;
-            set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        public IReadOnlyDictionary<string, Activity> Activities => _activities;
 
         /// <summary>
         /// Add a callback receiver.
