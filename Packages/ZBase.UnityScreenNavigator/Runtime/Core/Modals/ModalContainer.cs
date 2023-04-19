@@ -15,13 +15,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         private static Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ModalContainer> s_instanceCacheByName = new();
 
-        [SerializeField] private string _overrideBackdropKey;
-
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
-        private readonly List<ModalBackdrop> _backdrops = new();
+        private readonly List<ViewRef<ModalBackdrop>> _backdrops = new();
 
-        private string _backdropKey;
         private bool _disableBackdrop;
 
         /// <summary>
@@ -37,7 +34,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <summary>
         /// Stacked backdrops.
         /// </summary>
-        public IReadOnlyList<ModalBackdrop> Backdrops => _backdrops;
+        public IReadOnlyList<ViewRef<ModalBackdrop>> Backdrops => _backdrops;
 
         public ViewRef<Modal> Current => _modals[^1];
 
@@ -52,12 +49,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         protected override void OnInitialize()
         {
             _callbackReceivers.AddRange(GetComponents<IModalContainerCallbackReceiver>());
-
             _disableBackdrop = Settings.DisableModalBackdrop;
-
-            _backdropKey = string.IsNullOrWhiteSpace(_overrideBackdropKey)
-                ? Settings.ModalBackdropKey
-                : _overrideBackdropKey;
         }
 
         protected override void OnDestroy()
@@ -78,7 +70,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             for (var i = 0; i < backdropCount; i++)
             {
-                var backdrop = backdrops[i];
+                var backdrop = backdrops[i].View;
                 DestroyAndForget(backdrop).Forget();
             }
 
@@ -100,6 +92,13 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             {
                 s_instanceCacheByTransform.Remove(keyToRemove);
             }
+        }
+
+        private string GetBackdropResourcePath(string resourcePath)
+        {
+            return string.IsNullOrWhiteSpace(resourcePath)
+                ? Settings.ModalBackdropResourcePath
+                : resourcePath;
         }
 
         /// <summary>
@@ -286,7 +285,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             var modal = _modals[index].View;
             _modals.RemoveAt(index);
 
-            ModalBackdrop backdrop = null;
+            ViewRef<ModalBackdrop>? backdrop = null;
 
             if (_disableBackdrop == false)
             {
@@ -295,7 +294,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             DestroyAndForget(modal).Forget();
-            DestroyAndForget(backdrop).Forget();
+
+            if (backdrop.HasValue)
+            {
+                DestroyAndForget(backdrop.Value.View).Forget();
+            }
         }
 
         /// <summary>
@@ -351,18 +354,21 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             _modals.RemoveAt(index);
             RectTransform.RemoveChild(enterModal.transform);
 
-            ModalBackdrop backdrop = null;
+            ViewRef<ModalBackdrop>? backdrop = null;
 
             if (_disableBackdrop == false)
             {
-                backdrop = _backdrops[index];
+                var backdropAtIndex = _backdrops[index];
                 _backdrops.RemoveAt(index);
-                RectTransform.RemoveChild(backdrop.transform);
 
-                backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
-                backdrop.Settings = Settings;
+                var backdropView = backdropAtIndex.View;
+                RectTransform.RemoveChild(backdropView.transform);
 
-                _backdrops.Add(backdrop);
+                backdropView.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
+                backdropView.Settings = Settings;
+
+                _backdrops.Add(backdropAtIndex);
+                backdrop = backdropAtIndex;
             }
 
             options.options.onLoaded?.Invoke(enterModal, args);
@@ -391,9 +397,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             // Play Animation
 
-            if (backdrop)
+            if (backdrop.HasValue && backdrop.Value.View)
             {
-                await backdrop.EnterAsync(options.options.playAnimation);
+                await backdrop.Value.View.EnterAsync(options.options.playAnimation);
             }
 
             if (exitModal)
@@ -497,9 +503,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             if (_disableBackdrop == false)
             {
-                backdrop = await GetViewAsync<ModalBackdrop>(_backdropKey, options.options.loadAsync);
+                var backdropResourcePath = GetBackdropResourcePath(options.modalBackdropResourcePath);
+                backdrop = await GetViewAsync<ModalBackdrop>(backdropResourcePath, options.options.loadAsync);
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
-                _backdrops.Add(backdrop);
+                _backdrops.Add(new ViewRef<ModalBackdrop>(backdrop, backdropResourcePath));
             }
 
             var enterModal = await GetViewAsync<TModal>(resourcePath, options.options.loadAsync);
@@ -614,14 +621,16 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 enterModal.Settings = Settings;
             }
 
-            ModalBackdrop backdrop = null;
+            ViewRef<ModalBackdrop>? backdrop = null;
 
             if (_disableBackdrop == false)
             {
                 var lastBackdropIndex = _backdrops.Count - 1;
-                backdrop = _backdrops[lastBackdropIndex];
-                backdrop.Settings = Settings;
+                var lastBackdrop = _backdrops[lastBackdropIndex];
                 _backdrops.RemoveAt(lastBackdropIndex);
+
+                lastBackdrop.View.Settings = Settings;
+                backdrop = lastBackdrop;
             }
 
             // Preprocess
@@ -645,9 +654,9 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 await enterModal.EnterAsync(false, playAnimation, exitModal);
             }
 
-            if (backdrop)
+            if (backdrop.HasValue && backdrop.Value.View)
             {
-                await backdrop.ExitAsync(playAnimation);
+                await backdrop.Value.View.ExitAsync(playAnimation);
             }
 
             // End Transition
@@ -671,7 +680,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             await exitModal.BeforeReleaseAsync();
 
             DestroyAndForget(exitModal).Forget();
-            DestroyAndForget(backdrop).Forget();
+
+            if (backdrop.HasValue)
+            {
+                DestroyAndForget(backdrop.Value.View).Forget();
+            }
 
             if (Settings.EnableInteractionInTransition == false)
             {

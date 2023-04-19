@@ -66,7 +66,7 @@ namespace ZBase.UnityScreenNavigator.Core
         [SerializeField] private bool _disableModalBackdrop;
 
         [EnabledIf(nameof(_disableModalBackdrop), false)]
-        [SerializeField] private string _modalBackdropKey = DEFAULT_MODAL_BACKDROP_PREFAB_KEY;
+        [SerializeField] private string _modalBackdropResourcePath = DEFAULT_MODAL_BACKDROP_PREFAB_KEY;
         
         private IAssetLoader _defaultAssetLoader;
 
@@ -122,9 +122,11 @@ namespace ZBase.UnityScreenNavigator.Core
             ? Instantiate(_activityExitAnimation)
             : SimpleTransitionAnimationObject.CreateInstance(afterScale: Vector3.one * 0.3f, afterAlpha: 0.0f);
 
-        public string ModalBackdropKey
+        public string ModalBackdropResourcePath
         {
-            get => string.IsNullOrWhiteSpace(_modalBackdropKey) ? DEFAULT_MODAL_BACKDROP_PREFAB_KEY : _modalBackdropKey;
+            get => string.IsNullOrWhiteSpace(_modalBackdropResourcePath)
+                ? DEFAULT_MODAL_BACKDROP_PREFAB_KEY
+                : _modalBackdropResourcePath;
         }
 
         public IAssetLoader AssetLoader

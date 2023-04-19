@@ -6,17 +6,20 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
     {
         public readonly float? backdropAlpha;
         public readonly bool? closeWhenClickOnBackdrop;
+        public readonly string modalBackdropResourcePath;
         public readonly WindowOptions options;
 
         public ModalOptions(
               in WindowOptions options
             , in float? backdropAlpha = null
             , in bool? closeWhenClickOnBackdrop = null
+            , string modalBackdropResourcePath = null
         )
         {
             this.options = options;
             this.backdropAlpha = backdropAlpha;
             this.closeWhenClickOnBackdrop = closeWhenClickOnBackdrop;
+            this.modalBackdropResourcePath = modalBackdropResourcePath;
         }
 
         public ModalOptions(
@@ -26,11 +29,13 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             , bool loadAsync = true
             , in float? backdropAlpha = null
             , in bool? closeWhenClickOnBackdrop = null
+            , string modalBackdropResourcePath = null
         )
         {
             this.options = new(resourcePath, playAnimation, onLoaded, loadAsync);
             this.backdropAlpha = backdropAlpha;
             this.closeWhenClickOnBackdrop = closeWhenClickOnBackdrop;
+            this.modalBackdropResourcePath = modalBackdropResourcePath;
         }
 
         public static implicit operator ModalOptions(in WindowOptions options)
