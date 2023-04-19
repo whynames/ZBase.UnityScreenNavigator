@@ -63,7 +63,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             s_instanceCacheByName = new();
         }
 
-        protected override void Awake()
+        protected override void OnInitialize()
         {
             _callbackReceivers.AddRange(GetComponents<IModalContainerCallbackReceiver>());
 

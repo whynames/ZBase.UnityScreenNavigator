@@ -38,6 +38,10 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             }
 
             Canvas = canvas;
+
+            OnInitialize();
         }
+
+        protected virtual void OnInitialize() { }
     }
 }
