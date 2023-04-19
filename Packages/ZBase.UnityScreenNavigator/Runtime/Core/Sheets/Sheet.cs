@@ -29,8 +29,6 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
         }
 
-        public UnityScreenNavigatorSettings Settings { get; set; }
-
         public SheetTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         public bool IsTransitioning { get; private set; }

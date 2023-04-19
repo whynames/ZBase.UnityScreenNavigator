@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
-using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core.Activities
 {
@@ -14,8 +13,6 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
     {
         private static Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
-
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
 
         private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<string, Activity> _activities = new();
@@ -302,41 +299,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 Interactable = false;
             }
 
-            var assetLoadHandle = options.options.loadAsync
-                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                : AssetLoader.Load<GameObject>(resourcePath);
-
-            while (assetLoadHandle.IsDone == false)
-            {
-                await UniTask.NextFrame();
-            }
-
-            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
-            {
-                throw assetLoadHandle.OperationException;
-            }
-
-            var instance = Instantiate(assetLoadHandle.Result);
-            
-            if (instance.TryGetComponent<TActivity>(out var activity) == false)
-            {
-                Debug.LogError(
-                    $"Cannot transition because the {typeof(TActivity).Name} component is not " +
-                    $"attached to the specified resource `{resourcePath}`."
-                    , instance
-                );
-
-                return;
-            }
-
-            activity.Settings = Settings;
-
-            var activityId = activity.GetInstanceID();
-            activity.Identifier = string.Concat(gameObject.name, activityId.ToString());
-            _assetLoadHandles.Add(activityId, assetLoadHandle);
-
+            var activity = await GetViewAsync<TActivity>(resourcePath, options.options.loadAsync);
             Add(resourcePath, activity);
-
             options.options.onLoaded?.Invoke(activity, args);
 
             await activity.AfterLoadAsync(RectTransform, args);
@@ -435,21 +399,6 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
-            }
-        }
-
-        private async UniTaskVoid DestroyAndForget(Activity activity)
-        {
-            var activityId = activity.GetInstanceID();
-
-            Destroy(activity.gameObject);
-
-            await UniTask.NextFrame();
-
-            if (_assetLoadHandles.TryGetValue(activityId, out var loadHandle))
-            {
-                AssetLoader.Release(loadHandle.Id);
-                _assetLoadHandles.Remove(activityId);
             }
         }
 

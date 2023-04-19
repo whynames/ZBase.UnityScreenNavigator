@@ -24,8 +24,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
         }
 
-        public UnityScreenNavigatorSettings Settings { get; set; }
-
         public ModalTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         public bool IsTransitioning { get; private set; }

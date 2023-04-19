@@ -18,8 +18,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
         [SerializeField] private ModalBackdrop _overrideBackdropPrefab;
 
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
-
         private readonly List<ModalBackdrop> _backdrops = new();
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
@@ -67,23 +65,14 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         {
             var modals = _modals;
             var count = modals.Count;
-            var assetLoadHandles = _assetLoadHandles;
 
             for (var i = 0; i < count; i++)
             {
                 var modal = modals[i].View;
-                var modalId = modal.GetInstanceID();
-
-                Destroy(modal.gameObject);
-
-                if (assetLoadHandles.TryGetValue(modalId, out var assetLoadHandle))
-                {
-                    AssetLoader.Release(assetLoadHandle.Id);
-                }
+                DestroyAndForget(modal).Forget();
             }
 
             modals.Clear();
-            assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(LayerName);
 
             using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
@@ -294,7 +283,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 _backdrops.RemoveAt(index);
             }
 
-            DestroyAndForget(modal, backdrop).Forget();
+            DestroyAndForget(modal).Forget();
+            DestroyAndForget(backdrop).Forget();
         }
 
         /// <summary>
@@ -492,20 +482,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 Interactable = false;
             }
 
-            var assetLoadHandle = options.options.loadAsync
-                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                : AssetLoader.Load<GameObject>(resourcePath);
-
-            while (assetLoadHandle.IsDone == false)
-            {
-                await UniTask.NextFrame();
-            }
-
-            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
-            {
-                throw assetLoadHandle.OperationException;
-            }
-
             ModalBackdrop backdrop = null;
 
             if (_disableBackdrop == false)
@@ -517,23 +493,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 _backdrops.Add(backdrop);
             }
 
-            var instance = Instantiate(assetLoadHandle.Result);
-
-            if (instance.TryGetComponent<TModal>(out var enterModal) == false)
-            {
-                Debug.LogError(
-                    $"Cannot transition because {typeof(TModal).Name} component is not " +
-                    $"attached to the specified resource `{resourcePath}`."
-                    , instance
-                );
-
-                return;
-            }
-
-            enterModal.Settings = Settings;
-
-            var modalId = enterModal.GetInstanceID();
-            _assetLoadHandles.Add(modalId, assetLoadHandle);
+            var enterModal = await GetViewAsync<TModal>(resourcePath, options.options.loadAsync);
             options.options.onLoaded?.Invoke(enterModal, args);
 
             await enterModal.AfterLoadAsync(RectTransform, args);
@@ -701,31 +661,12 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             // Unload unused Modal
             await exitModal.BeforeReleaseAsync();
 
-            DestroyAndForget(exitModal, backdrop).Forget();
+            DestroyAndForget(exitModal).Forget();
+            DestroyAndForget(backdrop).Forget();
 
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
-            }
-        }
-
-        private async UniTaskVoid DestroyAndForget(Modal modal, ModalBackdrop backdrop)
-        {
-            var modalId = modal.GetInstanceID();
-
-            Destroy(modal.gameObject);
-
-            if (backdrop)
-            {
-                Destroy(backdrop.gameObject);
-            }
-
-            await UniTask.NextFrame();
-
-            if (_assetLoadHandles.TryGetValue(modalId, out var loadHandle))
-            {
-                AssetLoader.Release(loadHandle.Id);
-                _assetLoadHandles.Remove(modalId);
             }
         }
     }

@@ -25,8 +25,6 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
         }
 
-        public UnityScreenNavigatorSettings Settings { get; set; }
-
         public ActivityTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         public bool IsTransitioning { get; private set; }

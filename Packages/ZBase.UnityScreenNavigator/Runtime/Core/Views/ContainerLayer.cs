@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
@@ -9,6 +10,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     public abstract class ContainerLayer : Window, IContainerLayer
     {
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
+        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+
         private IAssetLoader _assetLoader;
 
         public string LayerName { get; private set; }
@@ -30,8 +33,6 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         }
 
         protected ContainerLayerConfig Config { get; private set; }
-
-        protected UnityScreenNavigatorSettings Settings { get; private set; }
 
         protected RectTransform PoolTransform { get; private set; }
 
@@ -129,6 +130,59 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             }
 
             AssetLoader.Release(handle.Id);
+        }
+
+        protected async UniTask<T> GetViewAsync<T>(string resourcePath, bool loadAsync)
+            where T : Window
+        {
+            var assetLoadHandle = loadAsync
+                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
+                : AssetLoader.Load<GameObject>(resourcePath);
+
+            while (assetLoadHandle.IsDone == false)
+            {
+                await UniTask.NextFrame();
+            }
+
+            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
+            {
+                throw assetLoadHandle.OperationException;
+            }
+
+            var instance = Instantiate(assetLoadHandle.Result);
+
+            if (instance.TryGetComponent<T>(out var view) == false)
+            {
+                Debug.LogError(
+                    $"Cannot find the {typeof(T).Name} component on the specified resource `{resourcePath}`."
+                    , instance
+                );
+
+                return null;
+            }
+
+            view.Settings = Settings;
+
+            var viewId = view.GetInstanceID();
+            view.Identifier = $"{gameObject.name}-{viewId}";
+            _assetLoadHandles.Add(viewId, assetLoadHandle);
+
+            return view;
+        }
+
+        protected async UniTaskVoid DestroyAndForget(UIBehaviour view)
+        {
+            var id = view.GetInstanceID();
+
+            Destroy(view.gameObject);
+
+            await UniTask.NextFrame();
+
+            if (_assetLoadHandles.TryGetValue(id, out var loadHandle))
+            {
+                AssetLoader.Release(loadHandle.Id);
+                _assetLoadHandles.Remove(id);
+            }
         }
     }
 }

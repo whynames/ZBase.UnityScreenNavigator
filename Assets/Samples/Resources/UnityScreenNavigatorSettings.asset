@@ -27,4 +27,4 @@ MonoBehaviour:
   _modalBackdropPrefab: {fileID: 0}
   _assetLoader: {fileID: 0}
   _enableInteractionInTransition: 0
-  _disableModalBackdrop: 1
+  _disableModalBackdrop: 0

@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
-using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
@@ -15,8 +14,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
     {
         private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
-
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
 
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Screen>> _screens = new();
@@ -52,23 +49,14 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         {
             var screens = _screens;
             var count = screens.Count;
-            var assetLoadHandles = _assetLoadHandles;
 
             for (var i = 0; i < count; i++)
             {
                 var screen = screens[i].View;
-                var screenId = screen.GetInstanceID();
-
-                Destroy(screen.gameObject);
-
-                if (assetLoadHandles.TryGetValue(screenId, out var assetLoadHandle))
-                {
-                    AssetLoader.Release(assetLoadHandle.Id);
-                }
+                DestroyAndForget(screen).Forget();
             }
 
             screens.Clear();
-            assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(LayerName);
 
             using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
@@ -271,10 +259,9 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             var screen = _screens[index].View;
-            var screenId = screen.GetInstanceID();
             _screens.RemoveAt(index);
 
-            DestroyAndForget(screen, screenId).Forget();
+            DestroyAndForget(screen).Forget();
         }
 
         /// <summary>
@@ -391,7 +378,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 await exitScreen.BeforeReleaseAsync();
 
-                DestroyAndForget(exitScreen, exitScreenId.Value).Forget();
+                DestroyAndForget(exitScreen).Forget();
             }
 
             _isActiveScreenStacked = options.stack;
@@ -469,38 +456,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 Interactable = false;
             }
 
-            // Setup
-            var assetLoadHandle = options.options.loadAsync
-                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                : AssetLoader.Load<GameObject>(resourcePath);
-
-            while (assetLoadHandle.IsDone == false)
-            {
-                await UniTask.NextFrame();
-            }
-
-            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
-            {
-                throw assetLoadHandle.OperationException;
-            }
-
-            var instance = Instantiate(assetLoadHandle.Result);
-
-            if (instance.TryGetComponent<TScreen>(out var enterScreen) == false)
-            {
-                Debug.LogError(
-                    $"Cannot transition because {typeof(TScreen).Name} component is not " +
-                    $"attached to the specified resource `{resourcePath}`."
-                    , instance
-                );
-
-                return;
-            }
-
-            enterScreen.Settings = Settings;
-
-            var screenId = enterScreen.GetInstanceID();
-            _assetLoadHandles.Add(screenId, assetLoadHandle);
+            var enterScreen = await GetViewAsync<TScreen>(resourcePath, options.options.loadAsync);
             options.options.onLoaded?.Invoke(enterScreen, args);
 
             await enterScreen.AfterLoadAsync(RectTransform, args);
@@ -561,7 +517,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 await exitScreen.BeforeReleaseAsync();
 
-                DestroyAndForget(exitScreen, exitScreenId.Value).Forget();
+                DestroyAndForget(exitScreen).Forget();
             }
 
             _isActiveScreenStacked = options.stack;
@@ -569,19 +525,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
-            }
-        }
-
-        private async UniTaskVoid DestroyAndForget(Screen screen, int screenId)
-        {
-            Destroy(screen.gameObject);
-
-            await UniTask.NextFrame();
-
-            if (_assetLoadHandles.TryGetValue(screenId, out var handle))
-            {
-                AssetLoader.Release(handle.Id);
-                _assetLoadHandles.Remove(screenId);
             }
         }
 
@@ -628,7 +571,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             var exitScreen = _screens[lastScreen].View;
             exitScreen.Settings = Settings;
 
-            var exitScreenId = exitScreen.GetInstanceID();
             var enterScreen = _screens.Count == 1 ? null : _screens[^2].View;
 
             if (enterScreen)
@@ -677,7 +619,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             // Unload unused Screen
             await exitScreen.BeforeReleaseAsync();
 
-            DestroyAndForget(exitScreen, exitScreenId).Forget();
+            DestroyAndForget(exitScreen).Forget();
 
             _isActiveScreenStacked = true;
             

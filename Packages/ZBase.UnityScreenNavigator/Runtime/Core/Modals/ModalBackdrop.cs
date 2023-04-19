@@ -1,11 +1,12 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    public sealed class ModalBackdrop : MonoBehaviour
+    public sealed class ModalBackdrop : UIBehaviour
     {
         [SerializeField] private ModalBackdropTransitionAnimationContainer _animationContainer;
         [SerializeField] private bool _closeModalWhenClicked;
@@ -20,7 +21,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
         public ModalBackdropTransitionAnimationContainer AnimationContainer => _animationContainer;
 
-        private void Awake()
+        protected override void Awake()
         {
             _rectTransform = (RectTransform)transform;
             _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();

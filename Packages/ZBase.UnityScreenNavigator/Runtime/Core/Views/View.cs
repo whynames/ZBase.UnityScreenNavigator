@@ -150,7 +150,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 return _canvasGroup;
             }
         }
-        
+
+        public UnityScreenNavigatorSettings Settings { get; set; }
+
         protected void SetIdentifer()
         {
             _identifier = _usePrefabNameAsIdentifier
