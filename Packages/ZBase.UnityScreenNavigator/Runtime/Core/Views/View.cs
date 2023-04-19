@@ -54,9 +54,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             }
         }
 
-        private Transform _parent;
+        private RectTransform _parent;
 
-        public virtual Transform Parent
+        public virtual RectTransform Parent
         {
             get
             {

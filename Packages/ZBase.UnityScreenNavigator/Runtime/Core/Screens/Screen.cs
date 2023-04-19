@@ -109,7 +109,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             SetIdentifer();
 
             Parent = parentTransform;
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
 
             // Set order of rendering.
             var siblingIndex = 0;
@@ -141,7 +141,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             IsTransitioning = true;
             TransitionAnimationType = push ? ScreenTransitionAnimationType.PushEnter : ScreenTransitionAnimationType.PopEnter;
             gameObject.SetActive(true);
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(0.0f);
 
             Alpha = 0.0f;
@@ -171,7 +171,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 await anim.PlayAsync(TransitionProgressReporter);
             }
 
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(1.0f);
         }
 
@@ -204,7 +204,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 : ScreenTransitionAnimationType.PopExit;
 
             gameObject.SetActive(true);
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(0.0f);
 
             Alpha = 1.0f;

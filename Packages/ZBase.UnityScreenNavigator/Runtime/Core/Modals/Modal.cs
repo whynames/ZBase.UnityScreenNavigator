@@ -106,7 +106,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             SetIdentifer();
 
             Parent = parentTransform;
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
 
             Alpha = 0.0f;
 
@@ -122,7 +122,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             {
                 TransitionAnimationType = ModalTransitionAnimationType.Enter;
                 gameObject.SetActive(true);
-                RectTransform.FillParent((RectTransform)Parent);
+                RectTransform.FillParent(Parent);
                 Alpha = 0.0f;
             }
 
@@ -154,7 +154,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                     await anim.PlayAsync(TransitionProgressReporter);
                 }
 
-                RectTransform.FillParent((RectTransform)Parent);
+                RectTransform.FillParent(Parent);
             }
 
             SetTransitionProgress(1.0f);
@@ -189,7 +189,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             {
                 TransitionAnimationType = ModalTransitionAnimationType.Exit;
                 gameObject.SetActive(true);
-                RectTransform.FillParent((RectTransform)Parent);
+                RectTransform.FillParent(Parent);
                 Alpha = 1.0f;
             }
 

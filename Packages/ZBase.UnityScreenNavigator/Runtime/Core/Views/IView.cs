@@ -16,7 +16,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         CanvasGroup CanvasGroup { get; }
         
-        Transform Parent { get; }
+        RectTransform Parent { get; }
 
         GameObject Owner { get; }
     }

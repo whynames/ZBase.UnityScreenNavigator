@@ -108,7 +108,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             SetIdentifer();
 
             Parent = parentTransform;
-            RectTransform.FillParent((RectTransform) Parent);
+            RectTransform.FillParent(Parent);
             Alpha = 0.0f;
 
             var tasks = _lifecycleEvents.Select(x => x.Initialize(args));
@@ -123,7 +123,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 : ActivityTransitionAnimationType.HideEnter;
 
             gameObject.SetActive(true);
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(0.0f);
 
             Alpha = 0.0f;
@@ -147,7 +147,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 await anim.PlayAsync(TransitionProgressReporter);
             }
 
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(1.0f);
         }
 

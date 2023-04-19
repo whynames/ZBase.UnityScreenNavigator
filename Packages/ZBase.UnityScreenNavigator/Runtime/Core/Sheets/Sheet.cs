@@ -93,7 +93,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             SetIdentifer();
 
             Parent = parentTransform;
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
 
             // Set order of rendering.
             var siblingIndex = 0;
@@ -122,7 +122,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             IsTransitioning = true;
             TransitionAnimationType = SheetTransitionAnimationType.Enter;
             gameObject.SetActive(true);
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(0.0f);
 
             Alpha = 0.0f;
@@ -149,7 +149,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 await anim.PlayAsync(TransitionProgressReporter);
             }
 
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
         }
 
         internal void AfterEnter(Memory<object> args)
@@ -168,7 +168,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             IsTransitioning = true;
             TransitionAnimationType = SheetTransitionAnimationType.Exit;
             gameObject.SetActive(true);
-            RectTransform.FillParent((RectTransform)Parent);
+            RectTransform.FillParent(Parent);
             SetTransitionProgress(0.0f);
 
             Alpha = 1.0f;
