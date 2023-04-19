@@ -439,10 +439,9 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 callbackReceiver.AfterHide(activity, args);
             }
 
-            // Unload unused Modal
+            // Unload unused Activity
             await activity.BeforeReleaseAsync();
 
-            // Unload unused Activity
             DestroyAndForget(activity).Forget();
 
             if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
@@ -453,11 +452,11 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         private async UniTaskVoid DestroyAndForget(Activity activity)
         {
+            var activityId = activity.GetInstanceID();
+
             Destroy(activity.gameObject);
 
             await UniTask.NextFrame();
-
-            var activityId = activity.GetInstanceID();
 
             if (_assetLoadHandles.TryGetValue(activityId, out var loadHandle))
             {

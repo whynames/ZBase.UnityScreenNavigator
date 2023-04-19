@@ -285,13 +285,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             var screenId = screen.GetInstanceID();
             _screens.RemoveAt(index);
 
-            Destroy(screen.gameObject);
-
-            if (_assetLoadHandles.TryGetValue(screenId, out var loadHandle))
-            {
-                AssetLoader.Release(loadHandle.Id);
-                _assetLoadHandles.Remove(screenId);
-            }
+            DestroyAndForget(screen, screenId).Forget();
         }
 
         /// <summary>

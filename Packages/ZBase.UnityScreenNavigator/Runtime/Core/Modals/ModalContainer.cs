@@ -295,24 +295,17 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             var modal = _modals[index].View;
-            var modalId = modal.GetInstanceID();
             _modals.RemoveAt(index);
 
-            Destroy(modal.gameObject);
+            ModalBackdrop backdrop = null;
 
             if (_disableBackdrop == false)
             {
-                var backdrop = _backdrops[index];
+                backdrop = _backdrops[index];
                 _backdrops.RemoveAt(index);
-
-                Destroy(backdrop.gameObject);
             }
 
-            if (_assetLoadHandles.TryGetValue(modalId, out var loadHandle))
-            {
-                AssetLoader.Release(loadHandle.Id);
-                _assetLoadHandles.Remove(modalId);
-            }
+            DestroyAndForget(modal, backdrop).Forget();
         }
 
         /// <summary>
@@ -636,7 +629,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             var lastModalIndex = _modals.Count - 1;
             var exitModal = _modals[lastModalIndex].View;
-            var exitModalId = exitModal.GetInstanceID();
             var enterModal = _modals.Count == 1 ? null : _modals[^2].View;
 
             ModalBackdrop backdrop = null;
@@ -694,7 +686,19 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             // Unload unused Modal
             await exitModal.BeforeReleaseAsync();
 
-            Destroy(exitModal.gameObject);
+            DestroyAndForget(exitModal, backdrop).Forget();
+
+            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
+            {
+                Interactable = true;
+            }
+        }
+
+        private async UniTaskVoid DestroyAndForget(Modal modal, ModalBackdrop backdrop)
+        {
+            var modalId = modal.GetInstanceID();
+
+            Destroy(modal.gameObject);
 
             if (backdrop)
             {
@@ -703,15 +707,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             await UniTask.NextFrame();
 
-            if (_assetLoadHandles.TryGetValue(exitModalId, out var loadHandle))
+            if (_assetLoadHandles.TryGetValue(modalId, out var loadHandle))
             {
                 AssetLoader.Release(loadHandle.Id);
-                _assetLoadHandles.Remove(exitModalId);
-            }
-
-            if (UnityScreenNavigatorSettings.Instance.EnableInteractionInTransition == false)
-            {
-                Interactable = true;
+                _assetLoadHandles.Remove(modalId);
             }
         }
 
