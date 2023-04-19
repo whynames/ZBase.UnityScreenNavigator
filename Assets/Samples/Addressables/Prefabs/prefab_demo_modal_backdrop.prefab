@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &78457337265729855
 RectTransform:
   m_ObjectHideFlags: 0
@@ -92,8 +92,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _usePrefabNameAsIdentifier: 1
   _identifier: 
-  _rectTransform: {fileID: 0}
-  _canvasGroup: {fileID: 0}
+  _rectTransform: {fileID: 78457337265729855}
+  _canvasGroup: {fileID: 3012687162618884780}
   _animationContainer:
     _enterAnimation:
       _assetType: 0
@@ -113,6 +113,6 @@ CanvasGroup:
   m_GameObject: {fileID: 78457337265729854}
   m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 1
+  m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
