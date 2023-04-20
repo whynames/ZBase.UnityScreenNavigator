@@ -176,9 +176,13 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
-        public static async UniTask<ModalContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        public static async UniTask<ModalContainer> CreateAsync(
+              ContainerLayerConfig layerConfig
+            , IContainerLayerManager manager
+            , UnityScreenNavigatorSettings settings
+        )
         {
-            var container = Create(layerConfig, manager);
+            var container = Create(layerConfig, manager, settings);
             await UniTask.NextFrame();
             return container;
         }
@@ -186,7 +190,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <summary>
         /// Create a new <see cref="ModalContainer" /> as a layer.
         /// </summary>
-        public static ModalContainer Create(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        public static ModalContainer Create(
+              ContainerLayerConfig layerConfig
+            , IContainerLayerManager manager
+            , UnityScreenNavigatorSettings settings
+        )
         {
             var root = new GameObject(
                   layerConfig.name
@@ -204,7 +212,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             rectTransform.localPosition = Vector3.zero;
 
             var container = root.AddComponent<ModalContainer>();
-            container.Initialize(layerConfig, manager);
+            container.Initialize(layerConfig, manager, settings);
 
             s_instanceCacheByName.Add(container.LayerName, container);
             return container;

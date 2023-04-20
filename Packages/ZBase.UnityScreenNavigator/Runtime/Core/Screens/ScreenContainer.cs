@@ -152,9 +152,13 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
-        public static async UniTask<ScreenContainer> CreateAsync(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        public static async UniTask<ScreenContainer> CreateAsync(
+              ContainerLayerConfig layerConfig
+            , IContainerLayerManager manager
+            , UnityScreenNavigatorSettings settings
+        )
         {
-            var container = Create(layerConfig, manager);
+            var container = Create(layerConfig, manager, settings);
             await UniTask.NextFrame();
             return container;
         }
@@ -162,7 +166,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <summary>
         /// Create a new <see cref="ScreenContainer"/> as a layer.
         /// </summary>
-        public static ScreenContainer Create(ContainerLayerConfig layerConfig, IContainerLayerManager manager)
+        public static ScreenContainer Create(
+              ContainerLayerConfig layerConfig
+            , IContainerLayerManager manager
+            , UnityScreenNavigatorSettings settings
+        )
         {
             var root = new GameObject(
                   layerConfig.name
@@ -180,7 +188,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             rectTransform.localPosition = Vector3.zero;
 
             var container = root.AddComponent<ScreenContainer>();
-            container.Initialize(layerConfig, manager);
+            container.Initialize(layerConfig, manager, settings);
 
             s_instanceCacheByName.Add(container.LayerName, container);
             return container;

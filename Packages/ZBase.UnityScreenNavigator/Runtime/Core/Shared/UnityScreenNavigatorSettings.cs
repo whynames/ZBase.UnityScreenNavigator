@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
@@ -10,26 +9,37 @@ namespace ZBase.UnityScreenNavigator.Core
     {
         private const string DEFAULT_MODAL_BACKDROP_PREFAB_KEY = "DefaultModalBackdrop";
 
-        private static UnityScreenNavigatorSettings _instance;
+        private static UnityScreenNavigatorSettings _default;
 
-        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
-        {
-            _instance = null;
-        }
-
-        public static UnityScreenNavigatorSettings Instance
+        /// <summary>
+        /// The default settings for UnityScreenNavigator.
+        /// </summary>
+        /// <remarks>
+        /// Its value must be manually set before the UnityScreenNavigator is used.
+        /// </remarks>
+        public static UnityScreenNavigatorSettings DefaultSettings
         {
             get
             {
-                if (_instance == false)
-                {
-                    var asset = Resources.FindObjectsOfTypeAll<UnityScreenNavigatorSettings>().FirstOrDefault();
-                    _instance = asset ? asset : CreateInstance<UnityScreenNavigatorSettings>();
-                }
+                ThrowIfDefaultSettingsNull();
+                return _default;
+            }
 
-                return _instance;
+            set => _default = value;
+        }
+
+        private static void ThrowIfDefaultSettingsNull()
+        {
+            const string MESSAGE = "UnityScreenNavigatorSettings.DefaultSettings is null. "
+                + "Its value must be set before the UnityScreenNavigator is used.";
+
+            if (_default == false)
+            {
+#if UNITY_EDITOR
+                Debug.LogError(MESSAGE);
+#else
+                throw new System.NullReferenceException(MESSAGE);
+#endif
             }
         }
 
@@ -69,7 +79,7 @@ namespace ZBase.UnityScreenNavigator.Core
 
         [EnabledIf(nameof(_disableModalBackdrop), false)]
         [SerializeField] private string _modalBackdropResourcePath = DEFAULT_MODAL_BACKDROP_PREFAB_KEY;
-        
+
         private IAssetLoader _defaultAssetLoader;
 
         public ITransitionAnimation SheetEnterAnimation => _sheetEnterAnimation

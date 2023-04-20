@@ -54,10 +54,14 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             _resourcePathToPool.Clear();
         }
 
-        protected void Initialize(ContainerLayerConfig config, IContainerLayerManager manager)
+        protected void Initialize(
+              ContainerLayerConfig config
+            , IContainerLayerManager manager
+            , UnityScreenNavigatorSettings settings
+        )
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
-            Settings = UnityScreenNavigatorSettings.Instance;
+            Settings = settings ? settings : throw new ArgumentNullException(nameof(settings));
 
             ContainerLayerManager = manager ?? throw new ArgumentNullException(nameof(manager));
             ContainerLayerManager.Add(this);
