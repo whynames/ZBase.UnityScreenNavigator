@@ -133,21 +133,63 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         /// </summary>
         /// <param name="resourcePath">Resource path of the view</param>
         /// <param name="amount">The number of view instances to keep</param>
+        /// <remarks>Fire-and-forget</remarks>
         public void KeepInPool(string resourcePath, int amount)
+        {
+            KeepInPoolAndForget(resourcePath, amount).Forget();
+        }
+
+        private async UniTaskVoid KeepInPoolAndForget(string resourcePath, int amount)
+        {
+            await KeepInPoolAsync(resourcePath, amount);
+        }
+
+        /// <summary>
+        /// Only keep an amount of view instances in the pool,
+        /// destroy other redundant instances.
+        /// </summary>
+        /// <param name="resourcePath">Resource path of the view</param>
+        /// <param name="amount">The number of view instances to keep</param>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask KeepInPoolAsync(string resourcePath, int amount)
         {
             if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
             {
                 return;
             }
 
-            amount = Mathf.Clamp(amount, 0, pool.Count);
+            var amountToDestroy = pool.Count - Mathf.Clamp(amount, 0, pool.Count);
 
-            for (var i = 0; i < amount; i++)
+            if (amountToDestroy < 1)
+            {
+                return;
+            }
+
+            var doDestroying = false;
+
+            for (var i = 0; i < amountToDestroy; i++)
             {
                 if (pool.TryDequeue(out var view))
                 {
-                    DestroyAndForget(new ViewRef(view, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                    if (view && view.gameObject)
+                    {
+                        Destroy(view.gameObject);
+                        doDestroying = true;
+                    }
                 }
+            }
+
+            if (doDestroying)
+            {
+                await UniTask.NextFrame();
+            }
+
+            if (pool.Count < 1
+                && _resourcePathToHandle.TryGetValue(resourcePath, out var handle)
+            )
+            {
+                AssetLoader.Release(handle.Id);
+                _resourcePathToHandle.Remove(resourcePath);
             }
         }
 
@@ -311,9 +353,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             if (view && view.gameObject)
             {
                 Destroy(view.gameObject);
+                await UniTask.NextFrame();
             }
-
-            await UniTask.NextFrame();
 
             if (ContainsInPool(viewRef.ResourcePath))
             {
