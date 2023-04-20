@@ -1,54 +1,22 @@
-﻿using System;
-using UnityEngine;
-using ZBase.UnityScreenNavigator.Core.Activities;
-using ZBase.UnityScreenNavigator.Core.Modals;
-using ZBase.UnityScreenNavigator.Core.Screens;
+﻿using ZBase.UnityScreenNavigator.Core.Screens;
 using ZBase.UnityScreenNavigator.Core;
 using ZBase.UnityScreenNavigator.Core.Views;
-using ZBase.UnityScreenNavigator.Foundation;
+using Cysharp.Threading.Tasks;
 
 namespace Demo.Scripts
 {
-    public class Launcher : MonoBehaviour
+    public class Launcher : UnityScreenNavigatorLauncher
     {
-        [SerializeField]
-        private ContainerLayerSettings containerLayerSettings;
-
-        private GlobalContainerLayerManager _globalContainerLayerManager;
-
-        private void Awake()
+        protected override void Start()
         {
-            if (containerLayerSettings == null)
-                throw new ArgumentNullException(nameof(containerLayerSettings));
-
-            _globalContainerLayerManager = this.GetOrAddComponent<GlobalContainerLayerManager>();
+            base.Start();
+            ShowTopPage().Forget();
         }
 
-        private async void Start()
+        private async UniTaskVoid ShowTopPage()
         {
-            var layers = containerLayerSettings.GetContainerLayers();
-            var manager = _globalContainerLayerManager;
-
-            foreach (var layer in layers)
-            {
-                switch (layer.layerType)
-                {
-                    case ContainerLayerType.Modal:
-                        ModalContainer.Create(layer, manager);
-                        break;
-
-                    case ContainerLayerType.Screen:
-                        ScreenContainer.Create(layer, manager);
-                        break;
-
-                    case ContainerLayerType.Activity:
-                        ActivityContainer.Create(layer, manager);
-                        break;
-                }
-            }
-
             var options = new WindowOptions(ResourceKey.TopPagePrefab(), false, loadAsync: false);
-            await manager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
+            await GlobalContainerLayerManager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
         }
     }
 }
