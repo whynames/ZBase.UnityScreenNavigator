@@ -19,7 +19,7 @@ namespace ZBase.UnityScreenNavigator.Core
 
         protected GlobalContainerLayerManager GlobalContainerLayerManager { get; private set; }
 
-        private void Awake()
+        protected virtual void Awake()
         {
             if (unityScreenNavigatorSettings == false)
             {
