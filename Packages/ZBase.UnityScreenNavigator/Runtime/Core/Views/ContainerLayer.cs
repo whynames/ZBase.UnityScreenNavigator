@@ -9,8 +9,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 {
     public abstract class ContainerLayer : Window, IContainerLayer
     {
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _preloadedResourceHandles = new();
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _viewIdToHandle = new();
+        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _resourcePathToHandle = new();
         private readonly Dictionary<string, Queue<View>> _resourcePathToPool = new();
 
         private IAssetLoader _assetLoader;
@@ -85,11 +84,6 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         private void InitializePool(Canvas canvas)
         {
-            if (EnablePooling == false)
-            {
-                return;
-            }
-
             var parentTransform = this.transform.parent.GetComponent<RectTransform>();
 
             var poolGO = new GameObject(
@@ -114,28 +108,73 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         }
 
         /// <summary>
-        /// Preload a prefab of <see cref="Activity"/>.
+        /// Returns the number of view instances currently in the pool
         /// </summary>
-        /// <remarks>Fire-and-forget</remarks>
-        public void Preload(string resourcePath, bool loadAsync = true)
-        {
-            PreloadAndForget(resourcePath, loadAsync).Forget();
-        }
+        /// <param name="resourcePath"></param>
+        /// <returns></returns>
+        public int CountInPool(string resourcePath)
+            => _resourcePathToPool.TryGetValue(resourcePath, out var pool) ? pool.Count : 0;
 
-        private async UniTaskVoid PreloadAndForget(string resourcePath, bool loadAsync = true)
+        /// <summary>
+        /// Returns true if there is at least one view instance in the pool.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <returns></returns>
+        public bool ContainsInPool(string resourcePath)
+            => _resourcePathToPool.TryGetValue(resourcePath, out var pool) && pool.Count > 0;
+
+        /// <summary>
+        /// Only keep an amount of view instances in the pool,
+        /// destroy other redundant instances.
+        /// </summary>
+        /// <param name="resourcePath">Resource path of the view</param>
+        /// <param name="amount">The number of view instances to keep</param>
+        public void KeepInPool(string resourcePath, int amount)
         {
-            await PreloadAsync(resourcePath, loadAsync);
+            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
+            {
+                return;
+            }
+
+            amount = Mathf.Clamp(amount, 0, pool.Count);
+
+            for (var i = 0; i < amount; i++)
+            {
+                if (pool.TryDequeue(out var view))
+                {
+                    DestroyAndForget(new ViewRef(view, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                }
+            }
         }
 
         /// <summary>
-        /// Preload a prefab of <see cref="Activity"/>.
+        /// Preload an amount of view instances and keep them in the pool.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        public void Preload(string resourcePath, bool loadAsync = true, int amount = 1)
+        {
+            PreloadAndForget(resourcePath, loadAsync, amount).Forget();
+        }
+
+        private async UniTaskVoid PreloadAndForget(string resourcePath, bool loadAsync = true, int amount = 1)
+        {
+            await PreloadAsync(resourcePath, loadAsync, amount);
+        }
+
+        /// <summary>
+        /// Preload an amount of view instances and keep them in the pool.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true)
+        public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true, int amount = 1)
         {
-            if (_preloadedResourceHandles.ContainsKey(resourcePath))
+            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
             {
-                Debug.LogError($"The resource at `{resourcePath}` has already been preloaded.");
+                _resourcePathToPool[resourcePath] = pool = new Queue<View>();
+            }
+
+            if (amount < 1)
+            {
+                Debug.LogWarning($"The amount of preloaded view instances should be greater than 0.");
                 return;
             }
 
@@ -143,56 +182,86 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 ? AssetLoader.LoadAsync<GameObject>(resourcePath)
                 : AssetLoader.Load<GameObject>(resourcePath);
 
-            _preloadedResourceHandles.Add(resourcePath, assetLoadHandle);
-
-            if (assetLoadHandle.IsDone == false)
+            while (assetLoadHandle.IsDone == false)
             {
-                await assetLoadHandle.Task;
+                await UniTask.NextFrame();
             }
 
             if (assetLoadHandle.Status == AssetLoadStatus.Failed)
             {
                 throw assetLoadHandle.OperationException;
             }
-        }
 
-        public bool IsPreloadRequested(string resourcePath)
-        {
-            return _preloadedResourceHandles.ContainsKey(resourcePath);
-        }
+            _resourcePathToHandle[resourcePath] = assetLoadHandle;
 
-        public bool IsPreloaded(string resourcePath)
-        {
-            if (_preloadedResourceHandles.TryGetValue(resourcePath, out var handle) == false)
+            for (var i = 0; i < amount; i++)
             {
-                return false;
+                InstantiateToPool(resourcePath, assetLoadHandle, pool);
             }
-
-            return handle.Status == AssetLoadStatus.Success;
         }
 
-        public void ReleasePreloaded(string resourcePath)
+        private void InstantiateToPool(
+              string resourcePath
+            , AssetLoadHandle<GameObject> assetLoadHandle
+            , Queue<View> pool
+        )
         {
-            if (_preloadedResourceHandles.TryGetValue(resourcePath, out var handle) == false)
+            var instance = Instantiate(assetLoadHandle.Result);
+
+            if (instance.TryGetComponent<View>(out var view) == false)
             {
-                Debug.LogError($"The resource at `{resourcePath}` is not preloaded.");
+                Debug.LogError(
+                    $"Cannot find the {typeof(View).Name} component on the specified resource `{resourcePath}`."
+                    , instance
+                );
+
                 return;
             }
 
-            AssetLoader.Release(handle.Id);
+            view.Settings = Settings;
+            view.RectTransform.SetParent(PoolTransform);
+            view.Parent = PoolTransform;
+            view.Owner.SetActive(false);
+
+            pool.Enqueue(view);
         }
 
-        protected async UniTask<T> GetViewAsync<T>(string resourcePath, WindowOptions options)
+        [Obsolete("This method is deprecated. Use ContainsInPool(string) instead.")]
+        public bool IsPreloadRequested(string resourcePath)
+            => ContainsInPool(resourcePath);
+
+        [Obsolete("This method is deprecated. Use ContainsInPool(string) instead.")]
+        public bool IsPreloaded(string resourcePath)
+            => ContainsInPool(resourcePath);
+
+        [Obsolete("This method is deprecated. Use KeepInPool(string, int) instead.")]
+        public void ReleasePreloaded(string resourcePath)
+            => KeepInPool(resourcePath, 0);
+
+        protected async UniTask<T> GetViewAsync<T>(WindowOptions options)
             where T : View
         {
+            var resourcePath = options.resourcePath;
+
             if (GetFromPool<T>(resourcePath, options.poolingPolicy, out var existView))
             {
                 return existView;
             }
 
-            var assetLoadHandle = options.loadAsync
-                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                : AssetLoader.Load<GameObject>(resourcePath);
+            AssetLoadHandle<GameObject> assetLoadHandle;
+            var handleInMap = false;
+
+            if (_resourcePathToHandle.TryGetValue(resourcePath, out var handle))
+            {
+                assetLoadHandle = handle;
+                handleInMap = true;
+            }
+            else
+            {
+                assetLoadHandle = options.loadAsync
+                    ? AssetLoader.LoadAsync<GameObject>(resourcePath)
+                    : AssetLoader.Load<GameObject>(resourcePath);
+            }
 
             while (assetLoadHandle.IsDone == false)
             {
@@ -218,8 +287,10 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             view.Settings = Settings;
 
-            var id = view.GetInstanceID();
-            _viewIdToHandle[id] = assetLoadHandle;
+            if (handleInMap == false)
+            {
+                _resourcePathToHandle[resourcePath] = assetLoadHandle;
+            }
 
             return view;
         }
@@ -232,7 +303,6 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             }
 
             var view = viewRef.View;
-            var id = view.GetInstanceID();
 
             if (view && view.gameObject)
             {
@@ -241,10 +311,15 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             await UniTask.NextFrame();
 
-            if (_viewIdToHandle.TryGetValue(id, out var loadHandle))
+            if (ContainsInPool(viewRef.ResourcePath))
             {
-                AssetLoader.Release(loadHandle.Id);
-                _viewIdToHandle.Remove(id);
+                return;
+            }
+
+            if (_resourcePathToHandle.TryGetValue(viewRef.ResourcePath, out var handle))
+            {
+                AssetLoader.Release(handle.Id);
+                _resourcePathToHandle.Remove(viewRef.ResourcePath);
             }
         }
 

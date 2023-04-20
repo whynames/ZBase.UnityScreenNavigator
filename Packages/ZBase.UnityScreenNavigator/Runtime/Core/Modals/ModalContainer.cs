@@ -521,12 +521,12 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                     , poolingPolicy: PoolingPolicy.UseSettings
                 );
 
-                backdrop = await GetViewAsync<ModalBackdrop>(backdropResourcePath, backdropOptions);
+                backdrop = await GetViewAsync<ModalBackdrop>(backdropOptions);
                 backdrop.Setup(RectTransform, options.backdropAlpha, options.closeWhenClickOnBackdrop);
                 _backdrops.Add(new ViewRef<ModalBackdrop>(backdrop, backdropResourcePath, backdropOptions.poolingPolicy));
             }
 
-            var enterModal = await GetViewAsync<TModal>(resourcePath, options.options);
+            var enterModal = await GetViewAsync<TModal>(options.options);
             options.options.onLoaded?.Invoke(enterModal, args);
 
             await enterModal.AfterLoadAsync(RectTransform, args);

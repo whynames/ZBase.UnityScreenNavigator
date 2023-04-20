@@ -34,7 +34,7 @@ namespace Demo.Scripts
         {
             _settingButton.onClick.RemoveListener(OnSettingButtonClicked);
             _shopButton.onClick.RemoveListener(OnShopButtonClicked);
-            ScreenContainer.Of(transform).ReleasePreloaded(ResourceKey.ShopPagePrefab());
+            ScreenContainer.Of(transform).KeepInPool(ResourceKey.ShopPagePrefab(), 0);
             return UniTask.CompletedTask;
         }
 

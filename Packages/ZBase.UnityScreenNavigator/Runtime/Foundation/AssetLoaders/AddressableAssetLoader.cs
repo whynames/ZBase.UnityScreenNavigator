@@ -51,6 +51,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
 
             var controlId = _nextControlId++;
             _controlIdToHandles.Add(controlId, addressableHandle);
+
             var handle = new AssetLoadHandle<T>(controlId);
             var tcs = new UniTaskCompletionSource<T>();
             addressableHandle.Completed += x =>

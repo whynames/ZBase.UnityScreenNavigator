@@ -311,7 +311,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 Interactable = false;
             }
 
-            var activity = await GetViewAsync<TActivity>(resourcePath, options.options);
+            var activity = await GetViewAsync<TActivity>(options.options);
             Add(resourcePath, activity, options.options.poolingPolicy);
             options.options.onLoaded?.Invoke(activity, args);
 

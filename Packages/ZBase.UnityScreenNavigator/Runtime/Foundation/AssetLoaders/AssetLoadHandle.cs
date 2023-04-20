@@ -50,10 +50,13 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
         }
     }
 
-    public sealed class AssetLoadHandle<T>
-        where T : Object
+    public class AssetLoadHandle
     {
         private Func<float> _percentCompleteFunc;
+
+        public Object TypelessResult { get; private set; }
+
+        public UniTask TypelessTask { get; private set; }
 
         public AssetLoadHandle(AssetLoadHandleId id)
         {
@@ -70,33 +73,51 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
 
         public Exception OperationException { get; private set; }
 
-        public T Result { get; private set; }
-
-        public UniTask<T> Task { get; private set; }
-
         public void SetStatus(AssetLoadStatus status)
         {
             Status = status;
-        }
-
-        public void SetResult(T result)
-        {
-            Result = result;
         }
 
         public void SetPercentCompleteFunc(Func<float> percentComplete)
         {
             _percentCompleteFunc = percentComplete;
         }
-        
-        public void SetTask(UniTask<T> task)
-        {
-            Task = task;
-        }
 
         public void SetOperationException(Exception ex)
         {
             OperationException = ex;
+        }
+
+        public void SetTypelessResult(Object result)
+        {
+            TypelessResult = result;
+        }
+
+        public void SetTypelessTask(UniTask task)
+        {
+            TypelessTask = task;
+        }
+    }
+
+    public class AssetLoadHandle<T> : AssetLoadHandle
+        where T : Object
+    {
+        public AssetLoadHandle(AssetLoadHandleId id) : base(id) { }
+
+        public T Result { get; private set; }
+
+        public UniTask<T> Task { get; private set; }
+
+        public void SetResult(T result)
+        {
+            Result = result;
+            SetTypelessResult(result);
+        }
+
+        public void SetTask(UniTask<T> task)
+        {
+            Task = task;
+            SetTypelessTask(task.AsUniTask());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -7,13 +8,16 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
 {
     public sealed class ResourcesAssetLoader : IAssetLoader
     {
+        private readonly Dictionary<AssetLoadHandleId, AssetLoadHandle> _controlIdToHandles = new();
+
         private uint _nextControlId;
 
         public AssetLoadHandle<T> Load<T>(string key) where T : Object
         {
             var controlId = _nextControlId++;
-
             var handle = new AssetLoadHandle<T>(controlId);
+            _controlIdToHandles.Add(controlId, handle);
+
             var result = Resources.Load<T>(key);
             handle.SetResult(result);
 
@@ -35,6 +39,8 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
         {
             var controlId = _nextControlId++;
             var handle = new AssetLoadHandle<T>(controlId);
+            _controlIdToHandles.Add(controlId, handle);
+
             var tcs = new UniTaskCompletionSource<T>();
             var req = Resources.LoadAsync<T>(key);
 
@@ -44,6 +50,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
                 handle.SetResult(result);
                 var status = result != null ? AssetLoadStatus.Success : AssetLoadStatus.Failed;
                 handle.SetStatus(status);
+
                 if (result == null)
                 {
                     var exception = new InvalidOperationException($"Requested asset（Key: {key}）was not found.");
@@ -58,13 +65,23 @@ namespace ZBase.UnityScreenNavigator.Foundation.AssetLoaders
             return handle;
         }
 
-
         /// <summary>
         /// Resources.UnloadUnusedAssets() is responsible for releasing
         /// assets loaded by Resources.Load(), so nothing is done here.
         /// </summary>
         public void Release(AssetLoadHandleId handleId)
         {
+            if (_controlIdToHandles.TryGetValue(handleId, out var handle) == false)
+            {
+                return;
+            }
+
+            _controlIdToHandles.Remove(handleId);
+
+            if (handle.TypelessResult)
+            {
+                Resources.UnloadAsset(handle.TypelessResult);
+            }
         }
     }
 }

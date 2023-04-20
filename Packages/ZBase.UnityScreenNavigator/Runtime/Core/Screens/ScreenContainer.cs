@@ -467,7 +467,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 Interactable = false;
             }
 
-            var enterScreen = await GetViewAsync<TScreen>(resourcePath, options.options);
+            var enterScreen = await GetViewAsync<TScreen>(options.options);
             options.options.onLoaded?.Invoke(enterScreen, args);
 
             await enterScreen.AfterLoadAsync(RectTransform, args);
