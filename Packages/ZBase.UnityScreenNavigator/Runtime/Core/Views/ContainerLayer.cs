@@ -54,7 +54,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             _resourcePathToPool.Clear();
         }
 
-        protected void Initialize(
+        public void Initialize(
               ContainerLayerConfig config
             , IContainerLayerManager manager
             , UnityScreenNavigatorSettings settings
