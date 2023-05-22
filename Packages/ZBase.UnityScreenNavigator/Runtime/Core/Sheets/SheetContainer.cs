@@ -17,16 +17,29 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
 
         [SerializeField] private string _name;
+        [SerializeField] UnityScreenNavigatorSettings _settings;
 
-        private readonly Dictionary<int, AssetLoadHandle<GameObject>> _assetLoadHandles = new();
+        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _resourcePathToHandle = new();
+        private readonly Dictionary<string, Queue<Sheet>> _resourcePathToPool = new();
         private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly Dictionary<string, int> _sheetNameToId = new();
-        private readonly Dictionary<int, Sheet> _sheets = new();
+        private readonly Dictionary<int, SheetRef<Sheet>> _sheets = new();
 
         private int? _activeSheetId;
         private CanvasGroup _canvasGroup;
+        private RectTransform _poolTransform;
 
-        private UnityScreenNavigatorSettings Settings => UnityScreenNavigatorSettings.DefaultSettings;
+        private UnityScreenNavigatorSettings Settings
+        {
+            get
+            {
+                if (_settings == false)
+                {
+                    _settings = UnityScreenNavigatorSettings.DefaultSettings;
+                }
+
+                return _settings;
+            }
+        }
 
         /// <summary>
         /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
@@ -45,7 +58,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                     return null;
                 }
 
-                return _sheets[_activeSheetId.Value];
+                return _sheets[_activeSheetId.Value].Sheet;
             }
         }
 
@@ -57,7 +70,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// <summary>
         /// Registered sheets.
         /// </summary>
-        public IReadOnlyDictionary<int, Sheet> Sheets => _sheets;
+        public IReadOnlyDictionary<int, SheetRef<Sheet>> Sheets => _sheets;
 
         public bool Interactable
         {
@@ -79,27 +92,50 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             s_instanceCacheByName[_name] = this;
             _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
+
+            InitializePool();
+        }
+
+        private void InitializePool()
+        {
+            var parentTransform = this.transform.parent.GetComponent<RectTransform>();
+
+            var poolGO = new GameObject(
+                $"[Pool] {this.name}"
+                , typeof(CanvasGroup)
+            );
+
+            _poolTransform = poolGO.GetOrAddComponent<RectTransform>();
+            _poolTransform.SetParent(parentTransform, false);
+            _poolTransform.FillParent(parentTransform);
+
+            var poolCanvasGroup = poolGO.GetComponent<CanvasGroup>();
+            poolCanvasGroup.alpha = 0f;
+            poolCanvasGroup.blocksRaycasts = false;
+            poolCanvasGroup.interactable = false;
         }
 
         protected override void OnDestroy()
         {
-            var sheets = _sheets;
-            var assetLoadHandles = _assetLoadHandles;
-
-            foreach (var sheet in sheets.Values)
+            foreach (var (resourcePath, pool) in _resourcePathToPool)
             {
-                var sheetId = sheet.GetInstanceID();
-
-                Destroy(sheet.gameObject);
-
-                if (assetLoadHandles.TryGetValue(sheetId, out var assetLoadHandle))
+                while (pool.TryDequeue(out var view))
                 {
-                    AssetLoader.Release(assetLoadHandle.Id);
+                    DestroyAndForget(new SheetRef(view, resourcePath, PoolingPolicy.DisablePooling)).Forget();
                 }
             }
 
+            _resourcePathToPool.Clear();
+
+            var sheets = _sheets;
+
+            foreach (var sheetRef in sheets.Values)
+            {
+                var (sheet, resourcePath) = sheetRef;
+                DestroyAndForget(new SheetRef(sheet, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+            }
+
             sheets.Clear();
-            _assetLoadHandles.Clear();
             s_instanceCacheByName.Remove(_name);
 
             using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
@@ -117,6 +153,23 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 s_instanceCacheByTransform.Remove(keyToRemove);
             }
         }
+
+        public void Deinitialize()
+        {
+            _activeSheetId = null;
+            IsInTransition = false;
+
+            var sheets = _sheets;
+
+            foreach (var sheetRef in sheets.Values)
+            {
+                ReturnToPool(sheetRef);
+            }
+
+            sheets.Clear();
+        }
+
+        #region STATIC_METHODS
 
         /// <summary>
         /// Get the <see cref="SheetContainer" /> that manages the sheet to which <paramref name="transform"/> belongs.
@@ -145,7 +198,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             container = rectTransform.GetComponentInParent<SheetContainer>();
-            
+
             if (container)
             {
                 s_instanceCacheByTransform.Add(id, container);
@@ -190,6 +243,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             return false;
         }
 
+        #endregion
+
         /// <summary>
         /// Add a callback receiver.
         /// </summary>
@@ -206,6 +261,167 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         public void RemoveCallbackReceiver(ISheetContainerCallbackReceiver callbackReceiver)
         {
             _callbackReceivers.Remove(callbackReceiver);
+        }
+
+        /// <summary>
+        /// Returns the number of view instances currently in the pool
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <returns></returns>
+        public int CountInPool(string resourcePath)
+            => _resourcePathToPool.TryGetValue(resourcePath, out var pool) ? pool.Count : 0;
+
+        /// <summary>
+        /// Returns true if there is at least one view instance in the pool.
+        /// </summary>
+        /// <param name="resourcePath"></param>
+        /// <returns></returns>
+        public bool ContainsInPool(string resourcePath)
+            => _resourcePathToPool.TryGetValue(resourcePath, out var pool) && pool.Count > 0;
+
+        /// <summary>
+        /// Only keep an amount of view instances in the pool,
+        /// destroy other redundant instances.
+        /// </summary>
+        /// <param name="resourcePath">Resource path of the view</param>
+        /// <param name="amount">The number of view instances to keep</param>
+        /// <remarks>Fire-and-forget</remarks>
+        public void KeepInPool(string resourcePath, int amount)
+        {
+            KeepInPoolAndForget(resourcePath, amount).Forget();
+        }
+
+        private async UniTaskVoid KeepInPoolAndForget(string resourcePath, int amount)
+        {
+            await KeepInPoolAsync(resourcePath, amount);
+        }
+
+        /// <summary>
+        /// Only keep an amount of view instances in the pool,
+        /// destroy other redundant instances.
+        /// </summary>
+        /// <param name="resourcePath">Resource path of the view</param>
+        /// <param name="amount">The number of view instances to keep</param>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask KeepInPoolAsync(string resourcePath, int amount)
+        {
+            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
+            {
+                return;
+            }
+
+            var amountToDestroy = pool.Count - Mathf.Clamp(amount, 0, pool.Count);
+
+            if (amountToDestroy < 1)
+            {
+                return;
+            }
+
+            var doDestroying = false;
+
+            for (var i = 0; i < amountToDestroy; i++)
+            {
+                if (pool.TryDequeue(out var view))
+                {
+                    if (view && view.gameObject)
+                    {
+                        Destroy(view.gameObject);
+                        doDestroying = true;
+                    }
+                }
+            }
+
+            if (doDestroying)
+            {
+                await UniTask.NextFrame();
+            }
+
+            if (pool.Count < 1
+                && _resourcePathToHandle.TryGetValue(resourcePath, out var handle)
+            )
+            {
+                AssetLoader.Release(handle.Id);
+                _resourcePathToHandle.Remove(resourcePath);
+            }
+        }
+
+        /// <summary>
+        /// Preload an amount of view instances and keep them in the pool.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        public void Preload(string resourcePath, bool loadAsync = true, int amount = 1)
+        {
+            PreloadAndForget(resourcePath, loadAsync, amount).Forget();
+        }
+
+        private async UniTaskVoid PreloadAndForget(string resourcePath, bool loadAsync = true, int amount = 1)
+        {
+            await PreloadAsync(resourcePath, loadAsync, amount);
+        }
+
+        /// <summary>
+        /// Preload an amount of view instances and keep them in the pool.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true, int amount = 1)
+        {
+            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
+            {
+                _resourcePathToPool[resourcePath] = pool = new Queue<Sheet>();
+            }
+
+            if (amount < 1)
+            {
+                Debug.LogWarning($"The amount of preloaded view instances should be greater than 0.");
+                return;
+            }
+
+            var assetLoadHandle = loadAsync
+                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
+                : AssetLoader.Load<GameObject>(resourcePath);
+
+            while (assetLoadHandle.IsDone == false)
+            {
+                await UniTask.NextFrame();
+            }
+
+            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
+            {
+                throw assetLoadHandle.OperationException;
+            }
+
+            _resourcePathToHandle[resourcePath] = assetLoadHandle;
+
+            for (var i = 0; i < amount; i++)
+            {
+                InstantiateToPool(resourcePath, assetLoadHandle, pool);
+            }
+        }
+
+        private void InstantiateToPool(
+              string resourcePath
+            , AssetLoadHandle<GameObject> assetLoadHandle
+            , Queue<Sheet> pool
+        )
+        {
+            var instance = Instantiate(assetLoadHandle.Result);
+
+            if (instance.TryGetComponent<Sheet>(out var view) == false)
+            {
+                Debug.LogError(
+                    $"Cannot find the {typeof(Sheet).Name} component on the specified resource `{resourcePath}`."
+                    , instance
+                );
+
+                return;
+            }
+
+            view.Settings = Settings;
+            view.RectTransform.SetParent(_poolTransform);
+            view.Parent = _poolTransform;
+            view.Owner.SetActive(false);
+
+            pool.Enqueue(view);
         }
 
         /// <summary>
@@ -262,57 +478,13 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 throw new ArgumentNullException(nameof(resourcePath));
             }
 
-            var assetLoadHandle = options.loadAsync
-                ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                : AssetLoader.Load<GameObject>(resourcePath);
-
-            while (assetLoadHandle.IsDone == false)
-            {
-                await UniTask.NextFrame();
-            }
-
-            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
-            {
-                throw assetLoadHandle.OperationException;
-            }
-
-            var instance = Instantiate(assetLoadHandle.Result);
-
-            if (instance.TryGetOrAddComponent<TSheet>(out var sheet) == false)
-            {
-                Debug.LogError(
-                    $"Cannot register because the `{typeof(TSheet).Name}` component is not " +
-                    $"attached to the specified resource `{resourcePath}`."
-                    , instance
-                );
-            }
-
-            sheet.Settings = Settings;
-
-            var sheetId = sheet.GetInstanceID();
-            _sheets.Add(sheetId, sheet);
-            _sheetNameToId[resourcePath] = sheetId;
-            _assetLoadHandles.Add(sheetId, assetLoadHandle);
+            var (sheetId, sheet) = await GetSheetAsync<TSheet>(options);
 
             options.onLoaded?.Invoke(sheetId, sheet);
 
             await sheet.AfterLoadAsync((RectTransform)transform, args);
 
             return sheetId;
-        }
-
-        public bool TryGetSheetId(string resourcePath, out int sheetId)
-        {
-            return _sheetNameToId.TryGetValue(resourcePath, out sheetId);
-        }
-
-        /// <summary>
-        /// Show an instance of <see cref="Sheet"/>.
-        /// </summary>
-        /// <remarks>Fire-and-forget</remarks>
-        public void Show(string resourcePath, bool playAnimation, params object[] args)
-        {
-            ShowAndForget(resourcePath, playAnimation, args).Forget();
         }
 
         /// <summary>
@@ -328,40 +500,14 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask ShowAsync(string resourcePath, bool playAnimation, params object[] args)
-        {
-            await ShowAsyncInternal(resourcePath, playAnimation, args);
-        }
-
-        /// <summary>
-        /// Show an instance of <see cref="Sheet"/>.
-        /// </summary>
-        /// <remarks>Asynchronous</remarks>
         public async UniTask ShowAsync(int sheetId, bool playAnimation, params object[] args)
         {
             await ShowAsyncInternal(sheetId, playAnimation, args);
         }
 
-        private async UniTaskVoid ShowAndForget(string resourcePath, bool playAnimation, Memory<object> args)
-        {
-            await ShowAsyncInternal(resourcePath, playAnimation, args);
-        }
-
         private async UniTaskVoid ShowAndForget(int sheetId, bool playAnimation, Memory<object> args)
         {
             await ShowAsyncInternal(sheetId, playAnimation, args);
-        }
-
-        private async UniTask ShowAsyncInternal(string resourcePath, bool playAnimation, Memory<object> args)
-        {
-            if (TryGetSheetId(resourcePath, out var sheetId))
-            {
-                await ShowAsyncInternal(sheetId, playAnimation, args);
-            }
-            else
-            {
-                Debug.LogError($"`{resourcePath}` must be registered before showing.");
-            }
         }
 
         private async UniTask ShowAsyncInternal(int sheetId, bool playAnimation, Memory<object> args)
@@ -385,10 +531,11 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 Interactable = false;
             }
 
-            var enterSheet = _sheets[sheetId];
+            var enterSheet = _sheets[sheetId].Sheet;
             enterSheet.Settings = Settings;
 
-            var exitSheet = _activeSheetId.HasValue ? _sheets[_activeSheetId.Value] : null;
+            SheetRef<Sheet>? exitSheetRef = _activeSheetId.HasValue ? _sheets[_activeSheetId.Value] : null;
+            var exitSheet = exitSheetRef.HasValue ? exitSheetRef.Value.Sheet : null;
 
             if (exitSheet)
             {
@@ -478,7 +625,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 Interactable = false;
             }
 
-            var exitSheet = _sheets[_activeSheetId.Value];
+            var exitSheetRef = _sheets[_activeSheetId.Value];
+            var exitSheet = exitSheetRef.Sheet;
             exitSheet.Settings = Settings;
 
             // Preprocess
@@ -503,11 +651,168 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             {
                 callbackReceiver.AfterHide(exitSheet, args);
             }
-            
+
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
             }
+        }
+
+        private async UniTask<(int, T)> GetSheetAsync<T>(SheetOptions options)
+            where T : Sheet
+        {
+            var resourcePath = options.resourcePath;
+
+            if (GetFromPool<T>(resourcePath, options.poolingPolicy, out var existSheet))
+            {
+                existSheet.Settings = Settings;
+
+                var existSheetId = existSheet.GetInstanceID();
+                _sheets[existSheetId] = new SheetRef<Sheet>(existSheet, resourcePath, options.poolingPolicy);
+
+                return (existSheetId, existSheet);
+            }
+
+            AssetLoadHandle<GameObject> assetLoadHandle;
+            var handleInMap = false;
+
+            if (_resourcePathToHandle.TryGetValue(resourcePath, out var handle))
+            {
+                assetLoadHandle = handle;
+                handleInMap = true;
+            }
+            else
+            {
+                assetLoadHandle = options.loadAsync
+                    ? AssetLoader.LoadAsync<GameObject>(resourcePath)
+                    : AssetLoader.Load<GameObject>(resourcePath);
+            }
+
+            while (assetLoadHandle.IsDone == false)
+            {
+                await UniTask.NextFrame();
+            }
+
+            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
+            {
+                throw assetLoadHandle.OperationException;
+            }
+
+            var instance = Instantiate(assetLoadHandle.Result);
+
+            if (instance.TryGetComponent<T>(out var sheet) == false)
+            {
+                Debug.LogError(
+                    $"Cannot find the {typeof(T).Name} component on the specified resource `{resourcePath}`."
+                    , instance
+                );
+
+                return (default, null);
+            }
+            
+            sheet.Settings = Settings;
+
+            var sheetId = sheet.GetInstanceID();
+            _sheets[sheetId] = new SheetRef<Sheet>(sheet, resourcePath, options.poolingPolicy);
+            
+            if (handleInMap == false)
+            {
+                _resourcePathToHandle[resourcePath] = assetLoadHandle;
+            }
+
+            return (sheetId, sheet);
+        }
+
+        private async UniTaskVoid DestroyAndForget(SheetRef viewRef)
+        {
+            if (ReturnToPool(viewRef))
+            {
+                return;
+            }
+
+            var view = viewRef.Sheet;
+
+            if (view && view.gameObject)
+            {
+                Destroy(view.gameObject);
+                await UniTask.NextFrame();
+            }
+
+            if (ContainsInPool(viewRef.ResourcePath))
+            {
+                return;
+            }
+
+            if (_resourcePathToHandle.TryGetValue(viewRef.ResourcePath, out var handle))
+            {
+                AssetLoader.Release(handle.Id);
+                _resourcePathToHandle.Remove(viewRef.ResourcePath);
+            }
+        }
+
+        private bool GetFromPool<T>(string resourcePath, PoolingPolicy poolingPolicy, out T view)
+            where T : Sheet
+        {
+            if (CanPool(poolingPolicy)
+                && _resourcePathToPool.TryGetValue(resourcePath, out var pool)
+                && pool.TryDequeue(out var typelessView)
+            )
+            {
+                if (typelessView is T typedView)
+                {
+                    view = typedView;
+                    view.Settings = Settings;
+                    view.Owner.SetActive(true);
+                    return true;
+                }
+
+                if (typelessView && typelessView.gameObject)
+                {
+                    Destroy(typelessView.Owner);
+                }
+            }
+
+            view = default;
+            return false;
+        }
+
+        private bool ReturnToPool(SheetRef sheetRef)
+        {
+            if (CanPool(sheetRef.PoolingPolicy) == false)
+            {
+                return false;
+            }
+
+            var resourcePathToPool = _resourcePathToPool;
+
+            if (resourcePathToPool.TryGetValue(sheetRef.ResourcePath, out var pool) == false)
+            {
+                resourcePathToPool[sheetRef.ResourcePath] = pool = new Queue<Sheet>();
+            }
+
+            var view = sheetRef.Sheet;
+
+            if (view.Owner == false)
+            {
+                return false;
+            }
+
+            view.RectTransform.SetParent(_poolTransform);
+            view.Parent = _poolTransform;
+            view.Owner.SetActive(false);
+            pool.Enqueue(view);
+            return true;
+        }
+
+        private bool CanPool(PoolingPolicy poolingPolicy)
+        {
+            if (poolingPolicy == PoolingPolicy.DisablePooling)
+                return false;
+
+            if (poolingPolicy == PoolingPolicy.EnablePooling)
+                return true;
+
+            return Settings.EnablePooling;
         }
     }
 }

@@ -21,18 +21,29 @@ namespace Demo.Scripts
             var itemGridSheetIds = _itemGridSheetIds;
             var itemGridButtons = _itemGridButtons;
 
-            for (var index = 0; index < ItemGridSheetCount; index++)
+            for (var i = 0; i < ItemGridSheetCount; i++)
             {
+                var index = i;
                 var options = new SheetOptions(
-                        resourcePath: ResourceKey.ShopItemGridSheetPrefab(),
-                        onLoaded: (id, sheet) => OnSheetLoaded(id, sheet, index)
-                    );
+                    resourcePath: ResourceKey.ShopItemGridSheetPrefab(),
+                    onLoaded: (id, sheet) => OnSheetLoaded(id, sheet, index)
+                );
 
                 var sheetId = await itemGridContainer.RegisterAsync(options, args);
                 itemGridButtons[index].onClick.AddListener(() => ShowSheet(sheetId).Forget());
             }
 
             await itemGridContainer.ShowAsync(itemGridSheetIds[0], false);
+        }
+
+        public override void DidPopExit(Memory<object> args)
+        {
+            _itemGridContainer.Deinitialize();
+        }
+
+        public override void DidPushExit(Memory<object> args)
+        {
+            _itemGridContainer.Deinitialize();
         }
 
         private async UniTaskVoid ShowSheet(int sheetId)
