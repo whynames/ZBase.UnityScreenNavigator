@@ -23,16 +23,13 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         void DidShow(Memory<object> args);
 
         /// <summary>
-        ///     /// <summary>
-        /// Called just before this activity is displayed by the Hide transition.
-        /// </summary>
-        /// <returns></returns>
+        /// Called just before this activity is hidden by the Hide transition.
         /// </summary>
         /// <returns></returns>
         UniTask WillHide(Memory<object> args);
 
         /// <summary>
-        /// Called just after this activity is displayed by the Hide transition.
+        /// Called just after this activity is hidden by the Hide transition.
         /// </summary>
         void DidHide(Memory<object> args);
 

@@ -64,29 +64,35 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 canvas.sortingOrder = sortingOrder.Value;
         }
 
+        /// <inheritdoc/>
         public virtual UniTask Initialize(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillShow(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidShow(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillHide(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidHide(Memory<object> args)
         {
         }
-        
+
+        /// <inheritdoc/>
         public virtual UniTask Cleanup()
         {
             return UniTask.CompletedTask;

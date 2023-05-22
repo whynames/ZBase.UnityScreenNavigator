@@ -47,47 +47,57 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// </summary>
         public event Action<float> TransitionAnimationProgressChanged;
 
+        /// <inheritdoc/>
         public virtual UniTask Initialize(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillPushEnter(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidPushEnter(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillPushExit(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidPushExit(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillPopEnter(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidPopEnter(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillPopExit(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidPopExit(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask Cleanup()
         {
             return UniTask.CompletedTask;

@@ -49,29 +49,35 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// </summary>
         public event Action<float> TransitionAnimationProgressChanged;
 
+        /// <inheritdoc/>
         public virtual UniTask Initialize(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillEnter(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidEnter(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask WillExit(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public virtual void DidExit(Memory<object> args)
         {
         }
 
+        /// <inheritdoc/>
         public virtual UniTask Cleanup()
         {
             return UniTask.CompletedTask;

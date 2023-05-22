@@ -6,7 +6,10 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     public sealed class AnonymousSheetLifecycleEvent : ISheetLifecycleEvent
     {
+        /// <see cref="ISheetLifecycleEvent.DidEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidEnter;
+
+        /// <see cref="ISheetLifecycleEvent.DidExit(Memory{object})"/>
         public event Action<Memory<object>> OnDidExit;
 
         public AnonymousSheetLifecycleEvent(
@@ -33,12 +36,16 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 OnCleanup.Add(onCleanup);
         }
 
+        /// <see cref="ISheetLifecycleEvent.Initialize(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnInitialize { get; } = new();
 
+        /// <see cref="ISheetLifecycleEvent.WillEnter(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillEnter { get; } = new();
 
+        /// <see cref="ISheetLifecycleEvent.WillExit(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillExit { get; } = new();
 
+        /// <see cref="ISheetLifecycleEvent.Cleanup"/>
         public List<Func<UniTask>> OnCleanup { get; } = new();
 
         async UniTask ISheetLifecycleEvent.Initialize(Memory<object> args)

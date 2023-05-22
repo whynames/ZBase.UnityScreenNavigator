@@ -6,9 +6,16 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 {
     public sealed class AnonymousModalLifecycleEvent : IModalLifecycleEvent
     {
+        /// <see cref="IModalLifecycleEvent.DidPushEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidPushEnter;
+
+        /// <see cref="IModalLifecycleEvent.DidPushExit(Memory{object})"/>
         public event Action<Memory<object>> OnDidPushExit;
+
+        /// <see cref="IModalLifecycleEvent.DidPopEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidPopEnter;
+
+        /// <see cref="IModalLifecycleEvent.DidPopExit(Memory{object})"/>
         public event Action<Memory<object>> OnDidPopExit;
 
         public AnonymousModalLifecycleEvent(
@@ -47,16 +54,22 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 OnCleanup.Add(onCleanup);
         }
 
+        /// <see cref="IModalLifecycleEvent.Initialize(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnInitialize { get; } = new();
 
+        /// <see cref="IModalLifecycleEvent.WillPushEnter(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPushEnter { get; } = new();
 
+        /// <see cref="IModalLifecycleEvent.WillPushExit(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPushExit { get; } = new();
 
+        /// <see cref="IModalLifecycleEvent.WillPopEnter(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPopEnter { get; } = new();
 
+        /// <see cref="IModalLifecycleEvent.WillPopExit(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPopExit { get; } = new();
 
+        /// <see cref="IModalLifecycleEvent.Cleanup"/>
         public List<Func<UniTask>> OnCleanup { get; } = new();
 
         async UniTask IModalLifecycleEvent.Initialize(Memory<object> args)

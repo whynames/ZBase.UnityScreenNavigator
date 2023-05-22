@@ -6,11 +6,18 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 {
     public sealed class AnonymousScreenLifecycleEvent : IScreenLifecycleEvent
     {
+        /// <inheritdoc cref="IScreenLifecycleEvent.DidPushEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidPushEnter;
-        public event Action<Memory<object>> OnDidPushExit;
-        public event Action<Memory<object>> OnDidPopEnter;
-        public event Action<Memory<object>> OnDidPopExit;
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.DidPushExit(Memory{object})"/>
+        public event Action<Memory<object>> OnDidPushExit;
+
+        /// <inheritdoc cref="IScreenLifecycleEvent.DidPopEnter(Memory{object})"/>
+        public event Action<Memory<object>> OnDidPopEnter;
+
+        /// <inheritdoc cref="IScreenLifecycleEvent.DidPopExit(Memory{object})"/>
+        public event Action<Memory<object>> OnDidPopExit;
+        
         public AnonymousScreenLifecycleEvent(
               Func<Memory<object>, UniTask> initialize = null
             , Func<Memory<object>, UniTask> onWillPushEnter = null, Action<Memory<object>> onDidPushEnter = null
@@ -47,16 +54,22 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
                 OnCleanup.Add(onCleanup);
         }
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.Initialize(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnInitialize { get; } = new();
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.WillPushEnter(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPushEnter { get; } = new();
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.WillPushExit(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPushExit { get; } = new();
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.WillPopEnter(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPopEnter { get; } = new();
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.WillPopExit(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillPopExit { get; } = new();
 
+        /// <inheritdoc cref="IScreenLifecycleEvent.Cleanup"/>
         public List<Func<UniTask>> OnCleanup { get; } = new();
 
         async UniTask IScreenLifecycleEvent.Initialize(Memory<object> args)

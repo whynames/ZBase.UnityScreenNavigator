@@ -6,7 +6,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 {
     public sealed class AnonymousActivityWindowLifecycleEvent : IActivityLifecycleEvent
     {
+        /// <see cref="IActivityLifecycleEvent.DidShow(Memory{object})"/>
         public event Action<Memory<object>> OnDidShow;
+
+        /// <see cref="IActivityLifecycleEvent.DidHide(Memory{object})"/>
         public event Action<Memory<object>> OnDidHide;
 
         public AnonymousActivityWindowLifecycleEvent(
@@ -33,12 +36,16 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 OnCleanup.Add(onCleanup);
         }
 
+        /// <see cref="IActivityLifecycleEvent.Initialize(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnInitialize { get; } = new();
 
+        /// <see cref="IActivityLifecycleEvent.WillShow(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillShow { get; } = new();
 
+        /// <see cref="IActivityLifecycleEvent.WillHide(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnWillHide { get; } = new();
 
+        /// <see cref="IActivityLifecycleEvent.Cleanup"/>
         public List<Func<UniTask>> OnCleanup { get; } = new();
 
         async UniTask IActivityLifecycleEvent.Initialize(Memory<object> args)
