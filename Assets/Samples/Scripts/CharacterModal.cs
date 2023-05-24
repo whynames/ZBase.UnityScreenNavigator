@@ -45,6 +45,7 @@ namespace Demo.Scripts
                 await imageContainer.RegisterAsync(options, args);
             }
 
+            _expandButton.onClick.RemoveListener(OnExpandButtonClicked);
             _expandButton.onClick.AddListener(OnExpandButtonClicked);
         }
 

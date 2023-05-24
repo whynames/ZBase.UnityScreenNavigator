@@ -30,7 +30,10 @@ namespace Demo.Scripts
                 );
 
                 var sheetId = await itemGridContainer.RegisterAsync(options, args);
-                itemGridButtons[index].onClick.AddListener(() => ShowSheet(sheetId).Forget());
+                var button = itemGridButtons[index];
+
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => ShowSheet(sheetId).Forget());
             }
 
             await itemGridContainer.ShowAsync(itemGridSheetIds[0], false);

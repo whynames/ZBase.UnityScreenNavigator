@@ -16,6 +16,9 @@ namespace Demo.Scripts
 
         public override async UniTask Initialize(Memory<object> args)
         {
+            _settingButton.onClick.RemoveAllListeners();
+            _shopButton.onClick.RemoveAllListeners();
+
             _settingButton.onClick.AddListener(OnSettingButtonClicked);
             _shopButton.onClick.AddListener(OnShopButtonClicked);
 

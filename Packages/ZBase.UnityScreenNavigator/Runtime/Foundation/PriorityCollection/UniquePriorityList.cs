@@ -8,9 +8,13 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
     /// <summary>
     /// The list that will sort the items in order of priority.
     /// </summary>
+    /// <remarks>
+    /// This list ensures that each added item is unique.
+    /// </remarks>
     /// <typeparam name="T"></typeparam>
-    public class PriorityList<T> : IEnumerable<T>, IEnumerable, ICollection, IReadOnlyCollection<T>
+    public class UniquePriorityList<T> : IEnumerable<T>, IEnumerable, ICollection, IReadOnlyCollection<T>
     {
+        private readonly HashSet<T> _unique = new();
         private readonly LinkedList<Node> _nodes = new();
 
         public IEnumerator<T> GetEnumerator()
@@ -36,23 +40,34 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         /// <param name="priority"></param>
         public void Add(T item, int priority)
         {
+            if (_unique.Contains(item))
+            {
+                return;
+            }
+
             var node = _nodes.First;
+
             LinkedListNode<Node> beforeNode = null;
+
             if (node == null)
             {
+                _unique.Add(item);
                 _nodes.AddFirst(new Node(item, priority));
                 return;
             }
+
             while (true)
             {
                 if (node.Value.Priority > priority)
                 {
                     if (beforeNode == null)
                     {
+                        _unique.Add(item);
                         _nodes.AddFirst(new Node(item, priority));
                     }
                     else
                     {
+                        _unique.Add(item);
                         _nodes.AddAfter(beforeNode, new Node(item, priority));
                     }
                     return;
@@ -60,8 +75,10 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
 
                 beforeNode = node;
                 node = node.Next;
+
                 if (node == null)
                 {
+                    _unique.Add(item);
                     _nodes.AddLast(new Node(item, priority));
                     return;
                 }
@@ -75,21 +92,31 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         /// <exception cref="InvalidOperationException"></exception>
         public bool Remove(T item)
         {
+            if (_unique.Contains(item) == false)
+            {
+                return false;
+            }
+
             var linkedListNode = _nodes.First;
+
             if (linkedListNode == null)
             {
                 return false;
             }
+
             var equalityComparer = EqualityComparer<T>.Default;
+
             while (true)
             {
                 if (equalityComparer.Equals(linkedListNode.Value.Item, item))
                 {
+                    _unique.Remove(item);
                     _nodes.Remove(linkedListNode);
                     return true;
                 }
 
                 linkedListNode = linkedListNode.Next;
+
                 if (linkedListNode == null)
                 {
                     return false;
@@ -103,6 +130,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
         public void Clear()
         {
             _nodes.Clear();
+            _unique.Clear();
         }
         
         void ICollection.CopyTo(Array array, int index)
@@ -135,6 +163,7 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
             
             var elementType = array.GetType().GetElementType();
             var c = typeof(T);
+
             if (!elementType.IsAssignableFrom(c) && !c.IsAssignableFrom(elementType))
             {
                 throw new ArgumentException($"Type of the {nameof(array)} element is invalid.");
@@ -222,14 +251,15 @@ namespace ZBase.UnityScreenNavigator.Foundation.PriorityCollection
 
         private readonly struct Node
         {
+            public readonly T Item;
+
+            public readonly int Priority;
+
             public Node(T item, int priority)
             {
                 Item = item;
                 Priority = priority;
             }
-
-            public T Item { get; }
-            public int Priority { get; }
         }
     }
 }

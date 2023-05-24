@@ -670,9 +670,10 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 var existSheetId = existSheet.GetInstanceID();
                 _sheets[existSheetId] = new SheetRef<Sheet>(existSheet, resourcePath, options.poolingPolicy);
 
+                Debug.Log($"Get from pool {existSheet.name}");
                 return (existSheetId, existSheet);
             }
-
+            Debug.Log($"Cannot get from pool {resourcePath}");
             AssetLoadHandle<GameObject> assetLoadHandle;
             var handleInMap = false;
 
@@ -796,7 +797,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             {
                 return false;
             }
-
+            Debug.Log($"Pool {view.name}");
             view.RectTransform.SetParent(_poolTransform);
             view.Parent = _poolTransform;
             view.Owner.SetActive(false);

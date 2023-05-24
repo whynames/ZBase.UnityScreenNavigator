@@ -13,7 +13,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         [SerializeField]
         private ModalTransitionAnimationContainer _animationContainer = new();
 
-        private readonly PriorityList<IModalLifecycleEvent> _lifecycleEvents = new();
+        private readonly UniquePriorityList<IModalLifecycleEvent> _lifecycleEvents = new();
         private Progress<float> _transitionProgressReporter;
 
         private Progress<float> TransitionProgressReporter

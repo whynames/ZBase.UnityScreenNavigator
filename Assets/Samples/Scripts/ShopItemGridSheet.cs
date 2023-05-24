@@ -27,6 +27,7 @@ namespace Demo.Scripts
         {
             var key = ResourceKey.CharacterThumbnailSprite(_characterId, 1);
             _thumbnailImage.sprite = DemoAssetLoader.AssetLoader.Load<Sprite>(key).Result;
+            _firstThumbButton.onClick.RemoveListener(OnFirstThumbButtonClicked);
             _firstThumbButton.onClick.AddListener(OnFirstThumbButtonClicked);
             return UniTask.CompletedTask;
         }

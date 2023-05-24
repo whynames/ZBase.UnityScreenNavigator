@@ -16,7 +16,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         [SerializeField]
         private ScreenTransitionAnimationContainer _animationContainer = new();
 
-        private readonly PriorityList<IScreenLifecycleEvent> _lifecycleEvents = new();
+        private readonly UniquePriorityList<IScreenLifecycleEvent> _lifecycleEvents = new();
         private Progress<float> _transitionProgressReporter;
 
         private Progress<float> TransitionProgressReporter

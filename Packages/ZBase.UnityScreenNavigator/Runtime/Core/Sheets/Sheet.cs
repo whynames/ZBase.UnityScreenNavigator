@@ -16,7 +16,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         [SerializeField]
         private SheetTransitionAnimationContainer _animationContainer = new();
 
-        private readonly PriorityList<ISheetLifecycleEvent> _lifecycleEvents = new();
+        private readonly UniquePriorityList<ISheetLifecycleEvent> _lifecycleEvents = new();
         private Progress<float> _transitionProgressReporter;
 
         private Progress<float> TransitionProgressReporter
