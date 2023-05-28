@@ -10,7 +10,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         [SerializeField]
         private int _renderingOrder;
 
-        protected override void InitAfterLoad(RectTransform parentTransform)
+        protected override void OnAfterLoad(RectTransform parentTransform)
         {
             RectTransform.FillParent(Parent);
 
@@ -34,7 +34,12 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             RectTransform.SetSiblingIndex(siblingIndex);
         }
 
-        protected override void InitBeforeEnter()
+        protected override void OnBeforeEnter()
+        {
+            RectTransform.FillParent(Parent);
+        }
+
+        protected override void OnBeforeExit()
         {
             RectTransform.FillParent(Parent);
         }
