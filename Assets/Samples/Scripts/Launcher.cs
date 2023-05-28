@@ -2,11 +2,20 @@
 using ZBase.UnityScreenNavigator.Core;
 using ZBase.UnityScreenNavigator.Core.Views;
 using Cysharp.Threading.Tasks;
+using ZBase.UnityScreenNavigator.Core.Windows;
 
 namespace Demo.Scripts
 {
     public class Launcher : UnityScreenNavigatorLauncher
     {
+        public static WindowContainerManager ContainerManager { get; private set; }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            ContainerManager = this;
+        }
+
         protected override void Start()
         {
             base.Start();
@@ -16,7 +25,7 @@ namespace Demo.Scripts
         private async UniTaskVoid ShowTopPage()
         {
             var options = new ViewOptions(ResourceKey.TopPagePrefab(), false, loadAsync: false);
-            await WindowContainerManager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
+            await ContainerManager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
         }
     }
 }
