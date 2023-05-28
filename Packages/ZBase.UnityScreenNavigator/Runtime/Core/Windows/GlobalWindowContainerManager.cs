@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Views
+namespace ZBase.UnityScreenNavigator.Core.Windows
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform), typeof(Canvas))]

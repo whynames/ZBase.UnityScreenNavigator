@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZBase.UnityScreenNavigator.Core.Views
+namespace ZBase.UnityScreenNavigator.Core.Windows
 {
     public delegate void OnLoadCallback(Window window, Memory<object> args);
 

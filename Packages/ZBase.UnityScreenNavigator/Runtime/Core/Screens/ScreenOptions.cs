@@ -1,4 +1,4 @@
-﻿using ZBase.UnityScreenNavigator.Core.Views;
+﻿using ZBase.UnityScreenNavigator.Core.Windows;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {

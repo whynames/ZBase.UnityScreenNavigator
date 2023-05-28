@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 
-namespace ZBase.UnityScreenNavigator.Core.Views
+namespace ZBase.UnityScreenNavigator.Core.Windows
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform), typeof(Canvas))]

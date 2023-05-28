@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZBase.UnityScreenNavigator.Core.Views
+namespace ZBase.UnityScreenNavigator.Core.Windows
 {
     public interface IWindowContainer
     {

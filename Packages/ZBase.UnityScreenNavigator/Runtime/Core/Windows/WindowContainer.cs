@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
-namespace ZBase.UnityScreenNavigator.Core.Views
+namespace ZBase.UnityScreenNavigator.Core.Windows
 {
     public abstract class WindowContainer : Window, IWindowContainer
     {
