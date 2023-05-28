@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
@@ -11,7 +12,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     [RequireComponent(typeof(RectMask2D))]
-    public sealed class SheetContainer : UIBehaviour
+    public sealed class SheetContainer : UIBehaviour, IViewContainer
     {
         private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
@@ -24,6 +25,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, SheetRef<Sheet>> _sheets = new();
 
+        private IAssetLoader _assetLoader;
         private int? _activeSheetId;
         private CanvasGroup _canvasGroup;
         private RectTransform _poolTransform;
@@ -45,7 +47,11 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// By default, <see cref="IAssetLoader" /> in <see cref="UnityScreenNavigatorSettings" /> is used.
         /// If this property is set, it is used instead.
         /// </summary>
-        public IAssetLoader AssetLoader => Settings.AssetLoader;
+        public IAssetLoader AssetLoader
+        {
+            get => _assetLoader ?? Settings.AssetLoader;
+            set => _assetLoader = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         public int? ActiveSheetId => _activeSheetId;
 
@@ -525,7 +531,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             IsInTransition = true;
-            
+
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
@@ -554,7 +560,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             await enterSheet.BeforeEnterAsync(args);
-            
+
             // Play Animation
             if (exitSheet)
             {
@@ -579,7 +585,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             {
                 callbackReceiver.AfterShow(enterSheet, exitSheet, args);
             }
-            
+
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = true;
@@ -619,7 +625,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             IsInTransition = true;
-            
+
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
@@ -709,12 +715,12 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
                 return (default, null);
             }
-            
+
             sheet.Settings = Settings;
 
             var sheetId = sheet.GetInstanceID();
             _sheets[sheetId] = new SheetRef<Sheet>(sheet, resourcePath, options.poolingPolicy);
-            
+
             if (handleInMap == false)
             {
                 _resourcePathToHandle[resourcePath] = assetLoadHandle;
