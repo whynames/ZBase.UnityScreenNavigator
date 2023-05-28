@@ -8,7 +8,7 @@ using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
 {
-    public abstract class ViewContainer : View, IViewContainer
+    public abstract class ViewContainerBase : View, IViewContainer
     {
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _resourcePathToHandle = new();
         private readonly Dictionary<string, Queue<View>> _resourcePathToPool = new();

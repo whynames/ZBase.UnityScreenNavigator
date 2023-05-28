@@ -9,7 +9,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     [RequireComponent(typeof(RectMask2D))]
-    public sealed class SheetContainer : ViewContainer, IViewContainer
+    public sealed class SheetContainer : ViewContainerBase, IViewContainer
     {
         private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
