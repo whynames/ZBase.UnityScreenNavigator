@@ -71,24 +71,24 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         }
 
         /// <inheritdoc/>
-        public virtual UniTask WillShow(Memory<object> args)
+        public virtual UniTask WillEnter(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
         /// <inheritdoc/>
-        public virtual void DidShow(Memory<object> args)
+        public virtual void DidEnter(Memory<object> args)
         {
         }
 
         /// <inheritdoc/>
-        public virtual UniTask WillHide(Memory<object> args)
+        public virtual UniTask WillExit(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
 
         /// <inheritdoc/>
-        public virtual void DidHide(Memory<object> args)
+        public virtual void DidExit(Memory<object> args)
         {
         }
 
@@ -125,8 +125,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         {
             IsTransitioning = true;
             TransitionAnimationType = show
-                ? ActivityTransitionAnimationType.ShowEnter
-                : ActivityTransitionAnimationType.HideEnter;
+                ? ActivityTransitionAnimationType.Enter
+                : ActivityTransitionAnimationType.Exit;
 
             gameObject.SetActive(true);
             RectTransform.FillParent(Parent);
@@ -135,8 +135,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             Alpha = 0.0f;
 
             var tasks = show
-                ? _lifecycleEvents.Select(x => x.WillShow(args))
-                : _lifecycleEvents.Select(x => x.WillHide(args));
+                ? _lifecycleEvents.Select(x => x.WillEnter(args))
+                : _lifecycleEvents.Select(x => x.WillExit(args));
             
             await WaitForAsync(tasks);
         }
@@ -163,14 +163,14 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             {
                 foreach (var lifecycleEvent in _lifecycleEvents)
                 {
-                    lifecycleEvent.DidShow(args);
+                    lifecycleEvent.DidEnter(args);
                 }
             }
             else
             {
                 foreach (var lifecycleEvent in _lifecycleEvents)
                 {
-                    lifecycleEvent.DidHide(args);
+                    lifecycleEvent.DidExit(args);
                 }
             }
 

@@ -2,9 +2,7 @@
 {
     public enum ActivityTransitionAnimationType
     {
-        ShowEnter,
-        ShowExit,
-        HideEnter,
-        HideExit
+        Enter,
+        Exit,
     }
 }

@@ -6,31 +6,31 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 {
     public sealed class AnonymousActivityWindowLifecycleEvent : IActivityLifecycleEvent
     {
-        /// <see cref="IActivityLifecycleEvent.DidShow(Memory{object})"/>
-        public event Action<Memory<object>> OnDidShow;
+        /// <see cref="IActivityLifecycleEvent.DidEnter(Memory{object})"/>
+        public event Action<Memory<object>> OnDidEnter;
 
-        /// <see cref="IActivityLifecycleEvent.DidHide(Memory{object})"/>
-        public event Action<Memory<object>> OnDidHide;
+        /// <see cref="IActivityLifecycleEvent.DidExit(Memory{object})"/>
+        public event Action<Memory<object>> OnDidExit;
 
         public AnonymousActivityWindowLifecycleEvent(
               Func<Memory<object>, UniTask> initialize = null
-            , Func<Memory<object>, UniTask> onWillShow = null, Action<Memory<object>> onDidShow = null
-            , Func<Memory<object>, UniTask> onWillHide = null, Action<Memory<object>> onDidHide = null
+            , Func<Memory<object>, UniTask> onWillEnter = null, Action<Memory<object>> onDidEnter = null
+            , Func<Memory<object>, UniTask> onWillExit = null, Action<Memory<object>> onDidExit = null
             , Func<UniTask> onCleanup = null
         )
         {
             if (initialize != null)
                 OnInitialize.Add(initialize);
 
-            if (onWillShow != null)
-                OnWillShow.Add(onWillShow);
+            if (onWillEnter != null)
+                OnWillEnter.Add(onWillEnter);
 
-            OnDidShow = onDidShow;
+            OnDidEnter = onDidEnter;
 
-            if (onWillHide != null)
-                OnWillHide.Add(onWillHide);
+            if (onWillExit != null)
+                OnWillExit.Add(onWillExit);
 
-            OnDidHide = onDidHide;
+            OnDidExit = onDidExit;
 
             if (onCleanup != null)
                 OnCleanup.Add(onCleanup);
@@ -39,11 +39,11 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <see cref="IActivityLifecycleEvent.Initialize(Memory{object})"/>
         public List<Func<Memory<object>, UniTask>> OnInitialize { get; } = new();
 
-        /// <see cref="IActivityLifecycleEvent.WillShow(Memory{object})"/>
-        public List<Func<Memory<object>, UniTask>> OnWillShow { get; } = new();
+        /// <see cref="IActivityLifecycleEvent.WillEnter(Memory{object})"/>
+        public List<Func<Memory<object>, UniTask>> OnWillEnter { get; } = new();
 
-        /// <see cref="IActivityLifecycleEvent.WillHide(Memory{object})"/>
-        public List<Func<Memory<object>, UniTask>> OnWillHide { get; } = new();
+        /// <see cref="IActivityLifecycleEvent.WillExit(Memory{object})"/>
+        public List<Func<Memory<object>, UniTask>> OnWillExit { get; } = new();
 
         /// <see cref="IActivityLifecycleEvent.Cleanup"/>
         public List<Func<UniTask>> OnCleanup { get; } = new();
@@ -54,26 +54,26 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
                 await onInitialize.Invoke(args);
         }
 
-        async UniTask IActivityLifecycleEvent.WillShow(Memory<object> args)
+        async UniTask IActivityLifecycleEvent.WillEnter(Memory<object> args)
         {
-            foreach (var onWillShowEnter in OnWillShow)
+            foreach (var onWillShowEnter in OnWillEnter)
                 await onWillShowEnter.Invoke(args);
         }
 
-        void IActivityLifecycleEvent.DidShow(Memory<object> args)
+        void IActivityLifecycleEvent.DidEnter(Memory<object> args)
         {
-            OnDidShow?.Invoke(args);
+            OnDidEnter?.Invoke(args);
         }
 
-        async UniTask IActivityLifecycleEvent.WillHide(Memory<object> args)
+        async UniTask IActivityLifecycleEvent.WillExit(Memory<object> args)
         {
-            foreach (var onWillHideEnter in OnWillHide)
+            foreach (var onWillHideEnter in OnWillExit)
                 await onWillHideEnter.Invoke(args);
         }
 
-        void IActivityLifecycleEvent.DidHide(Memory<object> args)
+        void IActivityLifecycleEvent.DidExit(Memory<object> args)
         {
-            OnDidHide?.Invoke(args);
+            OnDidExit?.Invoke(args);
         }
 
         async UniTask IActivityLifecycleEvent.Cleanup()
