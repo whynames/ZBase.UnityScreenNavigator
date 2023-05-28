@@ -13,7 +13,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         public readonly OnViewLoadedCallback onLoaded;
 
         public ViewOptions(
-            string resourcePath
+              string resourcePath
             , bool playAnimation = true
             , OnViewLoadedCallback onLoaded = null
             , bool loadAsync = true

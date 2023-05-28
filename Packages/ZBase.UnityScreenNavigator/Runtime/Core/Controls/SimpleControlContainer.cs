@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
@@ -172,28 +171,17 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             _callbackReceivers.Remove(callbackReceiver);
         }
 
-        private async UniTask<(int, TControl)> GetControlAsync<TControl>(ViewOptions options)
-            where TControl : Control
-        {
-            var control = await GetViewAsync<TControl>(options);
-            var controlId = control.GetInstanceID();
-
-            _controls[controlId] = new ViewRef<Control>(control, options.resourcePath, options.poolingPolicy);
-
-            return (controlId, control);
-        }
-
         /// <summary>
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
-        public void Show<TControl>(ViewOptions options, params object[] args)
+        public void Show<TControl>(ControlOptions options, params object[] args)
             where TControl : Control
         {
             ShowAndForget<TControl>(options, args).Forget();
         }
 
-        public void Show(ViewOptions options, params object[] args)
+        public void Show(ControlOptions options, params object[] args)
         {
             ShowAndForget<Control>(options, args).Forget();
         }
@@ -202,24 +190,24 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask ShowAsync<TControl>(ViewOptions options, params object[] args)
+        public async UniTask ShowAsync<TControl>(ControlOptions options, params object[] args)
             where TControl : Control
         {
             await ShowAsyncInternal<TControl>(options, args);
         }
 
-        public async UniTask ShowAsync(ViewOptions options, params object[] args)
+        public async UniTask ShowAsync(ControlOptions options, params object[] args)
         {
             await ShowAsyncInternal<Control>(options, args);
         }
 
-        private async UniTaskVoid ShowAndForget<TControl>(ViewOptions options, Memory<object> args)
+        private async UniTaskVoid ShowAndForget<TControl>(ControlOptions options, Memory<object> args)
             where TControl : Control
         {
             await ShowAsyncInternal<TControl>(options, args);
         }
 
-        private async UniTask ShowAsyncInternal<TControl>(ViewOptions options, Memory<object> args)
+        private async UniTask ShowAsyncInternal<TControl>(ControlOptions options, Memory<object> args)
             where TControl : Control
         {
             var resourcePath = options.resourcePath;
@@ -231,7 +219,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
             var (controlId, control) = await GetControlAsync<TControl>(options);
 
-            options.onLoaded?.Invoke(control, args);
+            options.onLoaded?.Invoke(controlId, control, args);
 
             await control.AfterLoadAsync((RectTransform)transform, args);
 
@@ -266,6 +254,17 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             {
                 Interactable = true;
             }
+        }
+
+        private async UniTask<(int, TControl)> GetControlAsync<TControl>(ControlOptions options)
+            where TControl : Control
+        {
+            var control = await GetViewAsync<TControl>(options.AsViewOptions());
+            var controlId = control.GetInstanceID();
+
+            _controls[controlId] = new ViewRef<Control>(control, options.resourcePath, options.poolingPolicy);
+
+            return (controlId, control);
         }
 
         /// <summary>
