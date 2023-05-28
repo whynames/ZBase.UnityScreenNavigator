@@ -23,7 +23,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         public ActivityOptions(
               string resourcePath
             , bool playAnimation = true
-            , OnLoadCallback onLoaded = null
+            , OnViewLoadedCallback onLoaded = null
             , bool loadAsync = true
             , in SortingLayerId? sortingLayer = null
             , in int? orderInLayer = null

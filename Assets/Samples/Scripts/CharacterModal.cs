@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Core.Sheets;
-using ZBase.UnityScreenNavigator.Core.Controls;
 
 namespace Demo.Scripts
 {
@@ -36,9 +35,9 @@ namespace Demo.Scripts
 
             for (var index = 0; index < ImageCount; index++)
             {
-                var options = new ControlOptions(
+                var options = new SheetOptions(
                     resourcePath: ResourceKey.CharacterModalImageSheetPrefab(),
-                    onLoaded: (sheetId, sheet) => {
+                    onLoaded: (sheetId, sheet, args) => {
                         imageSheets[index] = (sheetId, (CharacterModalImageSheet)sheet);
                     }
                 );

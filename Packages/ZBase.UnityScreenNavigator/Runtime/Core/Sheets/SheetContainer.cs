@@ -200,7 +200,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <typeparamref name="TSheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
-        public void Register<TSheet>(ControlOptions options, params object[] args)
+        public void Register<TSheet>(SheetOptions options, params object[] args)
             where TSheet : Sheet
         {
             RegisterAndForget<TSheet>(options, args).Forget();
@@ -210,7 +210,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
-        public void Register(ControlOptions options, params object[] args)
+        public void Register(SheetOptions options, params object[] args)
         {
             RegisterAndForget<Sheet>(options, args).Forget();
         }
@@ -219,7 +219,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <typeparamref name="TSheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask<int> RegisterAsync<TSheet>(ControlOptions options, params object[] args)
+        public async UniTask<int> RegisterAsync<TSheet>(SheetOptions options, params object[] args)
             where TSheet : Sheet
         {
             return await RegisterAsyncInternal<TSheet>(options, args);
@@ -229,18 +229,18 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask<int> RegisterAsync(ControlOptions options, params object[] args)
+        public async UniTask<int> RegisterAsync(SheetOptions options, params object[] args)
         {
             return await RegisterAsyncInternal<Sheet>(options, args);
         }
 
-        private async UniTaskVoid RegisterAndForget<TSheet>(ControlOptions options, Memory<object> args)
+        private async UniTaskVoid RegisterAndForget<TSheet>(SheetOptions options, Memory<object> args)
             where TSheet : Sheet
         {
             await RegisterAsyncInternal<TSheet>(options, args);
         }
 
-        private async UniTask<int> RegisterAsyncInternal<TSheet>(ControlOptions options, Memory<object> args)
+        private async UniTask<int> RegisterAsyncInternal<TSheet>(SheetOptions options, Memory<object> args)
             where TSheet : Sheet
         {
             var resourcePath = options.resourcePath;
@@ -252,14 +252,14 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             var (sheetId, sheet) = await GetSheetAsync<TSheet>(options);
 
-            options.onLoaded?.Invoke(sheetId, sheet);
+            options.onLoaded?.Invoke(sheetId, sheet, args);
 
             await sheet.AfterLoadAsync((RectTransform)transform, args);
 
             return sheetId;
         }
 
-        private async UniTask<(int, TSheet)> GetSheetAsync<TSheet>(ControlOptions options)
+        private async UniTask<(int, TSheet)> GetSheetAsync<TSheet>(SheetOptions options)
             where TSheet : Sheet
         {
             var sheet = await GetViewAsync<TSheet>(options.AsViewOptions());

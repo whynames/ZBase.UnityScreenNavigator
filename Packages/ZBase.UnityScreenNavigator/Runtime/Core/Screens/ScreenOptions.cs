@@ -19,7 +19,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         public ScreenOptions(
               string resourcePath
             , bool playAnimation = true
-            , OnLoadCallback onLoaded = null
+            , OnViewLoadedCallback onLoaded = null
             , bool loadAsync = true
             , bool stack = true
             , PoolingPolicy poolingPolicy = PoolingPolicy.UseSettings

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
@@ -171,73 +172,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             _callbackReceivers.Remove(callbackReceiver);
         }
 
-        /// <summary>
-        /// Register an instance of <typeparamref name="TControl"/>.
-        /// </summary>
-        /// <remarks>Fire-and-forget</remarks>
-        public void Register<TControl>(ControlOptions options, params object[] args)
+        private async UniTask<(int, TControl)> GetControlAsync<TControl>(ViewOptions options)
             where TControl : Control
         {
-            RegisterAndForget<TControl>(options, args).Forget();
-        }
-
-        /// <summary>
-        /// Register an instance of <see cref="Control"/>.
-        /// </summary>
-        /// <remarks>Fire-and-forget</remarks>
-        public void Register(ControlOptions options, params object[] args)
-        {
-            RegisterAndForget<Control>(options, args).Forget();
-        }
-
-        /// <summary>
-        /// Register an instance of <typeparamref name="TControl"/>.
-        /// </summary>
-        /// <remarks>Asynchronous</remarks>
-        public async UniTask<int> RegisterAsync<TControl>(ControlOptions options, params object[] args)
-            where TControl : Control
-        {
-            return await RegisterAsyncInternal<TControl>(options, args);
-        }
-
-        /// <summary>
-        /// Register an instance of <see cref="Control"/>.
-        /// </summary>
-        /// <remarks>Asynchronous</remarks>
-        public async UniTask<int> RegisterAsync(ControlOptions options, params object[] args)
-        {
-            return await RegisterAsyncInternal<Control>(options, args);
-        }
-
-        private async UniTaskVoid RegisterAndForget<TControl>(ControlOptions options, Memory<object> args)
-            where TControl : Control
-        {
-            await RegisterAsyncInternal<TControl>(options, args);
-        }
-
-        private async UniTask<int> RegisterAsyncInternal<TControl>(ControlOptions options, Memory<object> args)
-            where TControl : Control
-        {
-            var resourcePath = options.resourcePath;
-
-            if (resourcePath == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePath));
-            }
-
-            var (controlId, control) = await GetControlAsync<TControl>(options);
-
-            options.onLoaded?.Invoke(controlId, control);
-
-            await control.AfterLoadAsync((RectTransform)transform, args);
-
-            return controlId;
-        }
-
-        private async UniTask<(int, TControl)> GetControlAsync<TControl>(ControlOptions options)
-            where TControl : Control
-        {
-            var control = await GetViewAsync<TControl>(options.AsViewOptions());
+            var control = await GetViewAsync<TControl>(options);
             var controlId = control.GetInstanceID();
 
             _controls[controlId] = new ViewRef<Control>(control, options.resourcePath, options.poolingPolicy);
@@ -249,27 +187,54 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
-        public void Show(int controlId, bool playAnimation, params object[] args)
+        public void Show<TControl>(ViewOptions options, params object[] args)
+            where TControl : Control
         {
-            ShowAndForget(controlId, playAnimation, args).Forget();
+            ShowAndForget<TControl>(options, args).Forget();
+        }
+
+        public void Show(ViewOptions options, params object[] args)
+        {
+            ShowAndForget<Control>(options, args).Forget();
         }
 
         /// <summary>
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask ShowAsync(int controlId, bool playAnimation, params object[] args)
+        public async UniTask ShowAsync<TControl>(ViewOptions options, params object[] args)
+            where TControl : Control
         {
-            await ShowAsyncInternal(controlId, playAnimation, args);
+            await ShowAsyncInternal<TControl>(options, args);
         }
 
-        private async UniTaskVoid ShowAndForget(int controlId, bool playAnimation, Memory<object> args)
+        public async UniTask ShowAsync(ViewOptions options, params object[] args)
         {
-            await ShowAsyncInternal(controlId, playAnimation, args);
+            await ShowAsyncInternal<Control>(options, args);
         }
 
-        private async UniTask ShowAsyncInternal(int controlId, bool playAnimation, Memory<object> args)
+        private async UniTaskVoid ShowAndForget<TControl>(ViewOptions options, Memory<object> args)
+            where TControl : Control
         {
+            await ShowAsyncInternal<TControl>(options, args);
+        }
+
+        private async UniTask ShowAsyncInternal<TControl>(ViewOptions options, Memory<object> args)
+            where TControl : Control
+        {
+            var resourcePath = options.resourcePath;
+
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
+            var (controlId, control) = await GetControlAsync<TControl>(options);
+
+            options.onLoaded?.Invoke(control, args);
+
+            await control.AfterLoadAsync((RectTransform)transform, args);
+
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
@@ -287,7 +252,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             await enterControl.BeforeEnterAsync(args);
 
             // Play Animation
-            await enterControl.EnterAsync(playAnimation, null);
+            await enterControl.EnterAsync(options.playAnimation, null);
 
             // Postprocess
             enterControl.AfterEnter(args);

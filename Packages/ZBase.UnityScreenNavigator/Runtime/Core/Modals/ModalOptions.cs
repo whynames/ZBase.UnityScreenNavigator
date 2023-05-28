@@ -25,7 +25,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         public ModalOptions(
               string resourcePath
             , bool playAnimation = true
-            , OnLoadCallback onLoaded = null
+            , OnViewLoadedCallback onLoaded = null
             , bool loadAsync = true
             , in float? backdropAlpha = null
             , in bool? closeWhenClickOnBackdrop = null

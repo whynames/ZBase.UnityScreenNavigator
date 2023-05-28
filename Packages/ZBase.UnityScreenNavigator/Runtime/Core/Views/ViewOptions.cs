@@ -2,7 +2,7 @@
 
 namespace ZBase.UnityScreenNavigator.Core.Views
 {
-    public delegate void OnLoadCallback(View view, Memory<object> args);
+    public delegate void OnViewLoadedCallback(View view, Memory<object> args);
 
     public readonly struct ViewOptions
     {
@@ -10,12 +10,12 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         public readonly bool playAnimation;
         public readonly PoolingPolicy poolingPolicy;
         public readonly string resourcePath;
-        public readonly OnLoadCallback onLoaded;
+        public readonly OnViewLoadedCallback onLoaded;
 
         public ViewOptions(
             string resourcePath
             , bool playAnimation = true
-            , OnLoadCallback onLoaded = null
+            , OnViewLoadedCallback onLoaded = null
             , bool loadAsync = true
             , PoolingPolicy poolingPolicy = PoolingPolicy.UseSettings
         )
