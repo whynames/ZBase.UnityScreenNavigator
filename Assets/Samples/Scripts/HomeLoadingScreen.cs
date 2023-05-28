@@ -8,7 +8,7 @@ namespace Demo.Scripts
     {
         public override void DidPushEnter(Memory<object> args)
         {
-            var options = new ViewOptions(ResourceKey.HomePagePrefab(), true);
+            var options = new ViewOptions(ResourceKey.HomeScreenPrefab(), true);
             // Transition to "Home".
             ScreenContainer.Of(transform).Push(options);
         }

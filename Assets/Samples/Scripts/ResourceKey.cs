@@ -3,10 +3,10 @@ namespace Demo.Scripts
     public static class ResourceKey
     {
         private const string PrefabFormat = "prefab_demo_{0}";
-        private const string TopPagePrefabName = "page_top";
-        private const string HomePagePrefabName = "page_home";
-        private const string HomeLoadingPagePrefabName = "page_home_loading";
-        private const string ShopPagePrefabName = "page_shop";
+        private const string TopScreenPrefabName = "screen_top";
+        private const string HomeScreenPrefabName = "screen_home";
+        private const string HomeLoadingScreenPrefabName = "screen_home_loading";
+        private const string ShopScreenPrefabName = "screen_shop";
         private const string SettingsModalPrefabName = "modal_settings";
         private const string CharacterModalPrefabName = "modal_character";
         private const string ShopItemGridSheetPrefabName = "sheet_shop_item_grid";
@@ -17,24 +17,24 @@ namespace Demo.Scripts
         private const string CharacterImageFormat = "tex_character_{0:D3}_{1}";
         private const string CharacterThumbnailFormat = "tex_character_thumb_{0:D3}_{1}";
 
-        public static string TopPagePrefab()
+        public static string TopScreenPrefab()
         {
-            return string.Format(PrefabFormat, TopPagePrefabName);
+            return string.Format(PrefabFormat, TopScreenPrefabName);
         }
 
-        public static string HomePagePrefab()
+        public static string HomeScreenPrefab()
         {
-            return string.Format(PrefabFormat, HomePagePrefabName);
+            return string.Format(PrefabFormat, HomeScreenPrefabName);
         }
 
-        public static string HomeLoadingPagePrefab()
+        public static string HomeLoadingScreenPrefab()
         {
-            return string.Format(PrefabFormat, HomeLoadingPagePrefabName);
+            return string.Format(PrefabFormat, HomeLoadingScreenPrefabName);
         }
 
-        public static string ShopPagePrefab()
+        public static string ShopScreenPrefab()
         {
-            return string.Format(PrefabFormat, ShopPagePrefabName);
+            return string.Format(PrefabFormat, ShopScreenPrefabName);
         }
 
         public static string SettingsModalPrefab()

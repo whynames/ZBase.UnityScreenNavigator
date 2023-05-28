@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 8233037150725077043}
   - component: {fileID: 9174898284614137540}
   m_Layer: 5
-  m_Name: prefab_demo_page_shop
+  m_Name: prefab_demo_screen_shop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 7225803148355229542}
   - component: {fileID: 8760942871074163620}
   - component: {fileID: 402683159186887891}
+  - component: {fileID: 3122395251848505083}
   m_Layer: 5
   m_Name: Container
   m_TagString: Untagged
@@ -567,8 +568,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 457bc41490c149f4085c1ba408229d25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _usePrefabNameAsIdentifier: 1
+  _identifier: 
+  _rectTransform: {fileID: 0}
+  _canvasGroup: {fileID: 0}
   _name: 
   _settings: {fileID: 11400000, guid: 514f7ef4ac39c644cb2e1176014eaeb7, type: 2}
+--- !u!225 &3122395251848505083
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2351079509676785807}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2723837016051288582
 GameObject:
   m_ObjectHideFlags: 0

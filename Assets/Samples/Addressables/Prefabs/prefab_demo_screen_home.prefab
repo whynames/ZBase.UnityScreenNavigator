@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 4960027252924367179}
   - component: {fileID: 2245201809904586190}
   m_Layer: 5
-  m_Name: prefab_demo_page_home
+  m_Name: prefab_demo_screen_home
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

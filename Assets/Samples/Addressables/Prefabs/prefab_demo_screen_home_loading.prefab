@@ -28,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8644593960100687349}
   m_RootOrder: 0
@@ -146,8 +147,9 @@ GameObject:
   - component: {fileID: 8644593960100687351}
   - component: {fileID: 8644593960100687348}
   - component: {fileID: 4247617824686548344}
+  - component: {fileID: 4556531042775110863}
   m_Layer: 5
-  m_Name: prefab_demo_page_home_loading
+  m_Name: prefab_demo_screen_home_loading
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,6 +165,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8644593959185190690}
   m_Father: {fileID: 0}
@@ -225,17 +228,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _usePrefabNameAsIdentifier: 0
   _identifier: HomeLoadingPage
+  _rectTransform: {fileID: 0}
+  _canvasGroup: {fileID: 0}
   _renderingOrder: 100
   _animationContainer:
     _pushEnterAnimations:
-    - _partnerPageIdentifierRegex: 
+    - _partnerScreenIdentifierRegex: 
       _assetType: 1
       _animationBehaviour: {fileID: 0}
-      _animationObject: {fileID: 11400000, guid: 0aed9c21058a39b44befbfd4331a648e, type: 2}
+      _animationObject: {fileID: 11400000, guid: 0aed9c21058a39b44befbfd4331a648e,
+        type: 2}
     _pushExitAnimations:
-    - _partnerPageIdentifierRegex: 
+    - _partnerScreenIdentifierRegex: 
       _assetType: 1
       _animationBehaviour: {fileID: 0}
-      _animationObject: {fileID: 11400000, guid: 1611407b7343f594597d3c0850d3cc65, type: 2}
+      _animationObject: {fileID: 11400000, guid: 1611407b7343f594597d3c0850d3cc65,
+        type: 2}
     _popEnterAnimations: []
     _popExitAnimations: []
+--- !u!225 &4556531042775110863
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8644593960100687338}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

@@ -24,7 +24,7 @@ namespace Demo.Scripts
 
         private async UniTaskVoid ShowTopPage()
         {
-            var options = new ViewOptions(ResourceKey.TopPagePrefab(), false, loadAsync: false);
+            var options = new ViewOptions(ResourceKey.TopScreenPrefab(), false, loadAsync: false);
             await ContainerManager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
         }
     }

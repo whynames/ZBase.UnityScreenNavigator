@@ -23,7 +23,7 @@ namespace Demo.Scripts
             _shopButton.onClick.AddListener(OnShopButtonClicked);
 
             // Preload the "Shop" page prefab.
-            await ScreenContainer.Of(transform).PreloadAsync(ResourceKey.ShopPagePrefab());
+            await ScreenContainer.Of(transform).PreloadAsync(ResourceKey.ShopScreenPrefab());
             // Simulate loading time.
             await UniTask.Delay(TimeSpan.FromSeconds(1));
         }
@@ -37,7 +37,7 @@ namespace Demo.Scripts
         {
             _settingButton.onClick.RemoveListener(OnSettingButtonClicked);
             _shopButton.onClick.RemoveListener(OnShopButtonClicked);
-            ScreenContainer.Of(transform).KeepInPool(ResourceKey.ShopPagePrefab(), 0);
+            ScreenContainer.Of(transform).KeepInPool(ResourceKey.ShopScreenPrefab(), 0);
             return UniTask.CompletedTask;
         }
 
@@ -49,7 +49,7 @@ namespace Demo.Scripts
 
         private void OnShopButtonClicked()
         {
-            var options = new ViewOptions(ResourceKey.ShopPagePrefab(), true);
+            var options = new ViewOptions(ResourceKey.ShopScreenPrefab(), true);
             ScreenContainer.Of(transform).Push(options);
         }
     }
