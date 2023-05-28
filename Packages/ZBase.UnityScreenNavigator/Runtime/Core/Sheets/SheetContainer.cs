@@ -15,7 +15,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
 
         private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly Dictionary<int, ControlRef<Sheet>> _sheets = new();
+        private readonly Dictionary<int, ViewRef<Sheet>> _sheets = new();
         private int? _activeSheetId;
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
@@ -37,7 +37,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                     return null;
                 }
 
-                return _sheets[ActiveSheetId.Value].Control;
+                return _sheets[ActiveSheetId.Value].View;
             }
         }
 
@@ -64,7 +64,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             foreach (var controlRef in controls.Values)
             {
-                ReturnToPool(controlRef.Control, controlRef.ResourcePath, controlRef.PoolingPolicy);
+                ReturnToPool(controlRef.View, controlRef.ResourcePath, controlRef.PoolingPolicy);
             }
 
             controls.Clear();
@@ -265,7 +265,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             var sheet = await GetViewAsync<TSheet>(options.AsViewOptions());
             var sheetId = sheet.GetInstanceID();
 
-            _sheets[sheetId] = new ControlRef<Sheet>(sheet, options.resourcePath, options.poolingPolicy);
+            this._sheets[sheetId] = new ViewRef<Sheet>(sheet, options.resourcePath, options.poolingPolicy);
 
             return (sheetId, sheet);
         }
@@ -314,11 +314,11 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 Interactable = false;
             }
 
-            var enterSheet = _sheets[sheetId].Control;
+            var enterSheet = _sheets[sheetId].View;
             enterSheet.Settings = Settings;
 
-            ControlRef<Sheet>? exitSheetRef = ActiveSheetId.HasValue ? _sheets[ActiveSheetId.Value] : null;
-            var exitSheet = exitSheetRef.HasValue ? exitSheetRef.Value.Control : null;
+            ViewRef<Sheet>? exitSheetRef = this.ActiveSheetId.HasValue ? this._sheets[this.ActiveSheetId.Value] : null;
+            var exitSheet = exitSheetRef.HasValue ? exitSheetRef.Value.View : null;
 
             if (exitSheet)
             {
@@ -409,7 +409,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             var exitSheetRef = _sheets[ActiveSheetId.Value];
-            var exitSheet = exitSheetRef.Control;
+            var exitSheet = exitSheetRef.View;
             exitSheet.Settings = Settings;
 
             // Preprocess

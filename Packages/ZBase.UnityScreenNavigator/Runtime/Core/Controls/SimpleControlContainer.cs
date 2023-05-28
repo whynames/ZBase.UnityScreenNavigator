@@ -14,7 +14,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         private static Dictionary<string, SimpleControlContainer> s_instanceCacheByName = new();
 
         private readonly List<ISimpleControlContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly Dictionary<int, ControlRef<Control>> _controls = new();
+        private readonly Dictionary<int, ViewRef<Control>> _controls = new();
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -39,7 +39,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
             foreach (var controlRef in controls.Values)
             {
-                ReturnToPool(controlRef.Control, controlRef.ResourcePath, controlRef.PoolingPolicy);
+                ReturnToPool(controlRef.View, controlRef.ResourcePath, controlRef.PoolingPolicy);
             }
 
             controls.Clear();
@@ -240,7 +240,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             var control = await GetViewAsync<TControl>(options.AsViewOptions());
             var controlId = control.GetInstanceID();
 
-            _controls[controlId] = new ControlRef<Control>(control, options.resourcePath, options.poolingPolicy);
+            _controls[controlId] = new ViewRef<Control>(control, options.resourcePath, options.poolingPolicy);
 
             return (controlId, control);
         }
@@ -275,7 +275,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
                 Interactable = false;
             }
 
-            var enterControl = _controls[controlId].Control;
+            var enterControl = _controls[controlId].View;
             enterControl.Settings = Settings;
 
             // Preprocess
@@ -329,7 +329,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             }
 
             var exitControlRef = _controls[controlId];
-            var exitControl = exitControlRef.Control;
+            var exitControl = exitControlRef.View;
             exitControl.Settings = Settings;
 
             // Preprocess
