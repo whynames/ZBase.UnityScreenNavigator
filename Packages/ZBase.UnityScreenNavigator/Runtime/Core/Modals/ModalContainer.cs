@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Core.Windows;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
@@ -62,7 +63,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             for (var i = 0; i < modalCount; i++)
             {
                 var (modal, resourcePath) = modals[i];
-                DestroyAndForget(new ViewRef(modal, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                DestroyAndForget(modal, resourcePath, PoolingPolicy.DisablePooling).Forget();
             }
 
             modals.Clear();
@@ -73,7 +74,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             for (var i = 0; i < backdropCount; i++)
             {
                 var (backdrop, resourcePath) = backdrops[i];
-                DestroyAndForget(new ViewRef(backdrop, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                DestroyAndForget(backdrop, resourcePath, PoolingPolicy.DisablePooling).Forget();
             }
 
             backdrops.Clear();
@@ -299,11 +300,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
                 _backdrops.RemoveAt(index);
             }
 
-            DestroyAndForget(modal).Forget();
+            DestroyAndForget(modal);
 
             if (backdrop.HasValue)
             {
-                DestroyAndForget(backdrop.Value).Forget();
+                DestroyAndForget(backdrop.Value);
             }
         }
 
@@ -510,7 +511,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             if (_disableBackdrop == false)
             {
                 var backdropResourcePath = GetBackdropResourcePath(options.modalBackdropResourcePath);
-                var backdropOptions = new WindowOptions(
+                var backdropOptions = new ViewOptions(
                       resourcePath: backdropResourcePath
                     , playAnimation: options.options.playAnimation
                     , loadAsync: options.options.loadAsync
@@ -693,11 +694,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             // Unload unused Modal
             await exitModal.BeforeReleaseAsync();
 
-            DestroyAndForget(exitModalRef).Forget();
+            DestroyAndForget(exitModalRef);
 
             if (backdrop.HasValue)
             {
-                DestroyAndForget(backdrop.Value).Forget();
+                DestroyAndForget(backdrop.Value);
             }
 
             if (Settings.EnableInteractionInTransition == false)

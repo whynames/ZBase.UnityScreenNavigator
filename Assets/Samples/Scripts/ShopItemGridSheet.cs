@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core;
-using ZBase.UnityScreenNavigator.Core.Windows;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Core.Sheets;
 
 namespace Demo.Scripts
@@ -99,7 +99,7 @@ namespace Demo.Scripts
         private void OnFirstThumbButtonClicked()
         {
             var modalContainer = ModalContainer.Find(ContainerKey.Modals);
-            var options = new WindowOptions(
+            var options = new ViewOptions(
                   ResourceKey.CharacterModalPrefab()
                 , playAnimation: true
                 , poolingPolicy: PoolingPolicy.DisablePooling

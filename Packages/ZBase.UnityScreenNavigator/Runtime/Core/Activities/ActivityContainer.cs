@@ -217,7 +217,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
             foreach (var (activity, resourcePath) in _activities.Values)
             {
-                DestroyAndForget(new ViewRef(activity, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                DestroyAndForget(activity, resourcePath, PoolingPolicy.DisablePooling).Forget();
             }
 
             _activities.Clear();
@@ -404,7 +404,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             // Unload unused Activity
             await activity.BeforeReleaseAsync();
 
-            DestroyAndForget(new ViewRef(activity, resourcePath, viewRef.PoolingPolicy)).Forget();
+            DestroyAndForget(activity, resourcePath, viewRef.PoolingPolicy).Forget();
 
             if (Settings.EnableInteractionInTransition == false)
             {

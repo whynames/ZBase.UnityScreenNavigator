@@ -151,7 +151,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             }
         }
 
-        public UnityScreenNavigatorSettings Settings { get; set; }
+        public virtual UnityScreenNavigatorSettings Settings { get; set; }
 
         protected void SetIdentifer()
         {

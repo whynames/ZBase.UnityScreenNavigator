@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Activities;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core.Screens;
-using ZBase.UnityScreenNavigator.Core.Windows;
+using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace Demo.Scripts
 {
@@ -43,13 +43,13 @@ namespace Demo.Scripts
 
         private void OnSettingButtonClicked()
         {
-            var options = new WindowOptions(ResourceKey.SettingsModalPrefab(), true);
+            var options = new ViewOptions(ResourceKey.SettingsModalPrefab(), true);
             ModalContainer.Find(ContainerKey.Modals).Push(options);
         }
 
         private void OnShopButtonClicked()
         {
-            var options = new WindowOptions(ResourceKey.ShopPagePrefab(), true);
+            var options = new ViewOptions(ResourceKey.ShopPagePrefab(), true);
             ScreenContainer.Of(transform).Push(options);
         }
     }

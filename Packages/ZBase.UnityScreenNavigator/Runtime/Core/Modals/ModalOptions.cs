@@ -1,4 +1,4 @@
-﻿using ZBase.UnityScreenNavigator.Core.Windows;
+﻿using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
@@ -7,10 +7,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         public readonly float? backdropAlpha;
         public readonly bool? closeWhenClickOnBackdrop;
         public readonly string modalBackdropResourcePath;
-        public readonly WindowOptions options;
+        public readonly ViewOptions options;
 
         public ModalOptions(
-              in WindowOptions options
+              in ViewOptions options
             , in float? backdropAlpha = null
             , in bool? closeWhenClickOnBackdrop = null
             , string modalBackdropResourcePath = null
@@ -39,13 +39,13 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             this.modalBackdropResourcePath = modalBackdropResourcePath;
         }
 
-        public static implicit operator ModalOptions(in WindowOptions options)
+        public static implicit operator ModalOptions(in ViewOptions options)
             => new(options);
 
         public static implicit operator ModalOptions(string resourcePath)
-            => new(new WindowOptions(resourcePath));
+            => new(new ViewOptions(resourcePath));
 
-        public static implicit operator WindowOptions(in ModalOptions options)
+        public static implicit operator ViewOptions(in ModalOptions options)
             => options.options;
     }
 }

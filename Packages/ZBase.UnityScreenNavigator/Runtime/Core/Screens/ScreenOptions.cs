@@ -1,14 +1,14 @@
-﻿using ZBase.UnityScreenNavigator.Core.Windows;
+﻿using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
     public readonly struct ScreenOptions
     {
         public readonly bool stack;
-        public readonly WindowOptions options;
+        public readonly ViewOptions options;
 
         public ScreenOptions(
-              in WindowOptions options
+              in ViewOptions options
             , bool stack = true
         )
         {
@@ -29,13 +29,13 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             this.stack = stack;
         }
 
-        public static implicit operator ScreenOptions(in WindowOptions options)
+        public static implicit operator ScreenOptions(in ViewOptions options)
             => new(options);
 
         public static implicit operator ScreenOptions(string resourcePath)
-            => new(new WindowOptions(resourcePath));
+            => new(new ViewOptions(resourcePath));
 
-        public static implicit operator WindowOptions(in ScreenOptions options)
+        public static implicit operator ViewOptions(in ScreenOptions options)
             => options.options;
     }
 }

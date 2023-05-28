@@ -55,7 +55,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             for (var i = 0; i < count; i++)
             {
                 var (screen, resourcePath) = screens[i];
-                DestroyAndForget(new ViewRef(screen, resourcePath, PoolingPolicy.DisablePooling)).Forget();
+                DestroyAndForget(screen, resourcePath, PoolingPolicy.DisablePooling).Forget();
             }
 
             screens.Clear();
@@ -267,7 +267,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             var screen = _screens[index];
             _screens.RemoveAt(index);
 
-            DestroyAndForget(screen).Forget();
+            DestroyAndForget(screen);
         }
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 await exitScreen.BeforeReleaseAsync();
 
-                DestroyAndForget(exitScreenRef.Value).Forget();
+                DestroyAndForget(exitScreenRef.Value);
             }
 
             _isActiveScreenStacked = options.stack;
@@ -525,7 +525,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             {
                 await exitScreen.BeforeReleaseAsync();
 
-                DestroyAndForget(exitScreenRef.Value).Forget();
+                DestroyAndForget(exitScreenRef.Value);
             }
 
             _isActiveScreenStacked = options.stack;
@@ -628,7 +628,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             // Unload unused Screen
             await exitScreen.BeforeReleaseAsync();
 
-            DestroyAndForget(exitScreenRef).Forget();
+            DestroyAndForget(exitScreenRef);
 
             _isActiveScreenStacked = true;
             

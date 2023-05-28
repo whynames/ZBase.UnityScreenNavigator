@@ -1,4 +1,4 @@
-﻿using ZBase.UnityScreenNavigator.Core.Windows;
+﻿using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Activities
@@ -7,10 +7,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
     {
         public readonly SortingLayerId? sortingLayer;
         public readonly int? orderInLayer;
-        public readonly WindowOptions options;
+        public readonly ViewOptions options;
 
         public ActivityOptions(
-              in WindowOptions options
+              in ViewOptions options
             , in SortingLayerId? sortingLayer = null
             , in int? orderInLayer = null
         )
@@ -35,13 +35,13 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             this.orderInLayer = orderInLayer;
         }
 
-        public static implicit operator ActivityOptions(in WindowOptions options)
+        public static implicit operator ActivityOptions(in ViewOptions options)
             => new(options);
 
         public static implicit operator ActivityOptions(string resourcePath)
-            => new(new WindowOptions(resourcePath));
+            => new(new ViewOptions(resourcePath));
 
-        public static implicit operator WindowOptions(in ActivityOptions options)
+        public static implicit operator ViewOptions(in ActivityOptions options)
             => options.options;
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace ZBase.UnityScreenNavigator.Core.Windows
+namespace ZBase.UnityScreenNavigator.Core.Views
 {
-    public delegate void OnLoadCallback(Window window, Memory<object> args);
+    public delegate void OnLoadCallback(View view, Memory<object> args);
 
-    public readonly struct WindowOptions
+    public readonly struct ViewOptions
     {
         public readonly bool loadAsync;
         public readonly bool playAnimation;
@@ -12,7 +12,7 @@ namespace ZBase.UnityScreenNavigator.Core.Windows
         public readonly string resourcePath;
         public readonly OnLoadCallback onLoaded;
 
-        public WindowOptions(
+        public ViewOptions(
             string resourcePath
             , bool playAnimation = true
             , OnLoadCallback onLoaded = null
@@ -27,7 +27,7 @@ namespace ZBase.UnityScreenNavigator.Core.Windows
             this.onLoaded = onLoaded;
         }
 
-        public static implicit operator WindowOptions(string resourcePath)
+        public static implicit operator ViewOptions(string resourcePath)
             => new(resourcePath);
     }
 }
