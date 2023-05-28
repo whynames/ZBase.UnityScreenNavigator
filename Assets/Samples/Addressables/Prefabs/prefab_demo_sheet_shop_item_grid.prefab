@@ -168,7 +168,6 @@ MonoBehaviour:
     _enterAnimations: []
     _exitAnimations: []
   _renderingOrder: 0
-  _grid: {fileID: 8469241364127469229}
   _controlContainer: {fileID: 348205957655966605}
 --- !u!225 &351787951978546582
 CanvasGroup:

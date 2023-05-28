@@ -6,13 +6,11 @@ using ZBase.UnityScreenNavigator.Core;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Core.Controls;
 using ZBase.UnityScreenNavigator.Core.Sheets;
-using UnityEngine.UI;
 
 namespace Demo.Scripts
 {
     public class ShopItemGridSheet : Sheet
     {
-        [SerializeField] private GridLayoutGroup _grid;
         [SerializeField] private SimpleControlContainer _controlContainer;
 
         private const int ItemCount = 8;
@@ -44,17 +42,15 @@ namespace Demo.Scripts
 
                 if (i == 0)
                 {
-                    options = new ControlOptions(shopItemKey, onLoaded: OnFirstShopItemLoaded);
+                    options = new ControlOptions(shopItemKey, false, onLoaded: OnFirstShopItemLoaded);
                     await _controlContainer.ShowAsync(options);
                 }
                 else
                 {
-                    options = new ControlOptions(shopItemKey);
+                    options = new ControlOptions(shopItemKey, false);
                     _controlContainer.Show(options);
                 }
             }
-
-            RebuildGridLayout().Forget();
         }
 
         private void OnFirstShopItemLoaded(int controlId, Control control, Memory<object> args)
@@ -69,12 +65,6 @@ namespace Demo.Scripts
             _firstShopItemControl.ThumbButton.onClick.AddListener(OnFirstThumbButtonClicked);
 
             _firstShopItemControl.Locked.gameObject.SetActive(false);
-        }
-
-        private async UniTaskVoid RebuildGridLayout()
-        {
-            await UniTask.WaitUntil(() => _controlContainer.Content.childCount == ItemCount);
-            LayoutRebuilder.MarkLayoutForRebuild(_grid.transform as RectTransform);
         }
 
         public override void Deinitialize(Memory<object> args)
