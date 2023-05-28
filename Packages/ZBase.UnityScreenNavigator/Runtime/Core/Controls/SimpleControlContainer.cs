@@ -2,18 +2,17 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    [RequireComponent(typeof(RectMask2D))]
     public sealed class SimpleControlContainer : ControlContainerBase
     {
         private static Dictionary<int, SimpleControlContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, SimpleControlContainer> s_instanceCacheByName = new();
 
         [SerializeField] private RectTransform _content;
+        [SerializeField] private bool _disableInteractionInTransition;
 
         private readonly List<ISimpleControlContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ViewRef<Control>> _controls = new();
@@ -237,7 +236,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
             await control.AfterLoadAsync(Content, args);
 
-            if (Settings.EnableInteractionInTransition == false)
+            if (_disableInteractionInTransition)
             {
                 Interactable = false;
             }
@@ -264,7 +263,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
                 callbackReceiver.AfterShow(enterControl, args);
             }
 
-            if (Settings.EnableInteractionInTransition == false)
+            if (_disableInteractionInTransition)
             {
                 Interactable = true;
             }
@@ -303,7 +302,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// <remarks>Asynchronous</remarks>
         public async UniTask HideAsync(int controlId, bool playAnimation, params object[] args)
         {
-            if (Settings.EnableInteractionInTransition == false)
+            if (_disableInteractionInTransition)
             {
                 Interactable = false;
             }
@@ -331,7 +330,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
                 callbackReceiver.AfterHide(exitControl, args);
             }
 
-            if (Settings.EnableInteractionInTransition == false)
+            if (_disableInteractionInTransition)
             {
                 Interactable = true;
             }

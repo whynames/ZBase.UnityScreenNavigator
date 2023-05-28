@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 894733205786630163}
   - component: {fileID: 8469241364127469229}
-  - component: {fileID: 8937367884163061091}
   - component: {fileID: 6424802956789696814}
   - component: {fileID: 348205957655966605}
   m_Layer: 5
@@ -64,20 +63,6 @@ MonoBehaviour:
   m_Spacing: {x: 42, y: 54}
   m_Constraint: 0
   m_ConstraintCount: 2
---- !u!114 &8937367884163061091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5127776153223032912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 0, y: 0}
 --- !u!225 &6424802956789696814
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -109,6 +94,7 @@ MonoBehaviour:
   _name: 
   _settings: {fileID: 11400000, guid: 514f7ef4ac39c644cb2e1176014eaeb7, type: 2}
   _content: {fileID: 0}
+  _disableInteractionInTransition: 0
 --- !u!1 &8149422562250073977
 GameObject:
   m_ObjectHideFlags: 0

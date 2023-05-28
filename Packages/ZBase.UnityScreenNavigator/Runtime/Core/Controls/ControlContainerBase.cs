@@ -1,11 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    [RequireComponent(typeof(RectMask2D))]
     public abstract class ControlContainerBase : ViewContainerBase
     {
         [SerializeField] private string _name;
