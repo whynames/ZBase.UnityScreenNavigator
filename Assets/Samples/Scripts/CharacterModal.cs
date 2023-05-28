@@ -73,7 +73,7 @@ namespace Demo.Scripts
                 }
 
                 var targetSheet = imageSheets[x];
-                if (imageContainer.ActiveControl.Equals(targetSheet.sheet))
+                if (imageContainer.ActiveSheet.Equals(targetSheet.sheet))
                 {
                     return;
                 }

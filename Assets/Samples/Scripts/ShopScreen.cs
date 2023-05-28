@@ -57,7 +57,7 @@ namespace Demo.Scripts
                 return;
             }
 
-            if (_itemGridContainer.ActiveControlId == sheetId)
+            if (_itemGridContainer.ActiveSheetId == sheetId)
             {
                 // This sheet is already displayed.
                 return;

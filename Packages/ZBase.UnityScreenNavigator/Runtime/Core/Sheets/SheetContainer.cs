@@ -14,6 +14,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
 
+        private readonly Dictionary<int, ControlRef<Sheet>> _sheets = new();
+        private int? _activeSheetId;
+
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
@@ -22,6 +25,26 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             s_instanceCacheByName = new();
         }
 
+        public int? ActiveSheetId => _activeSheetId;
+
+        public Sheet ActiveSheet
+        {
+            get
+            {
+                if (ActiveSheetId.HasValue == false)
+                {
+                    return null;
+                }
+
+                return _sheets[ActiveSheetId.Value].Control;
+            }
+        }
+
+        /// <summary>
+        /// True if in transition.
+        /// </summary>
+        public bool IsInTransition { get; private set; }
+
         protected override void Awake()
         {
             s_instanceCacheByName[ContainerName] = this;
@@ -29,10 +52,35 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             base.Awake();
         }
 
+        public void Deinitialize()
+        {
+            _activeSheetId = null;
+            IsInTransition = false;
+
+            var controls = _sheets;
+
+            foreach (var controlRef in controls.Values)
+            {
+                ReturnToPool(controlRef.Control, controlRef.ResourcePath, controlRef.PoolingPolicy);
+            }
+
+            controls.Clear();
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
             
+            var controls = _sheets;
+
+            foreach (var controlRef in controls.Values)
+            {
+                var (control, resourcePath) = controlRef;
+                DestroyAndForget(control, resourcePath, PoolingPolicy.DisablePooling).Forget();
+            }
+
+            controls.Clear();
+
             s_instanceCacheByName.Remove(ContainerName);
 
             using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
@@ -128,6 +176,80 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         #endregion
 
         /// <summary>
+        /// Register an instance of <typeparamref name="TSheet"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        public void Register<TSheet>(ControlOptions options, params object[] args)
+            where TSheet : Sheet
+        {
+            RegisterAndForget<TSheet>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Register an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        public void Register(ControlOptions options, params object[] args)
+        {
+            RegisterAndForget<Sheet>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Register an instance of <typeparamref name="TSheet"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask<int> RegisterAsync<TSheet>(ControlOptions options, params object[] args)
+            where TSheet : Sheet
+        {
+            return await RegisterAsyncInternal<TSheet>(options, args);
+        }
+
+        /// <summary>
+        /// Register an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        public async UniTask<int> RegisterAsync(ControlOptions options, params object[] args)
+        {
+            return await RegisterAsyncInternal<Sheet>(options, args);
+        }
+
+        private async UniTaskVoid RegisterAndForget<TSheet>(ControlOptions options, Memory<object> args)
+            where TSheet : Sheet
+        {
+            await RegisterAsyncInternal<TSheet>(options, args);
+        }
+
+        private async UniTask<int> RegisterAsyncInternal<TSheet>(ControlOptions options, Memory<object> args)
+            where TSheet : Sheet
+        {
+            var resourcePath = options.resourcePath;
+
+            if (resourcePath == null)
+            {
+                throw new ArgumentNullException(nameof(resourcePath));
+            }
+
+            var (sheetId, sheet) = await GetSheetAsync<TSheet>(options);
+
+            options.onLoaded?.Invoke(sheetId, sheet);
+
+            await sheet.AfterLoadAsync((RectTransform)transform, args);
+
+            return sheetId;
+        }
+
+        private async UniTask<(int, TSheet)> GetSheetAsync<TSheet>(ControlOptions options)
+            where TSheet : Sheet
+        {
+            var sheet = await GetViewAsync<TSheet>(options.AsViewOptions());
+            var sheetId = sheet.GetInstanceID();
+
+            _sheets[sheetId] = new ControlRef<Sheet>(sheet, options.resourcePath, options.poolingPolicy);
+
+            return (sheetId, sheet);
+        }
+
+        /// <summary>
         /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
@@ -158,7 +280,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 return;
             }
 
-            if (ActiveControlId.HasValue && ActiveControlId.Value.Equals(sheetId))
+            if (ActiveSheetId.HasValue && ActiveSheetId.Value.Equals(sheetId))
             {
                 Debug.LogWarning($"Cannot transition because the sheet {sheetId} is already active.");
                 return;
@@ -171,10 +293,10 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 Interactable = false;
             }
 
-            var enterSheet = Controls[sheetId].Control;
+            var enterSheet = _sheets[sheetId].Control;
             enterSheet.Settings = Settings;
 
-            ControlRef<Control>? exitSheetRef = ActiveControlId.HasValue ? Controls[ActiveControlId.Value] : null;
+            ControlRef<Sheet>? exitSheetRef = ActiveSheetId.HasValue ? _sheets[ActiveSheetId.Value] : null;
             var exitSheet = exitSheetRef.HasValue ? exitSheetRef.Value.Control : null;
 
             if (exitSheet)
@@ -204,7 +326,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             await enterSheet.EnterAsync(playAnimation, exitSheet);
 
             // End Transition
-            ActiveControlId = sheetId;
+            _activeSheetId = sheetId;
             IsInTransition = false;
 
             // Postprocess
@@ -252,7 +374,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 return;
             }
 
-            if (ActiveControlId.HasValue == false)
+            if (ActiveSheetId.HasValue == false)
             {
                 Debug.LogWarning("Cannot transition because there is no active sheet.");
                 return;
@@ -265,7 +387,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 Interactable = false;
             }
 
-            var exitSheetRef = Controls[ActiveControlId.Value];
+            var exitSheetRef = _sheets[ActiveSheetId.Value];
             var exitSheet = exitSheetRef.Control;
             exitSheet.Settings = Settings;
 
@@ -281,7 +403,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             await exitSheet.ExitAsync(playAnimation, null);
 
             // End Transition
-            ActiveControlId = null;
+            _activeSheetId = null;
             IsInTransition = false;
 
             // Postprocess
