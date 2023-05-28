@@ -13,6 +13,7 @@ namespace Demo.Scripts
         private const string CharacterModalImageSheetPrefabName = "sheet_character_modal_image";
         private const string CharacterImageModalPrefabName = "modal_character_image";
         private const string LoadingActivityPrefabName = "activity_loading";
+        private const string ShopItemPrefabName = "control_shop_item";
 
         private const string CharacterImageFormat = "tex_character_{0:D3}_{1}";
         private const string CharacterThumbnailFormat = "tex_character_thumb_{0:D3}_{1}";
@@ -75,6 +76,11 @@ namespace Demo.Scripts
         public static string LoadingActivity()
         {
             return string.Format(PrefabFormat, LoadingActivityPrefabName);
+        }
+
+        public static string ShopItemControlPrefab()
+        {
+            return string.Format(PrefabFormat, ShopItemPrefabName);
         }
     }
 }
