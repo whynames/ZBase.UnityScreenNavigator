@@ -6,9 +6,10 @@ using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
 {
-    [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
+    [RequireComponent(typeof(RectTransform))]
     public abstract class View : UIBehaviour, IView
     {
+        [SerializeField] private bool _dontUseCanvasGroup = false;
         [SerializeField] private bool _usePrefabNameAsIdentifier = true;
 
         [SerializeField]
@@ -104,14 +105,18 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 if (IsDestroyed() || gameObject == false)
                     return 0;
 
-                return CanvasGroup.alpha;
+                if (CanvasGroup)
+                    return CanvasGroup.alpha;
+
+                return 1f;
             }
             set
             {
                 if (IsDestroyed() || gameObject == false)
                     return;
 
-                CanvasGroup.alpha = value;
+                if (CanvasGroup)
+                    CanvasGroup.alpha = value;
             }
         }
 
@@ -122,7 +127,10 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 if (IsDestroyed() || gameObject == false)
                     return false;
 
-                return CanvasGroup.interactable;
+                if (CanvasGroup)
+                    return CanvasGroup.interactable;
+
+                return true;
             }
 
             set
@@ -130,7 +138,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 if (IsDestroyed() || gameObject == false)
                     return;
 
-                CanvasGroup.interactable = value;
+                if (CanvasGroup)
+                    CanvasGroup.interactable = value;
             }
         }
 
@@ -145,7 +154,10 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                     return null;
 
                 if (_canvasGroup == false)
-                    _canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
+                    _canvasGroup = gameObject.GetComponent<CanvasGroup>();
+
+                if (_canvasGroup == false && _dontUseCanvasGroup == false)
+                    _canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
                 return _canvasGroup;
             }

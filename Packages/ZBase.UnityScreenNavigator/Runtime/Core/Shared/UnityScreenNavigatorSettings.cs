@@ -63,10 +63,6 @@ namespace ZBase.UnityScreenNavigator.Core
 
         [SerializeField] private TransitionAnimationObject _activityExitAnimation;
 
-        [SerializeField] private TransitionAnimationObject _controlEnterAnimation;
-
-        [SerializeField] private TransitionAnimationObject _controlExitAnimation;
-
         [SerializeField] private TransitionAnimationObject _sheetEnterAnimation;
 
         [SerializeField] private TransitionAnimationObject _sheetExitAnimation;
@@ -129,14 +125,6 @@ namespace ZBase.UnityScreenNavigator.Core
         public ITransitionAnimation ActivityExitAnimation => _activityExitAnimation
             ? Instantiate(_activityExitAnimation)
             : SimpleTransitionAnimationObject.CreateInstance(afterScale: Vector3.one * 0.3f, afterAlpha: 0.0f);
-
-        public ITransitionAnimation ControlEnterAnimation => _controlEnterAnimation
-            ? Instantiate(_controlEnterAnimation)
-            : SimpleTransitionAnimationObject.CreateInstance(beforeAlpha: 0.0f, easeType: EaseType.Linear);
-
-        public ITransitionAnimation ControlExitAnimation => _controlExitAnimation
-            ? Instantiate(_controlExitAnimation)
-            : SimpleTransitionAnimationObject.CreateInstance(afterAlpha: 0.0f, easeType: EaseType.Linear);
 
         public ITransitionAnimation SheetEnterAnimation => _sheetEnterAnimation
             ? Instantiate(_sheetEnterAnimation)
@@ -203,11 +191,6 @@ namespace ZBase.UnityScreenNavigator.Core
         public ITransitionAnimation GetDefaultActivityTransitionAnimation(bool enter)
         {
             return enter ? ActivityEnterAnimation : ActivityExitAnimation;
-        }
-
-        public ITransitionAnimation GetDefaultControlTransitionAnimation(bool enter)
-        {
-            return enter ? ControlEnterAnimation : ControlExitAnimation;
         }
 
         public ITransitionAnimation GetDefaultSheetTransitionAnimation(bool enter)

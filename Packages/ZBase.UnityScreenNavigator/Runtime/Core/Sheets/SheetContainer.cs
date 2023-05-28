@@ -8,7 +8,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
-    [RequireComponent(typeof(RectMask2D))]
+    [RequireComponent(typeof(RectMask2D), typeof(CanvasGroup))]
     public sealed class SheetContainer : ControlContainerBase
     {
         private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();

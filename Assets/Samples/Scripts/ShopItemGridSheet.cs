@@ -65,6 +65,12 @@ namespace Demo.Scripts
             _firstShopItemControl.ThumbButton.onClick.AddListener(OnFirstThumbButtonClicked);
 
             _firstShopItemControl.Locked.gameObject.SetActive(false);
+            _firstShopItemControl.Unlocked.gameObject.SetActive(true);
+        }
+
+        public override void DidExit(Memory<object> args)
+        {
+            _controlContainer.Deinitialize();
         }
 
         public override void Deinitialize(Memory<object> args)

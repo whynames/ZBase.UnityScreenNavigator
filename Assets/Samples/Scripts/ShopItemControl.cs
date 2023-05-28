@@ -11,6 +11,7 @@ namespace Demo.Scripts
         [SerializeField] private Image _thumbnailImage;
         [SerializeField] private Button _thumbButton;
         [SerializeField] private RectTransform _locked;
+        [SerializeField] private RectTransform _unlocked;
 
         public Image ThumbnailImage => _thumbnailImage;
 
@@ -18,9 +19,10 @@ namespace Demo.Scripts
 
         public RectTransform Locked => _locked;
 
+        public RectTransform Unlocked => _unlocked;
+
         public override UniTask Initialize(Memory<object> args)
         {
-            CanvasGroup.enabled = false;
             return base.Initialize(args);
         }
 
@@ -28,6 +30,7 @@ namespace Demo.Scripts
         {
             _thumbButton.onClick.RemoveAllListeners();
             _thumbnailImage.sprite = null;
+            _unlocked.gameObject.SetActive(false);
             _locked.gameObject.SetActive(true);
         }
     }

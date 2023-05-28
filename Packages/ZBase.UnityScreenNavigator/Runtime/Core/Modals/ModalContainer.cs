@@ -10,7 +10,6 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    [RequireComponent(typeof(RectMask2D))]
     public sealed class ModalContainer : WindowContainerBase
     {
         private static Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();

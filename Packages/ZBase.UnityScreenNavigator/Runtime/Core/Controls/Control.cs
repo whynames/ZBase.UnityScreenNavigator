@@ -117,8 +117,6 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             IsTransitioning = true;
             TransitionAnimationType = ControlTransitionAnimationType.Enter;
             gameObject.SetActive(true);
-            SetTransitionProgress(0.0f);
-            Alpha = 0.0f;
 
             OnBeforeEnter();
 
@@ -133,22 +131,31 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
         internal async UniTask EnterAsync(bool playAnimation, Control partnerControl)
         {
-            Alpha = 1.0f;
+            OnEnter();
 
-            if (playAnimation)
+            if (playAnimation == false)
             {
-                var anim = GetAnimation(true, partnerControl);
-
-                if (partnerControl)
-                {
-                    anim.SetPartner(partnerControl.RectTransform);
-                }
-
-                anim.Setup(RectTransform);
-
-                await anim.PlayAsync(TransitionProgressReporter);
+                return;
             }
+
+            var anim = GetAnimation(true, partnerControl);
+
+            if (anim == null)
+            {
+                return;
+            }
+
+            if (partnerControl)
+            {
+                anim.SetPartner(partnerControl.RectTransform);
+            }
+
+            anim.Setup(RectTransform);
+
+            await anim.PlayAsync(TransitionProgressReporter);
         }
+
+        protected virtual void OnEnter() { }
 
         internal void AfterEnter(Memory<object> args)
         {
@@ -166,8 +173,6 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             IsTransitioning = true;
             TransitionAnimationType = ControlTransitionAnimationType.Exit;
             gameObject.SetActive(true);
-            SetTransitionProgress(0.0f);
-            Alpha = 1.0f;
 
             OnBeforeExit();
 
@@ -182,23 +187,29 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
         internal async UniTask ExitAsync(bool playAnimation, Control partnerControl)
         {
-            if (playAnimation)
+            if (playAnimation == false)
             {
-                var anim = GetAnimation(false, partnerControl);
-
-                if (partnerControl)
-                {
-                    anim.SetPartner(partnerControl.RectTransform);
-                }
-
-                anim.Setup(RectTransform);
-
-                await anim.PlayAsync(TransitionProgressReporter);
+                return;
             }
 
-            Alpha = 0.0f;
-            SetTransitionProgress(1.0f);
+            var anim = GetAnimation(false, partnerControl);
+
+            if (anim == null)
+            {
+                return;
+            }
+
+            if (partnerControl)
+            {
+                anim.SetPartner(partnerControl.RectTransform);
+            }
+
+            anim.Setup(RectTransform);
+
+            await anim.PlayAsync(TransitionProgressReporter);
         }
+
+        protected virtual void OnExit() { }
 
         internal void AfterExit(Memory<object> args)
         {
@@ -216,7 +227,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             await WaitForAsync(tasks);
         }
 
-        private void SetTransitionProgress(float progress)
+        protected void SetTransitionProgress(float progress)
         {
             TransitionAnimationProgress = progress;
             TransitionAnimationProgressChanged?.Invoke(progress);
@@ -225,14 +236,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         protected virtual ITransitionAnimation GetAnimation(bool enter, Control partner)
         {
             var partnerIdentifier = partner == true ? partner.Identifier : string.Empty;
-            var anim = _animationContainer.GetAnimation(enter, partnerIdentifier);
-
-            if (anim == null)
-            {
-                return Settings.GetDefaultControlTransitionAnimation(enter);
-            }
-
-            return anim;
+            return _animationContainer.GetAnimation(enter, partnerIdentifier);
         }
     }
 }

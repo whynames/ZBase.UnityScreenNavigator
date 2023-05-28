@@ -6,6 +6,7 @@ using ZBase.UnityScreenNavigator.Core.Views;
 namespace ZBase.UnityScreenNavigator.Core.Windows
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(CanvasGroup))]
     public abstract class Window : View, IViewGroup, IWindow
     {
         private readonly List<IView> views = new();

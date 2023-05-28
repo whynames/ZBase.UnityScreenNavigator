@@ -1,10 +1,12 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Windows
 {
+    [RequireComponent(typeof(RectMask2D), typeof(CanvasGroup))]
     public abstract class WindowContainerBase : ViewContainerBase, IWindowContainer
     {
         public string LayerName { get; private set; }

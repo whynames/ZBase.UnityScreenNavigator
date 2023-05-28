@@ -36,12 +36,27 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
         protected sealed override void OnBeforeEnter()
         {
+            SetTransitionProgress(0.0f);
+            Alpha = 0.0f;
             RectTransform.FillParent(Parent);
+        }
+
+        protected override void OnEnter()
+        {
+            Alpha = 1.0f;
         }
 
         protected sealed override void OnBeforeExit()
         {
+            SetTransitionProgress(0.0f);
+            Alpha = 1.0f;
             RectTransform.FillParent(Parent);
+        }
+
+        protected override void OnExit()
+        {
+            Alpha = 0.0f;
+            SetTransitionProgress(1.0f);
         }
 
         protected sealed override ITransitionAnimation GetAnimation(bool enter, Control partner)

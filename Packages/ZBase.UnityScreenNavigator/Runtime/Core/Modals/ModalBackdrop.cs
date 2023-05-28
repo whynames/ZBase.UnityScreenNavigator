@@ -6,6 +6,7 @@ using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
+    [RequireComponent(typeof(CanvasGroup))]
     public sealed class ModalBackdrop : View
     {
         [SerializeField] private ModalBackdropTransitionAnimationContainer _animationContainer;

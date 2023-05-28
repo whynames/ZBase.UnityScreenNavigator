@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 894733205786630163}
   - component: {fileID: 8469241364127469229}
-  - component: {fileID: 6424802956789696814}
   - component: {fileID: 348205957655966605}
   m_Layer: 5
   m_Name: Grid
@@ -63,18 +62,6 @@ MonoBehaviour:
   m_Spacing: {x: 42, y: 54}
   m_Constraint: 0
   m_ConstraintCount: 2
---- !u!225 &6424802956789696814
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5127776153223032912}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!114 &348205957655966605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,6 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f0ae44fd79f035499790d5a15cf4b3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontUseCanvasGroup: 1
   _usePrefabNameAsIdentifier: 1
   _identifier: 
   _rectTransform: {fileID: 0}
@@ -146,6 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7851a0fc90f6e654ea397a269404878d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontUseCanvasGroup: 0
   _usePrefabNameAsIdentifier: 1
   _identifier: 
   _rectTransform: {fileID: 0}
