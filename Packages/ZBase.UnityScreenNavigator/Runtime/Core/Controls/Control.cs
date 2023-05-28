@@ -91,8 +91,9 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             SetIdentifer();
 
             Parent = parentTransform;
-            OnAfterLoad(parentTransform);
             gameObject.SetActive(false);
+
+            OnAfterLoad(parentTransform);
 
             var tasks = _lifecycleEvents.Select(x => x.Initialize(args));
             await WaitForAsync(tasks);
@@ -105,9 +106,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             IsTransitioning = true;
             TransitionAnimationType = ControlTransitionAnimationType.Enter;
             gameObject.SetActive(true);
-            OnBeforeEnter();
             SetTransitionProgress(0.0f);
             Alpha = 0.0f;
+
+            OnBeforeEnter();
 
             var tasks = _lifecycleEvents.Select(x => x.WillEnter(args));
             await WaitForAsync(tasks);
@@ -133,8 +135,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
                 await anim.PlayAsync(TransitionProgressReporter);
             }
 
-            RectTransform.FillParent(Parent);
+            OnEnter();
         }
+
+        protected virtual void OnEnter() { }
 
         internal void AfterEnter(Memory<object> args)
         {
@@ -152,10 +156,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             IsTransitioning = true;
             TransitionAnimationType = ControlTransitionAnimationType.Exit;
             gameObject.SetActive(true);
-            OnBeforeExit();
             SetTransitionProgress(0.0f);
-
             Alpha = 1.0f;
+
+            OnBeforeExit();
 
             var tasks = _lifecycleEvents.Select(x => x.WillExit(args));
             await WaitForAsync(tasks);

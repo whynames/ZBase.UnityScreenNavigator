@@ -34,6 +34,11 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             RectTransform.SetSiblingIndex(siblingIndex);
         }
 
+        protected override void OnEnter()
+        {
+            RectTransform.FillParent(Parent);
+        }
+
         protected override void OnBeforeEnter()
         {
             RectTransform.FillParent(Parent);
