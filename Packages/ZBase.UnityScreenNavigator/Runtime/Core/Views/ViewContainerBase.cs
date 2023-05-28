@@ -166,14 +166,19 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         /// <remarks>Asynchronous</remarks>
         public async UniTask PreloadAsync(string resourcePath, bool loadAsync = true, int amount = 1)
         {
+            if (amount < 1)
+            {
+                Debug.LogWarning($"The amount of preloaded view instances should be greater than 0.");
+                return;
+            }
+
             if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
             {
                 _resourcePathToPool[resourcePath] = pool = new Queue<View>();
             }
 
-            if (amount < 1)
+            if (pool.Count >= amount)
             {
-                Debug.LogWarning($"The amount of preloaded view instances should be greater than 0.");
                 return;
             }
 
@@ -338,6 +343,11 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected bool ReturnToPool<T>(ViewRef<T> viewRef)
+            where T : View
+            => ReturnToPool<T>(viewRef.View, viewRef.ResourcePath, viewRef.PoolingPolicy);
+
         protected bool ReturnToPool<T>(T view, string resourcePath, PoolingPolicy poolingPolicy)
             where T : View
         {
@@ -351,11 +361,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 return false;
             }
 
-            var resourcePathToPool = _resourcePathToPool;
-
-            if (resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
+            if (_resourcePathToPool.TryGetValue(resourcePath, out var pool) == false)
             {
-                resourcePathToPool[resourcePath] = pool = new Queue<View>();
+                _resourcePathToPool[resourcePath] = pool = new Queue<View>();
             }
 
             if (view.Owner == false)

@@ -10,7 +10,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         [SerializeField]
         private int _renderingOrder;
 
-        protected override void OnAfterLoad(RectTransform parentTransform)
+        protected sealed override void OnAfterLoad()
         {
             RectTransform.FillParent(Parent);
 
@@ -34,22 +34,17 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             RectTransform.SetSiblingIndex(siblingIndex);
         }
 
-        protected override void OnEnter()
+        protected sealed override void OnBeforeEnter()
         {
             RectTransform.FillParent(Parent);
         }
 
-        protected override void OnBeforeEnter()
+        protected sealed override void OnBeforeExit()
         {
             RectTransform.FillParent(Parent);
         }
 
-        protected override void OnBeforeExit()
-        {
-            RectTransform.FillParent(Parent);
-        }
-
-        protected override ITransitionAnimation GetAnimation(bool enter, Control partner)
+        protected sealed override ITransitionAnimation GetAnimation(bool enter, Control partner)
         {
             var partnerIdentifier = partner == true ? partner.Identifier : string.Empty;
             var anim = AnimationContainer.GetAnimation(enter, partnerIdentifier);

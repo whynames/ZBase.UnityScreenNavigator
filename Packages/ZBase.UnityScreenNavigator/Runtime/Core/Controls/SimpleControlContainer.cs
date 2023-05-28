@@ -13,8 +13,21 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         private static Dictionary<int, SimpleControlContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, SimpleControlContainer> s_instanceCacheByName = new();
 
+        [SerializeField] private RectTransform _content;
+
         private readonly List<ISimpleControlContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ViewRef<Control>> _controls = new();
+
+        public RectTransform Content
+        {
+            get
+            {
+                if (_content == false)
+                    _content = RectTransform;
+
+                return _content;
+            }
+        }
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -33,13 +46,14 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             _callbackReceivers.AddRange(GetComponents<ISimpleControlContainerCallbackReceiver>());
         }
 
-        public void Deinitialize()
+        public void Deinitialize(params object[] args)
         {
             var controls = _controls;
 
             foreach (var controlRef in controls.Values)
             {
-                ReturnToPool(controlRef.View, controlRef.ResourcePath, controlRef.PoolingPolicy);
+                controlRef.View.Deinitialize(args);
+                DestroyAndForget(controlRef);
             }
 
             controls.Clear();
@@ -190,15 +204,15 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
-        public async UniTask ShowAsync<TControl>(ControlOptions options, params object[] args)
+        public async UniTask<int> ShowAsync<TControl>(ControlOptions options, params object[] args)
             where TControl : Control
         {
-            await ShowAsyncInternal<TControl>(options, args);
+            return await ShowAsyncInternal<TControl>(options, args);
         }
 
-        public async UniTask ShowAsync(ControlOptions options, params object[] args)
+        public async UniTask<int> ShowAsync(ControlOptions options, params object[] args)
         {
-            await ShowAsyncInternal<Control>(options, args);
+            return await ShowAsyncInternal<Control>(options, args);
         }
 
         private async UniTaskVoid ShowAndForget<TControl>(ControlOptions options, Memory<object> args)
@@ -207,7 +221,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             await ShowAsyncInternal<TControl>(options, args);
         }
 
-        private async UniTask ShowAsyncInternal<TControl>(ControlOptions options, Memory<object> args)
+        private async UniTask<int> ShowAsyncInternal<TControl>(ControlOptions options, Memory<object> args)
             where TControl : Control
         {
             var resourcePath = options.resourcePath;
@@ -221,7 +235,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
             options.onLoaded?.Invoke(controlId, control, args);
 
-            await control.AfterLoadAsync((RectTransform)transform, args);
+            await control.AfterLoadAsync(Content, args);
 
             if (Settings.EnableInteractionInTransition == false)
             {
@@ -254,6 +268,8 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             {
                 Interactable = true;
             }
+
+            return controlId;
         }
 
         private async UniTask<(int, TControl)> GetControlAsync<TControl>(ControlOptions options)

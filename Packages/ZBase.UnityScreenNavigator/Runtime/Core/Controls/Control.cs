@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Views;
+using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.PriorityCollection;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
@@ -72,6 +73,11 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         }
 
         /// <inheritdoc/>
+        public virtual void Deinitialize(Memory<object> args)
+        {
+        }
+
+        /// <inheritdoc/>
         public virtual UniTask Cleanup()
         {
             return UniTask.CompletedTask;
@@ -95,13 +101,16 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             Parent = parentTransform;
             gameObject.SetActive(false);
 
-            OnAfterLoad(parentTransform);
+            OnAfterLoad();
 
             var tasks = _lifecycleEvents.Select(x => x.Initialize(args));
             await WaitForAsync(tasks);
         }
 
-        protected virtual void OnAfterLoad(RectTransform parentTransform) { }
+        protected virtual void OnAfterLoad()
+        {
+            RectTransform.SetParentRect(Parent);
+        }
 
         internal async UniTask BeforeEnterAsync(Memory<object> args)
         {
@@ -117,7 +126,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             await WaitForAsync(tasks);
         }
 
-        protected virtual void OnBeforeEnter() { }
+        protected virtual void OnBeforeEnter()
+        {
+            RectTransform.SetParentRect(Parent);
+        }
 
         internal async UniTask EnterAsync(bool playAnimation, Control partnerControl)
         {
@@ -136,11 +148,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
                 await anim.PlayAsync(TransitionProgressReporter);
             }
-
-            OnEnter();
         }
-
-        protected virtual void OnEnter() { }
 
         internal void AfterEnter(Memory<object> args)
         {
@@ -167,7 +175,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             await WaitForAsync(tasks);
         }
 
-        protected virtual void OnBeforeExit() { }
+        protected virtual void OnBeforeExit()
+        {
+            RectTransform.SetParentRect(Parent);
+        }
 
         internal async UniTask ExitAsync(bool playAnimation, Control partnerControl)
         {

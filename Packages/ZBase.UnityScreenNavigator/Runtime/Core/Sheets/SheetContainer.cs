@@ -55,19 +55,20 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             _callbackReceivers.AddRange(GetComponents<ISheetContainerCallbackReceiver>());
         }
 
-        public void Deinitialize()
+        public void Deinitialize(params object[] args)
         {
             _activeSheetId = null;
             IsInTransition = false;
 
-            var controls = _sheets;
+            var sheets = _sheets;
 
-            foreach (var controlRef in controls.Values)
+            foreach (var sheetRef in sheets.Values)
             {
-                ReturnToPool(controlRef.View, controlRef.ResourcePath, controlRef.PoolingPolicy);
+                sheetRef.View.Deinitialize(args);
+                DestroyAndForget(sheetRef);
             }
 
-            controls.Clear();
+            sheets.Clear();
         }
 
         protected override void OnDestroy()
