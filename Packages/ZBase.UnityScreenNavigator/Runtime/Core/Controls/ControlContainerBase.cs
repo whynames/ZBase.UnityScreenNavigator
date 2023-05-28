@@ -8,7 +8,7 @@ using ZBase.UnityScreenNavigator.Core.Views;
 namespace ZBase.UnityScreenNavigator.Core.Controls
 {
     [RequireComponent(typeof(RectMask2D))]
-    public abstract class ControlContainerBase : ViewContainerBase, IViewContainer
+    public abstract class ControlContainerBase : ViewContainerBase
     {
         [SerializeField] private string _name;
         [SerializeField] private UnityScreenNavigatorSettings _settings;
