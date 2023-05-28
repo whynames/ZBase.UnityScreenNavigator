@@ -10,7 +10,7 @@ using ZBase.UnityScreenNavigator.Foundation;
 namespace ZBase.UnityScreenNavigator.Core.Activities
 {
     [RequireComponent(typeof(RectMask2D))]
-    public class ActivityContainer : WindowContainer
+    public class ActivityContainer : WindowContainerBase
     {
         private static Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();

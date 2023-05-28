@@ -10,7 +10,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
     [RequireComponent(typeof(RectMask2D))]
-    public sealed class ScreenContainer : WindowContainer
+    public sealed class ScreenContainer : WindowContainerBase
     {
         private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();

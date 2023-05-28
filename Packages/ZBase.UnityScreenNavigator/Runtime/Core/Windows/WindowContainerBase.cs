@@ -5,7 +5,7 @@ using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Windows
 {
-    public abstract class WindowContainer : ViewContainerBase, IWindowContainer
+    public abstract class WindowContainerBase : ViewContainerBase, IWindowContainer
     {
         public string LayerName { get; private set; }
 
