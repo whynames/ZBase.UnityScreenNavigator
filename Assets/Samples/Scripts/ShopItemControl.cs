@@ -2,6 +2,7 @@ using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Controls;
 using UnityEngine.UI;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace Demo.Scripts
 {
@@ -17,9 +18,17 @@ namespace Demo.Scripts
 
         public RectTransform Locked => _locked;
 
+        public override UniTask Initialize(Memory<object> args)
+        {
+            CanvasGroup.enabled = false;
+            return base.Initialize(args);
+        }
+
         public override void Deinitialize(Memory<object> args)
         {
             _thumbButton.onClick.RemoveAllListeners();
+            _thumbnailImage.sprite = null;
+            _locked.gameObject.SetActive(true);
         }
     }
 }
