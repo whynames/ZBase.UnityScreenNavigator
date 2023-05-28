@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
-using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Sheets
@@ -18,8 +17,6 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         [SerializeField] private string _name;
         [SerializeField] UnityScreenNavigatorSettings _settings;
 
-        private readonly Dictionary<string, AssetLoadHandle<GameObject>> _resourcePathToHandle = new();
-        private readonly Dictionary<string, Queue<Sheet>> _resourcePathToPool = new();
         private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, SheetRef<Sheet>> _sheets = new();
 
@@ -467,64 +464,9 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private async UniTask<(int, T)> GetSheetAsync<T>(SheetOptions options)
             where T : Sheet
         {
-            var resourcePath = options.resourcePath;
-
-            if (GetFromPool<T>(resourcePath, options.poolingPolicy, out var existSheet))
-            {
-                existSheet.Settings = Settings;
-
-                var existSheetId = existSheet.GetInstanceID();
-                _sheets[existSheetId] = new SheetRef<Sheet>(existSheet, resourcePath, options.poolingPolicy);
-
-                return (existSheetId, existSheet);
-            }
-
-            AssetLoadHandle<GameObject> assetLoadHandle;
-            var handleInMap = false;
-
-            if (_resourcePathToHandle.TryGetValue(resourcePath, out var handle))
-            {
-                assetLoadHandle = handle;
-                handleInMap = true;
-            }
-            else
-            {
-                assetLoadHandle = options.loadAsync
-                    ? AssetLoader.LoadAsync<GameObject>(resourcePath)
-                    : AssetLoader.Load<GameObject>(resourcePath);
-            }
-
-            while (assetLoadHandle.IsDone == false)
-            {
-                await UniTask.NextFrame();
-            }
-
-            if (assetLoadHandle.Status == AssetLoadStatus.Failed)
-            {
-                throw assetLoadHandle.OperationException;
-            }
-
-            var instance = Instantiate(assetLoadHandle.Result);
-
-            if (instance.TryGetComponent<T>(out var sheet) == false)
-            {
-                Debug.LogError(
-                    $"Cannot find the {typeof(T).Name} component on the specified resource `{resourcePath}`."
-                    , instance
-                );
-
-                return (default, null);
-            }
-
-            sheet.Settings = Settings;
-
+            var sheet = await GetViewAsync<T>(options.AsViewOptions());
             var sheetId = sheet.GetInstanceID();
-            _sheets[sheetId] = new SheetRef<Sheet>(sheet, resourcePath, options.poolingPolicy);
-
-            if (handleInMap == false)
-            {
-                _resourcePathToHandle[resourcePath] = assetLoadHandle;
-            }
+            _sheets[sheetId] = new SheetRef<Sheet>(sheet, options.resourcePath, options.poolingPolicy);
 
             return (sheetId, sheet);
         }

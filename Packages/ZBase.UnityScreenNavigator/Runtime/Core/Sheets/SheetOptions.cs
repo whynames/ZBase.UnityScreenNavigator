@@ -1,4 +1,6 @@
-﻿namespace ZBase.UnityScreenNavigator.Core.Sheets
+﻿using ZBase.UnityScreenNavigator.Core.Views;
+
+namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     public readonly struct SheetOptions
     {
@@ -19,6 +21,9 @@
             this.onLoaded = onLoaded;
             this.poolingPolicy = poolingPolicy;
         }
+
+        public ViewOptions AsViewOptions()
+            => new(resourcePath, false, null, loadAsync, poolingPolicy);
 
         public static implicit operator SheetOptions(string resourcePath)
             => new(resourcePath);

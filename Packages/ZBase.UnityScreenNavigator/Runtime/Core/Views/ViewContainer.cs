@@ -231,6 +231,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         {
             if (GetFromPool<T>(resourcePath, poolingPolicy, out var existView))
             {
+                existView.Settings = Settings;
                 return existView;
             }
 
