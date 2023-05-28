@@ -2,13 +2,13 @@
 
 namespace ZBase.UnityScreenNavigator.Core.Views
 {
-    public interface IContainerLayer
+    public interface IWindowContainer
     {
         string LayerName { get; }
 
-        ContainerLayerType LayerType { get; }
+        WindowContainerType LayerType { get; }
 
-        IContainerLayerManager ContainerLayerManager { get; }
+        IWindowContainerManager ContainerManager { get; }
 
         Canvas Canvas { get; }
     }

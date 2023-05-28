@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using ZBase.UnityScreenNavigator.Core.Activities;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core.Screens;
@@ -14,10 +15,10 @@ namespace ZBase.UnityScreenNavigator.Core
         [SerializeField]
         private UnityScreenNavigatorSettings unityScreenNavigatorSettings;
 
-        [SerializeField]
-        private ContainerLayerSettings containerLayerSettings;
+        [SerializeField, FormerlySerializedAs("containerLayerSettings")]
+        private WindowContainerSettings windowContainerSettings;
 
-        protected GlobalContainerLayerManager GlobalContainerLayerManager { get; private set; }
+        protected GlobalWindowContainerManager WindowContainerManager { get; private set; }
 
         protected virtual void Awake()
         {
@@ -26,33 +27,33 @@ namespace ZBase.UnityScreenNavigator.Core
                 throw new NullReferenceException(nameof(unityScreenNavigatorSettings));
             }
 
-            if (containerLayerSettings == false)
+            if (windowContainerSettings == false)
             {
-                throw new NullReferenceException(nameof(containerLayerSettings));
+                throw new NullReferenceException(nameof(windowContainerSettings));
             }
 
             UnityScreenNavigatorSettings.DefaultSettings = unityScreenNavigatorSettings;
-            GlobalContainerLayerManager = this.GetOrAddComponent<GlobalContainerLayerManager>();
+            WindowContainerManager = this.GetOrAddComponent<GlobalWindowContainerManager>();
         }
 
         protected virtual void Start()
         {
-            var layers = containerLayerSettings.GetContainerLayers();
-            var manager = GlobalContainerLayerManager;
+            var layers = windowContainerSettings.Containers.Span;
+            var manager = WindowContainerManager;
 
             foreach (var layer in layers)
             {
-                switch (layer.layerType)
+                switch (layer.containerType)
                 {
-                    case ContainerLayerType.Modal:
+                    case WindowContainerType.Modal:
                         ModalContainer.Create(layer, manager, unityScreenNavigatorSettings);
                         break;
 
-                    case ContainerLayerType.Screen:
+                    case WindowContainerType.Screen:
                         ScreenContainer.Create(layer, manager, unityScreenNavigatorSettings);
                         break;
 
-                    case ContainerLayerType.Activity:
+                    case WindowContainerType.Activity:
                         ActivityContainer.Create(layer, manager, unityScreenNavigatorSettings);
                         break;
                 }

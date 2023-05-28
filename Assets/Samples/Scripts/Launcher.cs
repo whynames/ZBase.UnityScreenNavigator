@@ -16,7 +16,7 @@ namespace Demo.Scripts
         private async UniTaskVoid ShowTopPage()
         {
             var options = new WindowOptions(ResourceKey.TopPagePrefab(), false, loadAsync: false);
-            await GlobalContainerLayerManager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
+            await WindowContainerManager.Find<ScreenContainer>(ContainerKey.Screens).PushAsync(options);
         }
     }
 }

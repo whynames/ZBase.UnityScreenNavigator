@@ -10,7 +10,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
     [RequireComponent(typeof(RectMask2D))]
-    public sealed class ScreenContainer : ContainerLayer
+    public sealed class ScreenContainer : WindowContainer
     {
         private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
@@ -151,24 +151,12 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             return false;
         }
 
-        [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
-        public static async UniTask<ScreenContainer> CreateAsync(
-              ContainerLayerConfig layerConfig
-            , IContainerLayerManager manager
-            , UnityScreenNavigatorSettings settings
-        )
-        {
-            var container = Create(layerConfig, manager, settings);
-            await UniTask.NextFrame();
-            return container;
-        }
-
         /// <summary>
         /// Create a new <see cref="ScreenContainer"/> as a layer.
         /// </summary>
         public static ScreenContainer Create(
-              ContainerLayerConfig layerConfig
-            , IContainerLayerManager manager
+              WindowContainerConfig layerConfig
+            , IWindowContainerManager manager
             , UnityScreenNavigatorSettings settings
         )
         {

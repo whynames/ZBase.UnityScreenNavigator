@@ -1,13 +1,16 @@
 ﻿using System;
+using UnityEngine.Serialization;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core
 {
     [Serializable]
-    public class ContainerLayerConfig
+    public class WindowContainerConfig
     {
         public string name;
-        public ContainerLayerType layerType;
+
+        [FormerlySerializedAs("layerType")]
+        public WindowContainerType containerType;
 
         public bool overrideSorting;
 

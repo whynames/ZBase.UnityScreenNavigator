@@ -10,7 +10,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
     [RequireComponent(typeof(RectMask2D))]
-    public sealed class ModalContainer : ContainerLayer
+    public sealed class ModalContainer : WindowContainer
     {
         private static Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ModalContainer> s_instanceCacheByName = new();
@@ -175,24 +175,12 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             return false;
         }
 
-        [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
-        public static async UniTask<ModalContainer> CreateAsync(
-              ContainerLayerConfig layerConfig
-            , IContainerLayerManager manager
-            , UnityScreenNavigatorSettings settings
-        )
-        {
-            var container = Create(layerConfig, manager, settings);
-            await UniTask.NextFrame();
-            return container;
-        }
-
         /// <summary>
         /// Create a new <see cref="ModalContainer" /> as a layer.
         /// </summary>
         public static ModalContainer Create(
-              ContainerLayerConfig layerConfig
-            , IContainerLayerManager manager
+              WindowContainerConfig layerConfig
+            , IWindowContainerManager manager
             , UnityScreenNavigatorSettings settings
         )
         {

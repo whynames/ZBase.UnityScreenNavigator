@@ -4,9 +4,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform), typeof(Canvas))]
-    public sealed class GlobalContainerLayerManager : ContainerLayerManager
+    public sealed class GlobalWindowContainerManager : WindowContainerManager
     {
-        public static GlobalContainerLayerManager Root;
+        public static GlobalWindowContainerManager Root;
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

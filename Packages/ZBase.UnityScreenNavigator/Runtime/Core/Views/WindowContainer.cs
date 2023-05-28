@@ -7,7 +7,7 @@ using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
 {
-    public abstract class ContainerLayer : Window, IContainerLayer
+    public abstract class WindowContainer : Window, IWindowContainer
     {
         private readonly Dictionary<string, AssetLoadHandle<GameObject>> _resourcePathToHandle = new();
         private readonly Dictionary<string, Queue<View>> _resourcePathToPool = new();
@@ -16,9 +16,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
         public string LayerName { get; private set; }
 
-        public ContainerLayerType LayerType { get; private set; }
+        public WindowContainerType LayerType { get; private set; }
 
-        public IContainerLayerManager ContainerLayerManager { get; private set; }
+        public IWindowContainerManager ContainerManager { get; private set; }
 
         public Canvas Canvas { get; private set; }
 
@@ -37,7 +37,7 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             get => Settings.EnablePooling;
         }
 
-        protected ContainerLayerConfig Config { get; private set; }
+        protected WindowContainerConfig Config { get; private set; }
 
         protected RectTransform PoolTransform { get; private set; }
 
@@ -55,19 +55,19 @@ namespace ZBase.UnityScreenNavigator.Core.Views
         }
 
         public void Initialize(
-              ContainerLayerConfig config
-            , IContainerLayerManager manager
+              WindowContainerConfig config
+            , IWindowContainerManager manager
             , UnityScreenNavigatorSettings settings
         )
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             Settings = settings ? settings : throw new ArgumentNullException(nameof(settings));
 
-            ContainerLayerManager = manager ?? throw new ArgumentNullException(nameof(manager));
-            ContainerLayerManager.Add(this);
+            ContainerManager = manager ?? throw new ArgumentNullException(nameof(manager));
+            ContainerManager.Add(this);
 
             LayerName = config.name;
-            LayerType = config.layerType;
+            LayerType = config.containerType;
             
             var canvas = GetComponent<Canvas>();
 
@@ -271,18 +271,6 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             pool.Enqueue(view);
         }
-
-        [Obsolete("This method is deprecated. Use ContainsInPool(string) instead.")]
-        public bool IsPreloadRequested(string resourcePath)
-            => ContainsInPool(resourcePath);
-
-        [Obsolete("This method is deprecated. Use ContainsInPool(string) instead.")]
-        public bool IsPreloaded(string resourcePath)
-            => ContainsInPool(resourcePath);
-
-        [Obsolete("This method is deprecated. Use KeepInPool(string, int) instead.")]
-        public void ReleasePreloaded(string resourcePath)
-            => KeepInPool(resourcePath, 0);
 
         protected async UniTask<T> GetViewAsync<T>(WindowOptions options)
             where T : View

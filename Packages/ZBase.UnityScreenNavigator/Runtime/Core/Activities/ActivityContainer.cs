@@ -9,7 +9,7 @@ using ZBase.UnityScreenNavigator.Foundation;
 namespace ZBase.UnityScreenNavigator.Core.Activities
 {
     [RequireComponent(typeof(RectMask2D))]
-    public class ActivityContainer : ContainerLayer
+    public class ActivityContainer : WindowContainer
     {
         private static Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
@@ -98,24 +98,12 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             return false;
         }
 
-        [Obsolete("This method is deprecated. Use Create(ContainerLayerConfig, IContainerLayerManager) instead")]
-        public static async UniTask<ActivityContainer> CreateAsync(
-              ContainerLayerConfig layerConfig
-            , IContainerLayerManager manager
-            , UnityScreenNavigatorSettings settings
-        )
-        {
-            var container = Create(layerConfig, manager, settings);
-            await UniTask.NextFrame();
-            return container;
-        }
-
         /// <summary>
         /// Create a new instance of <see cref="ActivityContainer"/> as a layer
         /// </summary>
         public static ActivityContainer Create(
-              ContainerLayerConfig layerConfig
-            , IContainerLayerManager manager
+              WindowContainerConfig layerConfig
+            , IWindowContainerManager manager
             , UnityScreenNavigatorSettings settings
         )
         {
