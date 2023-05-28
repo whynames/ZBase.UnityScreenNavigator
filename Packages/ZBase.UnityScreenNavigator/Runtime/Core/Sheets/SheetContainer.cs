@@ -14,6 +14,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
         private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
 
+        private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ControlRef<Sheet>> _sheets = new();
         private int? _activeSheetId;
 
@@ -50,6 +51,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             s_instanceCacheByName[ContainerName] = this;
 
             base.Awake();
+
+            _callbackReceivers.AddRange(GetComponents<ISheetContainerCallbackReceiver>());
         }
 
         public void Deinitialize()
@@ -174,6 +177,24 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         #endregion
+
+        /// <summary>
+        /// Add a callback receiver.
+        /// </summary>
+        /// <param name="callbackReceiver"></param>
+        public void AddCallbackReceiver(ISheetContainerCallbackReceiver callbackReceiver)
+        {
+            _callbackReceivers.Add(callbackReceiver);
+        }
+
+        /// <summary>
+        /// Remove a callback receiver.
+        /// </summary>
+        /// <param name="callbackReceiver"></param>
+        public void RemoveCallbackReceiver(ISheetContainerCallbackReceiver callbackReceiver)
+        {
+            _callbackReceivers.Remove(callbackReceiver);
+        }
 
         /// <summary>
         /// Register an instance of <typeparamref name="TSheet"/>.
@@ -305,7 +326,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             // Preprocess
-            foreach (var callbackReceiver in CallbackReceivers)
+            foreach (var callbackReceiver in _callbackReceivers)
             {
                 callbackReceiver.BeforeShow(enterSheet, exitSheet, args);
             }
@@ -337,7 +358,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             enterSheet.AfterEnter(args);
 
-            foreach (var callbackReceiver in CallbackReceivers)
+            foreach (var callbackReceiver in _callbackReceivers)
             {
                 callbackReceiver.AfterShow(enterSheet, exitSheet, args);
             }
@@ -392,7 +413,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             exitSheet.Settings = Settings;
 
             // Preprocess
-            foreach (var callbackReceiver in CallbackReceivers)
+            foreach (var callbackReceiver in _callbackReceivers)
             {
                 callbackReceiver.BeforeHide(exitSheet, args);
             }
@@ -409,7 +430,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             // Postprocess
             exitSheet.AfterExit(args);
 
-            foreach (var callbackReceiver in CallbackReceivers)
+            foreach (var callbackReceiver in _callbackReceivers)
             {
                 callbackReceiver.AfterHide(exitSheet, args);
             }

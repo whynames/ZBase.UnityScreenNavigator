@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Core.Views;
-using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.PriorityCollection;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
@@ -16,12 +15,15 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         private readonly UniquePriorityList<IControlLifecycleEvent> _lifecycleEvents = new();
         private Progress<float> _transitionProgressReporter;
 
+        public ControlTransitionAnimationContainer AnimationContainer
+        {
+            get => _animationContainer;
+        }
+
         private Progress<float> TransitionProgressReporter
         {
             get => _transitionProgressReporter ??= new Progress<float>(SetTransitionProgress);
         }
-
-        public ControlTransitionAnimationContainer AnimationContainer => _animationContainer;
 
         public bool IsTransitioning { get; private set; }
 
