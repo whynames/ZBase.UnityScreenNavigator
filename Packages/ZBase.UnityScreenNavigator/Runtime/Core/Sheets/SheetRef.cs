@@ -1,6 +1,4 @@
-﻿using ZBase.UnityScreenNavigator.Core.Views;
-
-namespace ZBase.UnityScreenNavigator.Core.Sheets
+﻿namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     public readonly struct SheetRef<T> where T : Sheet
     {
