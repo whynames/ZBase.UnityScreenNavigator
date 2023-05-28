@@ -43,10 +43,6 @@ namespace ZBase.UnityScreenNavigator.Core
             }
         }
 
-        [SerializeField] private TransitionAnimationObject _sheetEnterAnimation;
-
-        [SerializeField] private TransitionAnimationObject _sheetExitAnimation;
-
         [SerializeField] private TransitionAnimationObject _screenPushEnterAnimation;
 
         [SerializeField] private TransitionAnimationObject _screenPushExitAnimation;
@@ -67,6 +63,14 @@ namespace ZBase.UnityScreenNavigator.Core
 
         [SerializeField] private TransitionAnimationObject _activityExitAnimation;
 
+        [SerializeField] private TransitionAnimationObject _controlEnterAnimation;
+
+        [SerializeField] private TransitionAnimationObject _controlExitAnimation;
+
+        [SerializeField] private TransitionAnimationObject _sheetEnterAnimation;
+
+        [SerializeField] private TransitionAnimationObject _sheetExitAnimation;
+
         [SerializeField] private ModalBackdrop _modalBackdropPrefab;
 
         [SerializeField] private AssetLoaderObject _assetLoader;
@@ -81,14 +85,6 @@ namespace ZBase.UnityScreenNavigator.Core
         [SerializeField] private string _modalBackdropResourcePath = DEFAULT_MODAL_BACKDROP_PREFAB_KEY;
 
         private IAssetLoader _defaultAssetLoader;
-
-        public ITransitionAnimation SheetEnterAnimation => _sheetEnterAnimation
-            ? Instantiate(_sheetEnterAnimation)
-            : SimpleTransitionAnimationObject.CreateInstance(beforeAlpha: 0.0f, easeType: EaseType.Linear);
-
-        public ITransitionAnimation SheetExitAnimation => _sheetExitAnimation
-            ? Instantiate(_sheetExitAnimation)
-            : SimpleTransitionAnimationObject.CreateInstance(afterAlpha: 0.0f, easeType: EaseType.Linear);
 
         public ITransitionAnimation ScreenPushEnterAnimation => _screenPushEnterAnimation
             ? Instantiate(_screenPushEnterAnimation)
@@ -133,6 +129,22 @@ namespace ZBase.UnityScreenNavigator.Core
         public ITransitionAnimation ActivityExitAnimation => _activityExitAnimation
             ? Instantiate(_activityExitAnimation)
             : SimpleTransitionAnimationObject.CreateInstance(afterScale: Vector3.one * 0.3f, afterAlpha: 0.0f);
+
+        public ITransitionAnimation ControlEnterAnimation => _controlEnterAnimation
+            ? Instantiate(_controlEnterAnimation)
+            : SimpleTransitionAnimationObject.CreateInstance(beforeAlpha: 0.0f, easeType: EaseType.Linear);
+
+        public ITransitionAnimation ControlExitAnimation => _controlExitAnimation
+            ? Instantiate(_controlExitAnimation)
+            : SimpleTransitionAnimationObject.CreateInstance(afterAlpha: 0.0f, easeType: EaseType.Linear);
+
+        public ITransitionAnimation SheetEnterAnimation => _sheetEnterAnimation
+            ? Instantiate(_sheetEnterAnimation)
+            : SimpleTransitionAnimationObject.CreateInstance(beforeAlpha: 0.0f, easeType: EaseType.Linear);
+
+        public ITransitionAnimation SheetExitAnimation => _sheetExitAnimation
+            ? Instantiate(_sheetExitAnimation)
+            : SimpleTransitionAnimationObject.CreateInstance(afterAlpha: 0.0f, easeType: EaseType.Linear);
 
         public string ModalBackdropResourcePath
         {
@@ -188,14 +200,19 @@ namespace ZBase.UnityScreenNavigator.Core
             return enter ? ModalBackdropEnterAnimation : ModalBackdropExitAnimation;
         }
 
-        public ITransitionAnimation GetDefaultSheetTransitionAnimation(bool enter)
-        {
-            return enter ? SheetEnterAnimation : SheetExitAnimation;
-        }
-
         public ITransitionAnimation GetDefaultActivityTransitionAnimation(bool enter)
         {
             return enter ? ActivityEnterAnimation : ActivityExitAnimation;
+        }
+
+        public ITransitionAnimation GetDefaultControlTransitionAnimation(bool enter)
+        {
+            return enter ? ControlEnterAnimation : ControlExitAnimation;
+        }
+
+        public ITransitionAnimation GetDefaultSheetTransitionAnimation(bool enter)
+        {
+            return enter ? SheetEnterAnimation : SheetExitAnimation;
         }
     }
 }

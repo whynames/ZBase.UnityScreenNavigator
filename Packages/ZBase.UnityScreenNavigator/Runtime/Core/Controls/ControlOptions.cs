@@ -1,17 +1,17 @@
 ﻿using ZBase.UnityScreenNavigator.Core.Views;
 
-namespace ZBase.UnityScreenNavigator.Core.Sheets
+namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    public readonly struct SheetOptions
+    public readonly struct ControlOptions
     {
         public readonly bool loadAsync;
         public readonly string resourcePath;
         public readonly PoolingPolicy poolingPolicy;
-        public readonly SheetLoadedAction onLoaded;
+        public readonly ControlLoadedAction onLoaded;
 
-        public SheetOptions(
+        public ControlOptions(
               string resourcePath
-            , SheetLoadedAction onLoaded = null
+            , ControlLoadedAction onLoaded = null
             , bool loadAsync = true
             , PoolingPolicy poolingPolicy = PoolingPolicy.UseSettings
         )
@@ -25,7 +25,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         public ViewOptions AsViewOptions()
             => new(resourcePath, false, null, loadAsync, poolingPolicy);
 
-        public static implicit operator SheetOptions(string resourcePath)
+        public static implicit operator ControlOptions(string resourcePath)
             => new(resourcePath);
     }
 }

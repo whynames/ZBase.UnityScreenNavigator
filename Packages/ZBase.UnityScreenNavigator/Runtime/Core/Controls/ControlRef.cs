@@ -1,73 +1,73 @@
-﻿namespace ZBase.UnityScreenNavigator.Core.Sheets
+﻿namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    public readonly struct SheetRef<T> where T : Sheet
+    public readonly struct ControlRef<T> where T : Control
     {
         public readonly PoolingPolicy PoolingPolicy;
-        public readonly T Sheet;
+        public readonly T Control;
         public readonly string ResourcePath;
 
-        public SheetRef(
-              T sheet
+        public ControlRef(
+              T control
             , string resourcePath
             , PoolingPolicy poolingPolicy
         )
         {
             PoolingPolicy = poolingPolicy;
-            Sheet = sheet;
+            Control = control;
             ResourcePath = resourcePath;
         }
 
-        public void Deconstruct(out T sheet, out string resourcePath)
+        public void Deconstruct(out T control, out string resourcePath)
         {
-            sheet = Sheet;
+            control = Control;
             resourcePath = ResourcePath;
         }
 
         public void Deconstruct(
-              out T sheet
+              out T control
             , out string resourcePath
             , out PoolingPolicy poolingPolicy
         )
         {
-            sheet = Sheet;
+            control = Control;
             resourcePath = ResourcePath;
             poolingPolicy = PoolingPolicy;
         }
 
-        public static implicit operator SheetRef(SheetRef<T> value)
-            => new SheetRef(value.Sheet, value.ResourcePath, value.PoolingPolicy);
+        public static implicit operator ControlRef(ControlRef<T> value)
+            => new ControlRef(value.Control, value.ResourcePath, value.PoolingPolicy);
     }
 
-    public readonly struct SheetRef
+    public readonly struct ControlRef
     {
         public readonly PoolingPolicy PoolingPolicy;
-        public readonly Sheet Sheet;
+        public readonly Control Control;
         public readonly string ResourcePath;
 
-        public SheetRef(
-              Sheet sheet
+        public ControlRef(
+              Control control
             , string resourcePath
             , PoolingPolicy poolingPolicy
         )
         {
             PoolingPolicy = poolingPolicy;
-            Sheet = sheet;
+            Control = control;
             ResourcePath = resourcePath;
         }
 
-        public void Deconstruct(out Sheet sheet, out string resourcePath)
+        public void Deconstruct(out Control control, out string resourcePath)
         {
-            sheet = Sheet;
+            control = Control;
             resourcePath = ResourcePath;
         }
 
         public void Deconstruct(
-              out Sheet sheet
+              out Control control
             , out string resourcePath
             , out PoolingPolicy poolingPolicy
         )
         {
-            sheet = Sheet;
+            control = Control;
             resourcePath = ResourcePath;
             poolingPolicy = PoolingPolicy;
         }

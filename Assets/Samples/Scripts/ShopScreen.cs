@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using ZBase.UnityScreenNavigator.Core.Controls;
 using ZBase.UnityScreenNavigator.Core.Sheets;
 
 namespace Demo.Scripts
@@ -24,7 +25,7 @@ namespace Demo.Scripts
             for (var i = 0; i < ItemGridSheetCount; i++)
             {
                 var index = i;
-                var options = new SheetOptions(
+                var options = new ControlOptions(
                     resourcePath: ResourceKey.ShopItemGridSheetPrefab(),
                     onLoaded: (id, sheet) => OnSheetLoaded(id, sheet, index)
                 );
@@ -56,7 +57,7 @@ namespace Demo.Scripts
                 return;
             }
 
-            if (_itemGridContainer.ActiveSheetId == sheetId)
+            if (_itemGridContainer.ActiveControlId == sheetId)
             {
                 // This sheet is already displayed.
                 return;
@@ -65,7 +66,7 @@ namespace Demo.Scripts
             await _itemGridContainer.ShowAsync(sheetId, true);
         }
 
-        private void OnSheetLoaded(int sheetId, Sheet sheet, int index)
+        private void OnSheetLoaded(int sheetId, Control sheet, int index)
         {
             _itemGridSheetIds[index] = sheetId;
             var shopItemGrid = (ShopItemGridSheet)sheet;

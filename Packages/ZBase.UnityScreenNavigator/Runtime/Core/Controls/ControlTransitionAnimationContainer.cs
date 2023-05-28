@@ -6,10 +6,10 @@ using UnityEngine;
 using ZBase.UnityScreenNavigator.Foundation;
 using Object = UnityEngine.Object;
 
-namespace ZBase.UnityScreenNavigator.Core.Sheets
+namespace ZBase.UnityScreenNavigator.Core.Controls
 {
     [Serializable]
-    public class SheetTransitionAnimationContainer
+    public class ControlTransitionAnimationContainer
     {
         [SerializeField] private List<TransitionAnimation> _enterAnimations = new();
         [SerializeField] private List<TransitionAnimation> _exitAnimations = new();
@@ -28,7 +28,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         [Serializable]
         public class TransitionAnimation
         {
-            [SerializeField] private string _partnerSheetIdentifierRegex;
+            [SerializeField] private string _partnerControlIdentifierRegex;
 
             [SerializeField] private AnimationAssetType _assetType;
 
@@ -38,12 +38,12 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             [SerializeField] [EnabledIf(nameof(_assetType), (int)AnimationAssetType.ScriptableObject)]
             private TransitionAnimationObject _animationObject;
 
-            private Regex _partnerSheetIdentifierRegexCache;
+            private Regex _partnerControlIdentifierRegexCache;
 
-            public string PartnerSheetIdentifierRegex
+            public string PartnerControlIdentifierRegex
             {
-                get => _partnerSheetIdentifierRegex;
-                set => _partnerSheetIdentifierRegex = value;
+                get => _partnerControlIdentifierRegex;
+                set => _partnerControlIdentifierRegex = value;
             }
 
             public AnimationAssetType AssetType
@@ -64,7 +64,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 set => _animationObject = value;
             }
 
-            public bool IsValid(string partnerSheetIdentifier)
+            public bool IsValid(string partnerControlIdentifier)
             {
                 if (GetAnimation() == null)
                 {
@@ -72,22 +72,22 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
                 }
 
                 // If the partner identifier is not registered, the animation is always valid.
-                if (string.IsNullOrEmpty(_partnerSheetIdentifierRegex))
+                if (string.IsNullOrEmpty(_partnerControlIdentifierRegex))
                 {
                     return true;
                 }
                 
-                if (string.IsNullOrEmpty(partnerSheetIdentifier))
+                if (string.IsNullOrEmpty(partnerControlIdentifier))
                 {
                     return false;
                 }
 
-                if (_partnerSheetIdentifierRegexCache == null)
+                if (_partnerControlIdentifierRegexCache == null)
                 {
-                    _partnerSheetIdentifierRegexCache = new Regex(_partnerSheetIdentifierRegex);
+                    _partnerControlIdentifierRegexCache = new Regex(_partnerControlIdentifierRegex);
                 }
 
-                return _partnerSheetIdentifierRegexCache.IsMatch(partnerSheetIdentifier);
+                return _partnerControlIdentifierRegexCache.IsMatch(partnerControlIdentifier);
             }
 
             public ITransitionAnimation GetAnimation()

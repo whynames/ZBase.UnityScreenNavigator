@@ -1,42 +1,42 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 
-namespace ZBase.UnityScreenNavigator.Core.Sheets
+namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    public interface ISheetLifecycleEvent
+    public interface IControlLifecycleEvent
     {
         /// <summary>
-        /// Called just after this sheet is loaded.
+        /// Called just after this control is loaded.
         /// </summary>
         /// <returns></returns>
         UniTask Initialize(Memory<object> args);
 
         /// <summary>
-        /// Called just before this sheet is displayed by the Show transition.
+        /// Called just before this control is displayed by the Show transition.
         /// </summary>
         /// <returns></returns>
         UniTask WillEnter(Memory<object> args);
 
         /// <summary>
-        /// Called just after this sheet is displayed by the Show transition.
+        /// Called just after this control is displayed by the Show transition.
         /// </summary>
         /// <returns></returns>
         void DidEnter(Memory<object> args);
 
         /// <summary>
-        /// Called just before this sheet is hidden by the Hide transition.
+        /// Called just before this control is hidden by the Hide transition.
         /// </summary>
         /// <returns></returns>
         UniTask WillExit(Memory<object> args);
 
         /// <summary>
-        /// Called just after this sheet is hidden by the Hide transition.
+        /// Called just after this control is hidden by the Hide transition.
         /// </summary>
         /// <returns></returns>
         void DidExit(Memory<object> args);
 
         /// <summary>
-        /// Called just before this sheet is released.
+        /// Called just before this control is released.
         /// </summary>
         /// <returns></returns>
         UniTask Cleanup();

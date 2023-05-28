@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core;
 using ZBase.UnityScreenNavigator.Core.Views;
+using ZBase.UnityScreenNavigator.Core.Controls;
 using ZBase.UnityScreenNavigator.Core.Sheets;
 
 namespace Demo.Scripts
@@ -61,32 +62,40 @@ namespace Demo.Scripts
 
             if (!string.IsNullOrEmpty(beforeSheetIdentifierRegex))
             {
-                var enterAnimation1 = new SheetTransitionAnimationContainer.TransitionAnimation();
-                enterAnimation1.PartnerSheetIdentifierRegex = beforeSheetIdentifierRegex;
-                enterAnimation1.AssetType = AnimationAssetType.ScriptableObject;
-                enterAnimation1.AnimationObject = fromRightEnterAnim;
+                var enterAnimation1 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                    PartnerControlIdentifierRegex = beforeSheetIdentifierRegex,
+                    AssetType = AnimationAssetType.ScriptableObject,
+                    AnimationObject = fromRightEnterAnim
+                };
+
                 AnimationContainer.EnterAnimations.Add(enterAnimation1);
             }
 
-            var enterAnimation2 = new SheetTransitionAnimationContainer.TransitionAnimation();
-            enterAnimation2.PartnerSheetIdentifierRegex = afterSheetIdentifierRegex;
-            enterAnimation2.AssetType = AnimationAssetType.ScriptableObject;
-            enterAnimation2.AnimationObject = fromLeftEnterAnim;
+            var enterAnimation2 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                PartnerControlIdentifierRegex = afterSheetIdentifierRegex,
+                AssetType = AnimationAssetType.ScriptableObject,
+                AnimationObject = fromLeftEnterAnim
+            };
+
             AnimationContainer.EnterAnimations.Add(enterAnimation2);
 
             if (!string.IsNullOrEmpty(beforeSheetIdentifierRegex))
             {
-                var exitAnimation1 = new SheetTransitionAnimationContainer.TransitionAnimation();
-                exitAnimation1.PartnerSheetIdentifierRegex = beforeSheetIdentifierRegex;
-                exitAnimation1.AssetType = AnimationAssetType.ScriptableObject;
-                exitAnimation1.AnimationObject = toRightExitAnim;
+                var exitAnimation1 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                    PartnerControlIdentifierRegex = beforeSheetIdentifierRegex,
+                    AssetType = AnimationAssetType.ScriptableObject,
+                    AnimationObject = toRightExitAnim
+                };
+
                 AnimationContainer.ExitAnimations.Add(exitAnimation1);
             }
 
-            var exitAnimation2 = new SheetTransitionAnimationContainer.TransitionAnimation();
-            exitAnimation2.PartnerSheetIdentifierRegex = afterSheetIdentifierRegex;
-            exitAnimation2.AssetType = AnimationAssetType.ScriptableObject;
-            exitAnimation2.AnimationObject = toLeftExitAnim;
+            var exitAnimation2 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                PartnerControlIdentifierRegex = afterSheetIdentifierRegex,
+                AssetType = AnimationAssetType.ScriptableObject,
+                AnimationObject = toLeftExitAnim
+            };
+
             AnimationContainer.ExitAnimations.Add(exitAnimation2);
         }
 

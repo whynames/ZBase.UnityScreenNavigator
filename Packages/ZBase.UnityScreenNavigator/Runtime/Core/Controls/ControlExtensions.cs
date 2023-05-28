@@ -1,12 +1,12 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 
-namespace ZBase.UnityScreenNavigator.Core.Sheets
+namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    public static class SheetExtensions
+    public static class ControlExtensions
     {
         public static void AddLifecycleEvent(
-              this Sheet self
+              this Control self
             , Func<Memory<object>, UniTask> initialize = null
             , Func<Memory<object>, UniTask> onWillEnter = null, Action<Memory<object>> onDidEnter = null
             , Func<Memory<object>, UniTask> onWillExit = null, Action<Memory<object>> onDidExit = null
@@ -14,7 +14,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             , int priority = 0
         )
         {
-            var lifecycleEvent = new AnonymousSheetLifecycleEvent(
+            var lifecycleEvent = new AnonymousControlLifecycleEvent(
                 initialize,
                 onWillEnter, onDidEnter,
                 onWillExit, onDidExit,

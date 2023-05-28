@@ -28,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9055759737193652636}
   m_RootOrder: 0
@@ -60,6 +61,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -85,6 +87,7 @@ GameObject:
   - component: {fileID: 9055759737193652636}
   - component: {fileID: 2957446910546967711}
   - component: {fileID: 5502180040634742863}
+  - component: {fileID: 994749961548745416}
   m_Layer: 5
   m_Name: prefab_demo_sheet_character_modal_image
   m_TagString: Untagged
@@ -102,6 +105,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 570428025766806162}
   m_Father: {fileID: 0}
@@ -138,9 +142,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a832ac52912fc2949a668f6b341739b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _usePrefabNameAsIdentifier: 1
   _identifier: 
-  _renderingOrder: 0
+  _rectTransform: {fileID: 0}
+  _canvasGroup: {fileID: 0}
   _animationContainer:
     _enterAnimations: []
     _exitAnimations: []
+  _renderingOrder: 0
   _image: {fileID: 1784606364929338400}
+--- !u!225 &994749961548745416
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8953087645951095503}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
