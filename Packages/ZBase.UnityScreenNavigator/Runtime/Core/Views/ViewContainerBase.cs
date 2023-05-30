@@ -299,9 +299,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 return;
             }
 
-            if (view && view.gameObject)
+            if (view && view.Owner)
             {
-                Destroy(view.gameObject);
+                Destroy(view.Owner);
                 await UniTask.NextFrame();
             }
 

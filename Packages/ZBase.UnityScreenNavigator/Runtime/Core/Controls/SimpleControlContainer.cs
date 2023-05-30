@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZBase.UnityScreenNavigator.Foundation.Collections;
@@ -45,7 +46,19 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             _callbackReceivers.AddRange(GetComponents<ISimpleControlContainerCallbackReceiver>());
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deinitialize(params object[] args)
+        {
+            DeinitializeInternal(args);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Deinitialize(Memory<object> args = default)
+        {
+            DeinitializeInternal(args);
+        }
+
+        private void DeinitializeInternal(Memory<object> args)
         {
             var controls = _controls;
 
@@ -188,12 +201,29 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Show<TControl>(ControlOptions options, params object[] args)
             where TControl : Control
         {
             ShowAndForget<TControl>(options, args).Forget();
         }
 
+        /// <summary>
+        /// Show an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Show<TControl>(ControlOptions options, Memory<object> args = default)
+            where TControl : Control
+        {
+            ShowAndForget<TControl>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Show an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Show(ControlOptions options, params object[] args)
         {
             ShowAndForget<Control>(options, args).Forget();
@@ -202,18 +232,56 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// <summary>
         /// Show an instance of <see cref="Control"/>.
         /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Show(ControlOptions options, Memory<object> args = default)
+        {
+            ShowAndForget<Control>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Show an instance of <see cref="Control"/>.
+        /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask<int> ShowAsync<TControl>(ControlOptions options, params object[] args)
             where TControl : Control
         {
             return await ShowAsyncInternal<TControl>(options, args);
         }
+        
+        /// <summary>
+        /// Show an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask<int> ShowAsync<TControl>(ControlOptions options, Memory<object> args = default)
+            where TControl : Control
+        {
+            return await ShowAsyncInternal<TControl>(options, args);
+        }
 
+        /// <summary>
+        /// Show an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask<int> ShowAsync(ControlOptions options, params object[] args)
         {
             return await ShowAsyncInternal<Control>(options, args);
         }
 
+        /// <summary>
+        /// Show an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask<int> ShowAsync(ControlOptions options, Memory<object> args = default)
+        {
+            return await ShowAsyncInternal<Control>(options, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async UniTaskVoid ShowAndForget<TControl>(ControlOptions options, Memory<object> args)
             where TControl : Control
         {
@@ -286,21 +354,49 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// Hide an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Hide(int controlId, bool playAnimation, params object[] args)
         {
             HideAndForget(controlId, playAnimation, args).Forget();
         }
-
-        private async UniTaskVoid HideAndForget(int controlId, bool playAnimation, params object[] args)
+        
+        /// <summary>
+        /// Hide an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Hide(int controlId, bool playAnimation, Memory<object> args = default)
         {
-            await HideAsync(controlId, playAnimation, args);
+            HideAndForget(controlId, playAnimation, args).Forget();
         }
 
         /// <summary>
         /// Hide an instance of <see cref="Control"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask HideAsync(int controlId, bool playAnimation, params object[] args)
+        {
+            await HideAsyncInternal(controlId, playAnimation, args);
+        }
+        
+        /// <summary>
+        /// Hide an instance of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask HideAsync(int controlId, bool playAnimation, Memory<object> args = default)
+        {
+            await HideAsyncInternal(controlId, playAnimation, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTaskVoid HideAndForget(int controlId, bool playAnimation, Memory<object> args)
+        {
+            await HideAsyncInternal(controlId, playAnimation, args);
+        }
+
+        private async UniTask HideAsyncInternal(int controlId, bool playAnimation, Memory<object> args)
         {
             if (_disableInteractionInTransition)
             {

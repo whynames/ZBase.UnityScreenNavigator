@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,7 +56,19 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             _callbackReceivers.AddRange(GetComponents<ISheetContainerCallbackReceiver>());
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deinitialize(params object[] args)
+        {
+            DeinitializeInternal(args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Deinitialize(Memory<object> args = default)
+        {
+            DeinitializeInternal(args);
+        }
+
+        private void DeinitializeInternal(Memory<object> args)
         {
             _activeSheetId = null;
             IsInTransition = false;
@@ -201,7 +214,19 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <typeparamref name="TSheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Register<TSheet>(SheetOptions options, params object[] args)
+            where TSheet : Sheet
+        {
+            RegisterAndForget<TSheet>(options, args).Forget();
+        }
+        
+        /// <summary>
+        /// Register an instance of <typeparamref name="TSheet"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Register<TSheet>(SheetOptions options, Memory<object> args = default)
             where TSheet : Sheet
         {
             RegisterAndForget<TSheet>(options, args).Forget();
@@ -211,7 +236,18 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Register(SheetOptions options, params object[] args)
+        {
+            RegisterAndForget<Sheet>(options, args).Forget();
+        }
+        
+        /// <summary>
+        /// Register an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Register(SheetOptions options, Memory<object> args = default)
         {
             RegisterAndForget<Sheet>(options, args).Forget();
         }
@@ -220,7 +256,19 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <typeparamref name="TSheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask<int> RegisterAsync<TSheet>(SheetOptions options, params object[] args)
+            where TSheet : Sheet
+        {
+            return await RegisterAsyncInternal<TSheet>(options, args);
+        }
+        
+        /// <summary>
+        /// Register an instance of <typeparamref name="TSheet"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask<int> RegisterAsync<TSheet>(SheetOptions options, Memory<object> args = default)
             where TSheet : Sheet
         {
             return await RegisterAsyncInternal<TSheet>(options, args);
@@ -230,11 +278,23 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Register an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask<int> RegisterAsync(SheetOptions options, params object[] args)
         {
             return await RegisterAsyncInternal<Sheet>(options, args);
         }
+        
+        /// <summary>
+        /// Register an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask<int> RegisterAsync(SheetOptions options, Memory<object> args = default)
+        {
+            return await RegisterAsyncInternal<Sheet>(options, args);
+        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async UniTaskVoid RegisterAndForget<TSheet>(SheetOptions options, Memory<object> args)
             where TSheet : Sheet
         {
@@ -275,7 +335,18 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Show(int sheetId, bool playAnimation, params object[] args)
+        {
+            ShowAndForget(sheetId, playAnimation, args).Forget();
+        }
+        
+        /// <summary>
+        /// Show an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Show(int sheetId, bool playAnimation, Memory<object> args = default)
         {
             ShowAndForget(sheetId, playAnimation, args).Forget();
         }
@@ -284,11 +355,23 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Show an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask ShowAsync(int sheetId, bool playAnimation, params object[] args)
         {
             await ShowAsyncInternal(sheetId, playAnimation, args);
         }
+        
+        /// <summary>
+        /// Show an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask ShowAsync(int sheetId, bool playAnimation, Memory<object> args = default)
+        {
+            await ShowAsyncInternal(sheetId, playAnimation, args);
+        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async UniTaskVoid ShowAndForget(int sheetId, bool playAnimation, Memory<object> args)
         {
             await ShowAsyncInternal(sheetId, playAnimation, args);
@@ -374,21 +457,49 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         /// Hide an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Hide(bool playAnimation, params object[] args)
         {
             HideAndForget(playAnimation, args).Forget();
         }
-
-        private async UniTaskVoid HideAndForget(bool playAnimation, params object[] args)
+        
+        /// <summary>
+        /// Hide an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Hide(bool playAnimation, Memory<object> args = default)
         {
-            await HideAsync(playAnimation, args);
+            HideAndForget(playAnimation, args).Forget();
         }
 
         /// <summary>
         /// Hide an instance of <see cref="Sheet"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask HideAsync(bool playAnimation, params object[] args)
+        {
+            await HideAsyncInternal(playAnimation, args);
+        }
+        
+        /// <summary>
+        /// Hide an instance of <see cref="Sheet"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask HideAsync(bool playAnimation, Memory<object> args = default)
+        {
+            await HideAsyncInternal(playAnimation, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTaskVoid HideAndForget(bool playAnimation, Memory<object> args)
+        {
+            await HideAsyncInternal(playAnimation, args);
+        }
+
+        private async UniTask HideAsyncInternal(bool playAnimation, Memory<object> args)
         {
             if (IsInTransition)
             {

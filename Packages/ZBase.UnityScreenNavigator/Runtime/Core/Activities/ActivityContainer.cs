@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -242,7 +243,19 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// Show an instance of <typeparamref name="TActivity"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Show<TActivity>(ActivityOptions options, params object[] args)
+            where TActivity : Activity
+        {
+            ShowAndForget<TActivity>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Show an instance of <typeparamref name="TActivity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Show<TActivity>(ActivityOptions options, Memory<object> args = default)
             where TActivity : Activity
         {
             ShowAndForget<TActivity>(options, args).Forget();
@@ -252,7 +265,18 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// Show an instance of <see cref="Activity"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Show(ActivityOptions options, params object[] args)
+        {
+            ShowAndForget<Activity>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Show an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Show(ActivityOptions options, Memory<object> args = default)
         {
             ShowAndForget<Activity>(options, args).Forget();
         }
@@ -261,7 +285,19 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// Show an instance of <typeparamref name="TActivity"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask ShowAsync<TActivity>(ActivityOptions options, params object[] args)
+            where TActivity : Activity
+        {
+            await ShowAsyncInternal<TActivity>(options, args);
+        }
+
+        /// <summary>
+        /// Show an instance of <typeparamref name="TActivity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask ShowAsync<TActivity>(ActivityOptions options, Memory<object> args = default)
             where TActivity : Activity
         {
             await ShowAsyncInternal<TActivity>(options, args);
@@ -271,11 +307,23 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// Show an instance of <see cref="Activity"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask ShowAsync(ActivityOptions options, params object[] args)
         {
             await ShowAsyncInternal<Activity>(options, args);
         }
 
+        /// <summary>
+        /// Show an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask ShowAsync(ActivityOptions options, Memory<object> args = default)
+        {
+            await ShowAsyncInternal<Activity>(options, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async UniTask ShowAndForget<TActivity>(ActivityOptions options, Memory<object> args)
             where TActivity : Activity
         {
@@ -301,7 +349,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
                 return;
             }
-            
+
             if (Settings.EnableInteractionInTransition == false)
             {
                 Interactable = false;
@@ -344,21 +392,49 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// Hide an instance of <see cref="Activity"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Hide(string resourcePath, bool playAnimation = true, params object[] args)
         {
             HideAndForget(resourcePath, playAnimation, args).Forget();
         }
 
-        private async UniTaskVoid HideAndForget(string resourcePath, bool playAnimation, params object[] args)
+        /// <summary>
+        /// Hide an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Hide(string resourcePath, bool playAnimation = true, Memory<object> args = default)
         {
-            await HideAsync(resourcePath, playAnimation, args);
+            HideAndForget(resourcePath, playAnimation, args).Forget();
         }
 
         /// <summary>
         /// Hide an instance of <see cref="Activity"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask HideAsync(string resourcePath, bool playAnimation = true, params object[] args)
+        {
+            await HideAsyncInternal(resourcePath, playAnimation, args);
+        }
+
+        /// <summary>
+        /// Hide an instance of <see cref="Activity"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask HideAsync(string resourcePath, bool playAnimation = true, Memory<object> args = default)
+        {
+            await HideAsyncInternal(resourcePath, playAnimation, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTaskVoid HideAndForget(string resourcePath, bool playAnimation, Memory<object> args)
+        {
+            await HideAsyncInternal(resourcePath, playAnimation, args);
+        }
+
+        private async UniTask HideAsyncInternal(string resourcePath, bool playAnimation, Memory<object> args)
         {
             if (TryGet(resourcePath, out var viewRef) == false)
             {

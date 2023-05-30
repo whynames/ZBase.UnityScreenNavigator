@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -312,6 +313,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// </summary>
         /// <param name="ignoreFront">Ignore if the modal is already in the front.</param>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BringToFront(ModalOptions options, bool ignoreFront, params object[] args)
         {
             BringToFrontAndForget(options, ignoreFront, args).Forget();
@@ -321,12 +323,36 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Bring an instance of <see cref="Modal"/> to the front.
         /// </summary>
         /// <param name="ignoreFront">Ignore if the modal is already in the front.</param>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void BringToFront(ModalOptions options, bool ignoreFront, Memory<object> args = default)
+        {
+            BringToFrontAndForget(options, ignoreFront, args).Forget();
+        }
+
+        /// <summary>
+        /// Bring an instance of <see cref="Modal"/> to the front.
+        /// </summary>
+        /// <param name="ignoreFront">Ignore if the modal is already in the front.</param>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask BringToFrontAsync(ModalOptions options, bool ignoreFront, params object[] args)
         {
             await BringToFrontAsyncInternal(options, ignoreFront, args);
         }
 
+        /// <summary>
+        /// Bring an instance of <see cref="Modal"/> to the front.
+        /// </summary>
+        /// <param name="ignoreFront">Ignore if the modal is already in the front.</param>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask BringToFrontAsync(ModalOptions options, bool ignoreFront, Memory<object> args = default)
+        {
+            await BringToFrontAsyncInternal(options, ignoreFront, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async UniTaskVoid BringToFrontAndForget(ModalOptions options, bool ignoreFront, Memory<object> args)
         {
             await BringToFrontAsyncInternal(options, ignoreFront, args);
@@ -442,7 +468,19 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Push an instance of <typeparamref name="TModal"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Push<TModal>(ModalOptions options, params object[] args)
+            where TModal : Modal
+        {
+            PushAndForget<TModal>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Push an instance of <typeparamref name="TModal"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Push<TModal>(ModalOptions options, Memory<object> args = default)
             where TModal : Modal
         {
             PushAndForget<TModal>(options, args).Forget();
@@ -452,7 +490,18 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Push an instance of <see cref="Modal"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Push(ModalOptions options, params object[] args)
+        {
+            PushAndForget<Modal>(options, args).Forget();
+        }
+
+        /// <summary>
+        /// Push an instance of <see cref="Modal"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Push(ModalOptions options, Memory<object> args = default)
         {
             PushAndForget<Modal>(options, args).Forget();
         }
@@ -461,7 +510,19 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Push an instance of <typeparamref name="TModal"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask PushAsync<TModal>(ModalOptions options, params object[] args)
+            where TModal : Modal
+        {
+            await PushAsyncInternal<TModal>(options, args);
+        }
+
+        /// <summary>
+        /// Push an instance of <typeparamref name="TModal"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask PushAsync<TModal>(ModalOptions options, Memory<object> args = default)
             where TModal : Modal
         {
             await PushAsyncInternal<TModal>(options, args);
@@ -471,11 +532,23 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Push an instance of <see cref="Modal"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask PushAsync(ModalOptions options, params object[] args)
         {
             await PushAsyncInternal<Modal>(options, args);
         }
 
+        /// <summary>
+        /// Push an instance of <see cref="Modal"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask PushAsync(ModalOptions options, Memory<object> args = default)
+        {
+            await PushAsyncInternal<Modal>(options, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async UniTaskVoid PushAndForget<TModal>(ModalOptions options, Memory<object> args)
             where TModal : Modal
         {
@@ -588,21 +661,49 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Push an instance of <see cref="Modal"/>.
         /// </summary>
         /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Pop(bool playAnimation, params object[] args)
         {
             PopAndForget(playAnimation, args).Forget();
         }
-
-        private async UniTaskVoid PopAndForget(bool playAnimation, params object[] args)
+        
+        /// <summary>
+        /// Push an instance of <see cref="Modal"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Pop(bool playAnimation, Memory<object> args = default)
         {
-            await PopAsync(playAnimation, args);
+            PopAndForget(playAnimation, args).Forget();
         }
 
         /// <summary>
         /// Push an instance of <see cref="Modal"/>.
         /// </summary>
         /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async UniTask PopAsync(bool playAnimation, params object[] args)
+        {
+            await PopAsyncInternal(playAnimation, args);
+        }
+
+        /// <summary>
+        /// Push an instance of <see cref="Modal"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask PopAsync(bool playAnimation, Memory<object> args = default)
+        {
+            await PopAsyncInternal(playAnimation, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTaskVoid PopAndForget(bool playAnimation, Memory<object> args)
+        {
+            await PopAsyncInternal(playAnimation, args);
+        }
+
+        private async UniTask PopAsyncInternal(bool playAnimation, Memory<object> args)
         {
             if (_modals.Count == 0)
             {
