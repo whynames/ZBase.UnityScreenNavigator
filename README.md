@@ -80,7 +80,7 @@ For more information, including copyright, please refer to the following website
 
 * [JewelSaviorFREE](http://www.jewel-s.jp/)
 
-## Breaking changes of this fork
+## Breaking changes in this fork
 * Require Unity 2021.3 or higher.
 * Rename `Page` to `Screen`.
 * Add `Activity` - a type of view which can be freely shown/hidden.
@@ -89,7 +89,12 @@ For more information, including copyright, please refer to the following website
 * Promote the use of `async UniTask` by retiring any use of `CoroutineManager`.
 * Many changes regarding the project's structure, asmdefs and namespaces.
 * Many improvements on various places.
+* Many refactoring regarding class hierarchy.
 * :warning: The README might be out-of-date.
+
+## Class Diagram
+
+![class diagram](Document~/class-diagram.svg)
 
 ## Setup
 
