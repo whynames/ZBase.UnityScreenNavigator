@@ -209,6 +209,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4609740367533392792}
+  - component: {fileID: 7652932893192455241}
   m_Layer: 5
   m_Name: prefab_demo_modal_base
   m_TagString: Untagged
@@ -237,6 +238,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &7652932893192455241
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4609740367533392799}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4609740367659431739
 GameObject:
   m_ObjectHideFlags: 0
