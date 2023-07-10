@@ -198,7 +198,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
 
             _resourcePathToHandle[resourcePath] = assetLoadHandle;
 
-            for (var i = 0; i < amount; i++)
+            var differentAmount = amount - pool.Count;
+
+            for (var i = 0; i < differentAmount; i++)
             {
                 InstantiateToPool(resourcePath, assetLoadHandle, pool);
             }
