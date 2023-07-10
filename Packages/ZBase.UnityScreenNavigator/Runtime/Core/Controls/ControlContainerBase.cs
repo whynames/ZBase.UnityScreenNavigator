@@ -34,7 +34,11 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
         protected override void Awake()
         {
-            var _ = CanvasGroup;
+            if (DontAddCanvasGroupAutomatically == false)
+            {
+                var _ = CanvasGroup;
+            }
+
             InitializePool();
         }
     }

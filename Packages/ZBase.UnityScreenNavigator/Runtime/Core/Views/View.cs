@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using ZBase.UnityScreenNavigator.Foundation;
 
 namespace ZBase.UnityScreenNavigator.Core.Views
@@ -9,7 +10,8 @@ namespace ZBase.UnityScreenNavigator.Core.Views
     [RequireComponent(typeof(RectTransform))]
     public abstract class View : UIBehaviour, IView
     {
-        [SerializeField] private bool _dontUseCanvasGroup = false;
+        [FormerlySerializedAs("_dontUseCanvasGroup")]
+        [SerializeField] private bool _dontAddCanvasGroupAutomatically = false;
         [SerializeField] private bool _usePrefabNameAsIdentifier = true;
 
         [SerializeField]
@@ -156,12 +158,14 @@ namespace ZBase.UnityScreenNavigator.Core.Views
                 if (_canvasGroup == false)
                     _canvasGroup = gameObject.GetComponent<CanvasGroup>();
 
-                if (_canvasGroup == false && _dontUseCanvasGroup == false)
+                if (_canvasGroup == false && _dontAddCanvasGroupAutomatically == false)
                     _canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
                 return _canvasGroup;
             }
         }
+
+        public bool DontAddCanvasGroupAutomatically => _dontAddCanvasGroupAutomatically;
 
         public virtual UnityScreenNavigatorSettings Settings { get; set; }
 
