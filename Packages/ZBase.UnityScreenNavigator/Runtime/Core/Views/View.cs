@@ -182,11 +182,19 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             {
                 foreach (var task in tasks)
                 {
-                    await task;
+                    try
+                    {
+                        await task;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
                 }
             }
-            catch
+            catch (System.Exception ex)
             {
+                Debug.LogException(ex);
             }
         }
     }
