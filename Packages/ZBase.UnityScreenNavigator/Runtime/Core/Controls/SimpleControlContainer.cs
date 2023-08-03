@@ -14,6 +14,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
         [SerializeField] private RectTransform _content;
         [SerializeField] private bool _disableInteractionInTransition;
+        [SerializeField] private bool _destroyOnHide;
 
         private readonly List<ISimpleControlContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ViewRef<Control>> _controls = new();
@@ -398,12 +399,21 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
         private async UniTask HideAsyncInternal(int controlId, bool playAnimation, Memory<object> args)
         {
+            if (_controls.TryGetValue(controlId, out var exitControlRef) == false)
+            {
+                return;
+            }
+
+            if (_destroyOnHide)
+            {
+                _controls.Remove(controlId);
+            }
+
             if (_disableInteractionInTransition)
             {
                 Interactable = false;
             }
 
-            var exitControlRef = _controls[controlId];
             var exitControl = exitControlRef.View;
             exitControl.Settings = Settings;
 
@@ -424,6 +434,11 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             foreach (var callbackReceiver in _callbackReceivers)
             {
                 callbackReceiver.AfterHide(exitControl, args);
+            }
+
+            if (_destroyOnHide)
+            {
+                DestroyAndForget(exitControlRef);
             }
 
             if (_disableInteractionInTransition)
