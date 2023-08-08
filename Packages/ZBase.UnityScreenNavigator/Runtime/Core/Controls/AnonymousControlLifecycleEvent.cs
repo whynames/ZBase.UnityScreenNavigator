@@ -12,14 +12,11 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         /// <see cref="IControlLifecycleEvent.DidExit(Memory{object})"/>
         public event Action<Memory<object>> OnDidExit;
 
-        /// <see cref="IControlLifecycleEvent.Deinitialize(Memory{object})"/>
-        public event Action<Memory<object>> OnDeinitialize;
-
         public AnonymousControlLifecycleEvent(
               Func<Memory<object>, UniTask> initialize = null
             , Func<Memory<object>, UniTask> onWillEnter = null, Action<Memory<object>> onDidEnter = null
             , Func<Memory<object>, UniTask> onWillExit = null, Action<Memory<object>> onDidExit = null
-            , Action<Memory<object>> onDeinitialize = null, Func<UniTask> onCleanup = null
+            , Func<Memory<object>, UniTask> onCleanup = null
         )
         {
             if (initialize != null)
@@ -34,7 +31,6 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
                 OnWillExit.Add(onWillExit);
 
             OnDidExit = onDidExit;
-            OnDeinitialize = onDeinitialize;
 
             if (onCleanup != null)
                 OnCleanup.Add(onCleanup);
@@ -50,7 +46,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         public List<Func<Memory<object>, UniTask>> OnWillExit { get; } = new();
 
         /// <see cref="IControlLifecycleEvent.Cleanup"/>
-        public List<Func<UniTask>> OnCleanup { get; } = new();
+        public List<Func<Memory<object>, UniTask>> OnCleanup { get; } = new();
 
         async UniTask IControlLifecycleEvent.Initialize(Memory<object> args)
         {
@@ -80,15 +76,10 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             OnDidExit?.Invoke(args);
         }
 
-        async UniTask IControlLifecycleEvent.Cleanup()
+        async UniTask IControlLifecycleEvent.Cleanup(Memory<object> args)
         {
             foreach (var onCleanup in OnCleanup)
-                await onCleanup.Invoke();
-        }
-
-        void IControlLifecycleEvent.Deinitialize(Memory<object> args)
-        {
-            OnDeinitialize?.Invoke(args);
+                await onCleanup.Invoke(args);
         }
     }
 }

@@ -70,12 +70,12 @@ namespace Demo.Scripts
 
         public override void DidExit(Memory<object> args)
         {
-            _controlContainer.Deinitialize();
+            _controlContainer.Cleanup();
         }
 
-        public override void Deinitialize(Memory<object> args)
+        public override async UniTask Cleanup(Memory<object> args)
         {
-            _controlContainer.Deinitialize();
+            await _controlContainer.CleanupAsync(args);
         }
 
         private void SetupTransitionAnimations(int index)

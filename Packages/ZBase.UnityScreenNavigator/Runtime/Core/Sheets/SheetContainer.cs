@@ -57,18 +57,36 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Deinitialize(params object[] args)
+        public void Cleanup(params object[] args)
         {
-            DeinitializeInternal(args);
+            CleanupAndForget(args).Forget();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Deinitialize(Memory<object> args = default)
+        public void Cleanup(Memory<object> args = default)
         {
-            DeinitializeInternal(args);
+            CleanupAndForget(args).Forget();
         }
 
-        private void DeinitializeInternal(Memory<object> args)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask CleanupAsync(params object[] args)
+        {
+            await CleanupAsyncInternal(args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask CleanupAsync(Memory<object> args = default)
+        {
+            await CleanupAsyncInternal(args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTaskVoid CleanupAndForget(Memory<object> args)
+        {
+            await CleanupAsyncInternal(args);
+        }
+
+        private async UniTask CleanupAsyncInternal(Memory<object> args)
         {
             _activeSheetId = null;
             IsInTransition = false;
@@ -77,7 +95,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
             foreach (var sheetRef in sheets.Values)
             {
-                sheetRef.View.Deinitialize(args);
+                await sheetRef.View.BeforeReleaseAsync(args);
                 DestroyAndForget(sheetRef);
             }
 

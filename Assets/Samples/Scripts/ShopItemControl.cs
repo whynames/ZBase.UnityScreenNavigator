@@ -26,12 +26,14 @@ namespace Demo.Scripts
             return base.Initialize(args);
         }
 
-        public override void Deinitialize(Memory<object> args)
+        public override UniTask Cleanup(Memory<object> args)
         {
             _thumbButton.onClick.RemoveAllListeners();
             _thumbnailImage.sprite = null;
             _unlocked.gameObject.SetActive(false);
             _locked.gameObject.SetActive(true);
+
+            return UniTask.CompletedTask;
         }
     }
 }

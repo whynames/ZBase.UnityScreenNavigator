@@ -41,12 +41,12 @@ namespace Demo.Scripts
 
         public override void DidPopExit(Memory<object> args)
         {
-            _itemGridContainer.Deinitialize();
+            _itemGridContainer.Cleanup();
         }
 
         public override void DidPushExit(Memory<object> args)
         {
-            _itemGridContainer.Deinitialize();
+            _itemGridContainer.Cleanup();
         }
 
         private async UniTaskVoid ShowSheet(int sheetId)

@@ -73,12 +73,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         }
 
         /// <inheritdoc/>
-        public virtual void Deinitialize(Memory<object> args)
-        {
-        }
-
-        /// <inheritdoc/>
-        public virtual UniTask Cleanup()
+        public virtual UniTask Cleanup(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
@@ -221,9 +216,9 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             gameObject.SetActive(false);
         }
 
-        internal async UniTask BeforeReleaseAsync()
+        internal async UniTask BeforeReleaseAsync(Memory<object> args)
         {
-            var tasks = _lifecycleEvents.Select(x => x.Cleanup());
+            var tasks = _lifecycleEvents.Select(x => x.Cleanup(args));
             await WaitForAsync(tasks);
         }
 

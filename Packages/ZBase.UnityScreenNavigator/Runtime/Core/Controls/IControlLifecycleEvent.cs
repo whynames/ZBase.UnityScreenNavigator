@@ -36,15 +36,9 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
         void DidExit(Memory<object> args);
 
         /// <summary>
-        /// Called just after this control is deinitialized.
-        /// </summary>
-        /// <returns></returns>
-        void Deinitialize(Memory<object> args);
-
-        /// <summary>
         /// Called just before this control is released.
         /// </summary>
         /// <returns></returns>
-        UniTask Cleanup();
+        UniTask Cleanup(Memory<object> args);
     }
 }
