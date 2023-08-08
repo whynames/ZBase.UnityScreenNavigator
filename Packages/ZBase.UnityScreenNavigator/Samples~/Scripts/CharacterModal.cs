@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Modals;
-using ZBase.UnityScreenNavigator.Core.Shared.Views;
+using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Core.Sheets;
 
 namespace Demo.Scripts
@@ -37,7 +37,7 @@ namespace Demo.Scripts
             {
                 var options = new SheetOptions(
                     resourcePath: ResourceKey.CharacterModalImageSheetPrefab(),
-                    onLoaded: (sheetId, sheet) => {
+                    onLoaded: (sheetId, sheet, args) => {
                         imageSheets[index] = (sheetId, (CharacterModalImageSheet)sheet);
                     }
                 );
@@ -45,6 +45,7 @@ namespace Demo.Scripts
                 await imageContainer.RegisterAsync(options, args);
             }
 
+            _expandButton.onClick.RemoveListener(OnExpandButtonClicked);
             _expandButton.onClick.AddListener(OnExpandButtonClicked);
         }
 
@@ -90,7 +91,7 @@ namespace Demo.Scripts
 
         private void OnExpandButtonClicked()
         {
-            var options = new WindowOptions(ResourceKey.CharacterImageModalPrefab(), true,
+            var options = new ViewOptions(ResourceKey.CharacterImageModalPrefab(), true,
                 onLoaded: (modal, args) =>
                 {
                     var characterImageModal = (CharacterImageModal) modal;

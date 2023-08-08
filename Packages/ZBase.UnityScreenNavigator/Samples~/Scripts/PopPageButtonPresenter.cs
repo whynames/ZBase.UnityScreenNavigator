@@ -18,11 +18,6 @@ namespace Demo
             _button.onClick.AddListener(OnClick);
         }
 
-        private void OnDestroy()
-        {
-            _button.onClick.RemoveListener(OnClick);
-        }
-
         private void OnClick()
         {
             var pageContainer = string.IsNullOrEmpty(_containerName)

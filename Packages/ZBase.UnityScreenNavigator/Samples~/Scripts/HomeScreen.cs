@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Activities;
 using ZBase.UnityScreenNavigator.Core.Modals;
 using ZBase.UnityScreenNavigator.Core.Screens;
-using ZBase.UnityScreenNavigator.Core.Shared.Views;
+using ZBase.UnityScreenNavigator.Core.Views;
 
 namespace Demo.Scripts
 {
@@ -16,11 +16,14 @@ namespace Demo.Scripts
 
         public override async UniTask Initialize(Memory<object> args)
         {
+            _settingButton.onClick.RemoveAllListeners();
+            _shopButton.onClick.RemoveAllListeners();
+
             _settingButton.onClick.AddListener(OnSettingButtonClicked);
             _shopButton.onClick.AddListener(OnShopButtonClicked);
 
             // Preload the "Shop" page prefab.
-            await ScreenContainer.Of(transform).PreloadAsync(ResourceKey.ShopPagePrefab());
+            await ScreenContainer.Of(transform).PreloadAsync(ResourceKey.ShopScreenPrefab());
             // Simulate loading time.
             await UniTask.Delay(TimeSpan.FromSeconds(1));
         }
@@ -34,19 +37,19 @@ namespace Demo.Scripts
         {
             _settingButton.onClick.RemoveListener(OnSettingButtonClicked);
             _shopButton.onClick.RemoveListener(OnShopButtonClicked);
-            ScreenContainer.Of(transform).ReleasePreloaded(ResourceKey.ShopPagePrefab());
+            ScreenContainer.Of(transform).KeepInPool(ResourceKey.ShopScreenPrefab(), 0);
             return UniTask.CompletedTask;
         }
 
         private void OnSettingButtonClicked()
         {
-            var options = new WindowOptions(ResourceKey.SettingsModalPrefab(), true);
+            var options = new ViewOptions(ResourceKey.SettingsModalPrefab(), true);
             ModalContainer.Find(ContainerKey.Modals).Push(options);
         }
 
         private void OnShopButtonClicked()
         {
-            var options = new WindowOptions(ResourceKey.ShopPagePrefab(), true);
+            var options = new ViewOptions(ResourceKey.ShopScreenPrefab(), true);
             ScreenContainer.Of(transform).Push(options);
         }
     }

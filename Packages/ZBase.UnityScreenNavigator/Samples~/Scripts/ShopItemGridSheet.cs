@@ -1,20 +1,21 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Modals;
-using ZBase.UnityScreenNavigator.Core.Shared;
-using ZBase.UnityScreenNavigator.Core.Shared.Views;
+using ZBase.UnityScreenNavigator.Core;
+using ZBase.UnityScreenNavigator.Core.Views;
+using ZBase.UnityScreenNavigator.Core.Controls;
 using ZBase.UnityScreenNavigator.Core.Sheets;
 
 namespace Demo.Scripts
 {
     public class ShopItemGridSheet : Sheet
     {
-        [SerializeField] private Image _thumbnailImage;
-        [SerializeField] private Button _firstThumbButton;
+        [SerializeField] private SimpleControlContainer _controlContainer;
 
+        private const int ItemCount = 8;
         private int _characterId;
+        private ShopItemControl _firstShopItemControl;
 
         public void Setup(int index, int characterId)
         {
@@ -25,10 +26,56 @@ namespace Demo.Scripts
 
         public override UniTask Initialize(Memory<object> args)
         {
-            var key = ResourceKey.CharacterThumbnailSprite(_characterId, 1);
-            _thumbnailImage.sprite = DemoAssetLoader.AssetLoader.Load<Sprite>(key).Result;
-            _firstThumbButton.onClick.AddListener(OnFirstThumbButtonClicked);
+            var shopItemKey = ResourceKey.ShopItemControlPrefab();
+            _controlContainer.Preload(shopItemKey, true, ItemCount);
+
             return UniTask.CompletedTask;
+        }
+
+        public override async UniTask WillEnter(Memory<object> args)
+        {
+            var shopItemKey = ResourceKey.ShopItemControlPrefab();
+
+            for (var i = 0; i < ItemCount; i++)
+            {
+                ControlOptions options;
+
+                if (i == 0)
+                {
+                    options = new ControlOptions(shopItemKey, false, onLoaded: OnFirstShopItemLoaded);
+                    await _controlContainer.ShowAsync(options);
+                }
+                else
+                {
+                    options = new ControlOptions(shopItemKey, false);
+                    _controlContainer.Show(options);
+                }
+            }
+        }
+
+        private void OnFirstShopItemLoaded(int controlId, Control control, Memory<object> args)
+        {
+            _firstShopItemControl = control.GetComponent<ShopItemControl>();
+            
+            var spriteKey = ResourceKey.CharacterThumbnailSprite(_characterId, 1);
+            var sprite = DemoAssetLoader.AssetLoader.Load<Sprite>(spriteKey).Result;
+
+            _firstShopItemControl.ThumbnailImage.sprite = sprite;
+            _firstShopItemControl.ThumbButton.onClick.RemoveListener(OnFirstThumbButtonClicked);
+            _firstShopItemControl.ThumbButton.onClick.AddListener(OnFirstThumbButtonClicked);
+
+            _firstShopItemControl.Locked.gameObject.SetActive(false);
+            _firstShopItemControl.Unlocked.gameObject.SetActive(true);
+        }
+
+        public override void DidExit(Memory<object> args)
+        {
+            _controlContainer.Cleanup();
+        }
+
+        public override async UniTask Cleanup(Memory<object> args)
+        {
+            await _controlContainer.CleanupAsync(args);
         }
 
         private void SetupTransitionAnimations(int index)
@@ -60,49 +107,56 @@ namespace Demo.Scripts
 
             if (!string.IsNullOrEmpty(beforeSheetIdentifierRegex))
             {
-                var enterAnimation1 = new SheetTransitionAnimationContainer.TransitionAnimation();
-                enterAnimation1.PartnerSheetIdentifierRegex = beforeSheetIdentifierRegex;
-                enterAnimation1.AssetType = AnimationAssetType.ScriptableObject;
-                enterAnimation1.AnimationObject = fromRightEnterAnim;
+                var enterAnimation1 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                    PartnerControlIdentifierRegex = beforeSheetIdentifierRegex,
+                    AssetType = AnimationAssetType.ScriptableObject,
+                    AnimationObject = fromRightEnterAnim
+                };
+
                 AnimationContainer.EnterAnimations.Add(enterAnimation1);
             }
 
-            var enterAnimation2 = new SheetTransitionAnimationContainer.TransitionAnimation();
-            enterAnimation2.PartnerSheetIdentifierRegex = afterSheetIdentifierRegex;
-            enterAnimation2.AssetType = AnimationAssetType.ScriptableObject;
-            enterAnimation2.AnimationObject = fromLeftEnterAnim;
+            var enterAnimation2 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                PartnerControlIdentifierRegex = afterSheetIdentifierRegex,
+                AssetType = AnimationAssetType.ScriptableObject,
+                AnimationObject = fromLeftEnterAnim
+            };
+
             AnimationContainer.EnterAnimations.Add(enterAnimation2);
 
             if (!string.IsNullOrEmpty(beforeSheetIdentifierRegex))
             {
-                var exitAnimation1 = new SheetTransitionAnimationContainer.TransitionAnimation();
-                exitAnimation1.PartnerSheetIdentifierRegex = beforeSheetIdentifierRegex;
-                exitAnimation1.AssetType = AnimationAssetType.ScriptableObject;
-                exitAnimation1.AnimationObject = toRightExitAnim;
+                var exitAnimation1 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                    PartnerControlIdentifierRegex = beforeSheetIdentifierRegex,
+                    AssetType = AnimationAssetType.ScriptableObject,
+                    AnimationObject = toRightExitAnim
+                };
+
                 AnimationContainer.ExitAnimations.Add(exitAnimation1);
             }
 
-            var exitAnimation2 = new SheetTransitionAnimationContainer.TransitionAnimation();
-            exitAnimation2.PartnerSheetIdentifierRegex = afterSheetIdentifierRegex;
-            exitAnimation2.AssetType = AnimationAssetType.ScriptableObject;
-            exitAnimation2.AnimationObject = toLeftExitAnim;
-            AnimationContainer.ExitAnimations.Add(exitAnimation2);
-        }
+            var exitAnimation2 = new ControlTransitionAnimationContainer.TransitionAnimation {
+                PartnerControlIdentifierRegex = afterSheetIdentifierRegex,
+                AssetType = AnimationAssetType.ScriptableObject,
+                AnimationObject = toLeftExitAnim
+            };
 
-        public override UniTask Cleanup()
-        {
-            _firstThumbButton.onClick.RemoveListener(OnFirstThumbButtonClicked);
-            return UniTask.CompletedTask;
+            AnimationContainer.ExitAnimations.Add(exitAnimation2);
         }
 
         private void OnFirstThumbButtonClicked()
         {
             var modalContainer = ModalContainer.Find(ContainerKey.Modals);
-            var options = new WindowOptions(ResourceKey.CharacterModalPrefab(), true, onLoaded: (modal, args) =>
-            {
-                var characterModal = (CharacterModal) modal;
-                characterModal.Setup(_characterId);
-            });
+            var options = new ViewOptions(
+                  ResourceKey.CharacterModalPrefab()
+                , playAnimation: true
+                , poolingPolicy: PoolingPolicy.DisablePooling
+                , onLoaded: (modal, args) => {
+                    var characterModal = (CharacterModal) modal;
+                    characterModal.Setup(_characterId);
+                }
+            );
+
             modalContainer.Push(options);
         }
     }
