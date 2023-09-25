@@ -467,5 +467,119 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
                 Interactable = true;
             }
         }
+
+        /// <summary>
+        /// Hide all instances of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void HideAll(bool playAnimation, params object[] args)
+        {
+            HideAllAndForget(playAnimation, args).Forget();
+        }
+
+        /// <summary>
+        /// Hide all instances of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Fire-and-forget</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void HideAll(bool playAnimation, Memory<object> args = default)
+        {
+            HideAllAndForget(playAnimation, args).Forget();
+        }
+
+        /// <summary>
+        /// Hide all instances of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask HideAllAsync(bool playAnimation, params object[] args)
+        {
+            await HideAllAsyncInternal(playAnimation, args);
+        }
+
+        /// <summary>
+        /// Hide all instances of <see cref="Control"/>.
+        /// </summary>
+        /// <remarks>Asynchronous</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public async UniTask HideAllAsync(bool playAnimation, Memory<object> args = default)
+        {
+            await HideAllAsyncInternal(playAnimation, args);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private async UniTaskVoid HideAllAndForget(bool playAnimation, Memory<object> args)
+        {
+            await HideAllAsyncInternal(playAnimation, args);
+        }
+
+        private async UniTask HideAllAsyncInternal(bool playAnimation, Memory<object> args)
+        {
+            var controls = _controls;
+            var controlIds = new List<int>(controls.Count);
+            var tasks = new List<UniTask>(controls.Count);
+            controlIds.AddRange(controls.Keys);
+
+            if (_disableInteractionInTransition)
+            {
+                Interactable = false;
+            }
+
+            foreach (var controlId in controlIds)
+            {
+                if (controls.TryGetValue(controlId, out var exitControlRef) == false)
+                {
+                    continue;
+                }
+
+                if (_destroyOnHide)
+                {
+                    controls.Remove(controlId);
+                }
+
+                var task = HideAsyncInternal(exitControlRef, playAnimation, args);
+                tasks.Add(task);
+            }
+
+            await UniTask.WhenAll(tasks);
+
+            if (_disableInteractionInTransition)
+            {
+                Interactable = true;
+            }
+        }
+
+        private async UniTask HideAsyncInternal(ViewRef<Control> exitControlRef, bool playAnimation, Memory<object> args)
+        {
+            var exitControl = exitControlRef.View;
+            exitControl.Settings = Settings;
+
+            // Preprocess
+            foreach (var callbackReceiver in _callbackReceivers)
+            {
+                callbackReceiver.BeforeHide(exitControl, args);
+            }
+
+            await exitControl.BeforeExitAsync(args);
+
+            // Play Animation
+            await exitControl.ExitAsync(playAnimation, null);
+
+            // Postprocess
+            exitControl.AfterExit(args);
+
+            foreach (var callbackReceiver in _callbackReceivers)
+            {
+                callbackReceiver.AfterHide(exitControl, args);
+            }
+
+            if (_destroyOnHide)
+            {
+                await exitControl.BeforeReleaseAsync(args);
+
+                DestroyAndForget(exitControlRef);
+            }
+        }
     }
 }
