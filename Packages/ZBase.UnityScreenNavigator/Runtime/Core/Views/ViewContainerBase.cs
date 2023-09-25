@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Foundation;
 using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
@@ -37,8 +38,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             var parentTransform = this.transform.parent.GetComponent<RectTransform>();
 
             var poolGO = new GameObject(
-                $"[Pool] {this.name}"
+                  $"[Pool] {this.name}"
                 , typeof(CanvasGroup)
+                , typeof(LayoutElement)
             );
 
             PoolTransform = poolGO.GetOrAddComponent<RectTransform>();
@@ -49,6 +51,9 @@ namespace ZBase.UnityScreenNavigator.Core.Views
             poolCanvasGroup.alpha = 0f;
             poolCanvasGroup.blocksRaycasts = false;
             poolCanvasGroup.interactable = false;
+
+            var layoutElement = poolGO.GetComponent<LayoutElement>();
+            layoutElement.ignoreLayout = true;
         }
 
         protected override void OnDestroy()
