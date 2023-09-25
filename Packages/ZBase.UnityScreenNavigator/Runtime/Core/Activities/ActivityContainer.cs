@@ -12,8 +12,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 {
     public class ActivityContainer : WindowContainerBase
     {
-        private static Dictionary<int, ActivityContainer> s_instanceCacheByTransform = new();
-        private static Dictionary<string, ActivityContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, ActivityContainer> s_instancesCachedByTransformId = new();
+        private static Dictionary<string, ActivityContainer> s_instancesCachedByName = new();
 
         private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<string, ViewRef<Activity>> _activities = new();
@@ -24,8 +24,8 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
         {
-            s_instanceCacheByTransform = new();
-            s_instanceCacheByName = new();
+            s_instancesCachedByTransformId = new();
+            s_instancesCachedByName = new();
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         public static ActivityContainer Of(RectTransform rectTransform, bool useCache = true)
         {
             var id = rectTransform.GetInstanceID();
-            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
+            if (useCache && s_instancesCachedByTransformId.TryGetValue(id, out var container))
             {
                 return container;
             }
@@ -57,7 +57,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
             if (container)
             {
-                s_instanceCacheByTransform.Add(id, container);
+                s_instancesCachedByTransformId.Add(id, container);
                 return container;
             }
 
@@ -72,7 +72,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <returns></returns>
         public static ActivityContainer Find(string containerName)
         {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instancesCachedByName.TryGetValue(containerName, out var instance))
             {
                 return instance;
             }
@@ -88,7 +88,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// <returns></returns>
         public static bool TryFind(string containerName, out ActivityContainer container)
         {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instancesCachedByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
                 return true;
@@ -126,7 +126,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             var container = root.GetOrAddComponent<ActivityContainer>();
             container.Initialize(layerConfig, manager, settings);
 
-            s_instanceCacheByName.Add(container.LayerName, container);
+            s_instancesCachedByName.Add(container.LayerName, container);
             return container;
         }
 

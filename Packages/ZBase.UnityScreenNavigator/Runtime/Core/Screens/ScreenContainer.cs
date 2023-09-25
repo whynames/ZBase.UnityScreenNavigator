@@ -12,8 +12,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 {
     public sealed class ScreenContainer : WindowContainerBase
     {
-        private static Dictionary<int, ScreenContainer> s_instanceCacheByTransform = new();
-        private static Dictionary<string, ScreenContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, ScreenContainer> s_instancesCacheByTransformId = new();
+        private static Dictionary<string, ScreenContainer> s_instancesCacheByName = new();
 
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Screen>> _screens = new();
@@ -36,8 +36,8 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
         {
-            s_instanceCacheByTransform = new();
-            s_instanceCacheByName = new();
+            s_instancesCacheByTransformId = new();
+            s_instancesCacheByName = new();
         }
 
         protected override void Awake()
@@ -59,11 +59,11 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             screens.Clear();
-            s_instanceCacheByName.Remove(LayerName);
+            s_instancesCacheByName.Remove(LayerName);
 
-            using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
+            using var keysToRemove = new PooledList<int>(s_instancesCacheByTransformId.Count);
 
-            foreach (var cache in s_instanceCacheByTransform)
+            foreach (var cache in s_instancesCacheByTransformId)
             {
                 if (Equals(cache.Value))
                 {
@@ -73,7 +73,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             foreach (var keyToRemove in keysToRemove)
             {
-                s_instanceCacheByTransform.Remove(keyToRemove);
+                s_instancesCacheByTransformId.Remove(keyToRemove);
             }
         }
 
@@ -100,7 +100,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         {
             var id = rectTransform.GetInstanceID();
 
-            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
+            if (useCache && s_instancesCacheByTransformId.TryGetValue(id, out var container))
             {
                 return container;
             }
@@ -109,7 +109,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
 
             if (container)
             {
-                s_instanceCacheByTransform.Add(id, container);
+                s_instancesCacheByTransformId.Add(id, container);
                 return container;
             }
 
@@ -124,7 +124,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <returns></returns>
         public static ScreenContainer Find(string containerName)
         {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instancesCacheByName.TryGetValue(containerName, out var instance))
             {
                 return instance;
             }
@@ -140,7 +140,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// <returns></returns>
         public static bool TryFind(string containerName, out ScreenContainer container)
         {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instancesCacheByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
                 return true;
@@ -178,7 +178,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             var container = root.AddComponent<ScreenContainer>();
             container.Initialize(layerConfig, manager, settings);
 
-            s_instanceCacheByName.Add(container.LayerName, container);
+            s_instancesCacheByName.Add(container.LayerName, container);
             return container;
         }
 

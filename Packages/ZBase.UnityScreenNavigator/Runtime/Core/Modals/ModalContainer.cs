@@ -13,8 +13,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 {
     public sealed class ModalContainer : WindowContainerBase
     {
-        private static Dictionary<int, ModalContainer> s_instanceCacheByTransform = new();
-        private static Dictionary<string, ModalContainer> s_instanceCacheByName = new();
+        private static Dictionary<int, ModalContainer> s_instancesCachedByTransformId = new();
+        private static Dictionary<string, ModalContainer> s_instancesCachedByName = new();
 
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
@@ -43,8 +43,8 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
         {
-            s_instanceCacheByTransform = new();
-            s_instanceCacheByName = new();
+            s_instancesCachedByTransformId = new();
+            s_instancesCachedByName = new();
         }
 
         protected override void OnInitialize()
@@ -79,11 +79,11 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             backdrops.Clear();
 
-            s_instanceCacheByName.Remove(LayerName);
+            s_instancesCachedByName.Remove(LayerName);
 
-            using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
+            using var keysToRemove = new PooledList<int>(s_instancesCachedByTransformId.Count);
 
-            foreach (var cache in s_instanceCacheByTransform)
+            foreach (var cache in s_instancesCachedByTransformId)
             {
                 if (Equals(cache.Value))
                 {
@@ -93,7 +93,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             foreach (var keyToRemove in keysToRemove)
             {
-                s_instanceCacheByTransform.Remove(keyToRemove);
+                s_instancesCachedByTransformId.Remove(keyToRemove);
             }
         }
 
@@ -125,7 +125,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         {
             var id = rectTransform.GetInstanceID();
 
-            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
+            if (useCache && s_instancesCachedByTransformId.TryGetValue(id, out var container))
             {
                 return container;
             }
@@ -134,7 +134,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
 
             if (container)
             {
-                s_instanceCacheByTransform.Add(id, container);
+                s_instancesCachedByTransformId.Add(id, container);
                 return container;
             }
 
@@ -149,7 +149,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <returns></returns>
         public static ModalContainer Find(string containerName)
         {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instancesCachedByName.TryGetValue(containerName, out var instance))
             {
                 return instance;
             }
@@ -165,7 +165,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// <returns></returns>
         public static bool TryFind(string containerName, out ModalContainer container)
         {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
+            if (s_instancesCachedByName.TryGetValue(containerName, out var instance))
             {
                 container = instance;
                 return true;
@@ -203,7 +203,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             var container = root.AddComponent<ModalContainer>();
             container.Initialize(layerConfig, manager, settings);
 
-            s_instanceCacheByName.Add(container.LayerName, container);
+            s_instancesCachedByName.Add(container.LayerName, container);
             return container;
         }
 
