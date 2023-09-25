@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Views;
 using ZBase.UnityScreenNavigator.Core.Windows;
 using ZBase.UnityScreenNavigator.Foundation;
+using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Activities
 {
@@ -221,6 +222,22 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
 
             _activities.Clear();
+            s_instancesCachedByName.Remove(LayerName);
+
+            using var keysToRemove = new PooledList<int>(s_instancesCachedByTransformId.Count);
+
+            foreach (var cache in s_instancesCachedByTransformId)
+            {
+                if (Equals(cache.Value))
+                {
+                    keysToRemove.Add(cache.Key);
+                }
+            }
+
+            foreach (var keyToRemove in keysToRemove)
+            {
+                s_instancesCachedByTransformId.Remove(keyToRemove);
+            }
         }
 
         protected virtual int GetChildIndex(Transform child)
