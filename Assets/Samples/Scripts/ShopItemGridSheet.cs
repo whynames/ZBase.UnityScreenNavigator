@@ -70,7 +70,7 @@ namespace Demo.Scripts
 
         public override void DidExit(Memory<object> args)
         {
-            _controlContainer.Cleanup();
+            _controlContainer.HideAll(false, args);
         }
 
         public override async UniTask Cleanup(Memory<object> args)
