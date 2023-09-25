@@ -5,27 +5,15 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Controls;
-using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     [RequireComponent(typeof(RectMask2D), typeof(CanvasGroup))]
     public sealed class SheetContainer : ControlContainerBase
     {
-        private static Dictionary<int, SheetContainer> s_instanceCacheByTransform = new();
-        private static Dictionary<string, SheetContainer> s_instanceCacheByName = new();
-
         private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ViewRef<Sheet>> _sheets = new();
         private int? _activeSheetId;
-
-        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
-        {
-            s_instanceCacheByTransform = new();
-            s_instanceCacheByName = new();
-        }
 
         public int? ActiveSheetId => _activeSheetId;
 
@@ -49,8 +37,6 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
 
         protected override void Awake()
         {
-            s_instanceCacheByName[ContainerName] = this;
-
             base.Awake();
 
             _callbackReceivers.AddRange(GetComponents<ISheetContainerCallbackReceiver>());
@@ -115,100 +101,7 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
             }
 
             controls.Clear();
-
-            s_instanceCacheByName.Remove(ContainerName);
-
-            using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
-
-            foreach (var cache in s_instanceCacheByTransform)
-            {
-                if (Equals(cache.Value))
-                {
-                    keysToRemove.Add(cache.Key);
-                }
-            }
-
-            foreach (var keyToRemove in keysToRemove)
-            {
-                s_instanceCacheByTransform.Remove(keyToRemove);
-            }
         }
-
-        #region STATIC_METHODS
-
-        /// <summary>
-        /// Get the <see cref="SheetContainer" /> that manages the sheet to which <paramref name="transform"/> belongs.
-        /// </summary>
-        /// <param name="transform"></param>
-        /// <param name="useCache">Use the previous result for the <paramref name="transform"/>.</param>
-        /// <returns></returns>
-        public static SheetContainer Of(Transform transform, bool useCache = true)
-        {
-            return Of((RectTransform)transform, useCache);
-        }
-
-        /// <summary>
-        /// Get the <see cref="SheetContainer" /> that manages the sheet to which <paramref name="rectTransform"/> belongs.
-        /// </summary>
-        /// <param name="rectTransform"></param>
-        /// <param name="useCache">Use the previous result for the <paramref name="rectTransform"/>.</param>
-        /// <returns></returns>
-        public static SheetContainer Of(RectTransform rectTransform, bool useCache = true)
-        {
-            var id = rectTransform.GetInstanceID();
-
-            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
-            {
-                return container;
-            }
-
-            container = rectTransform.GetComponentInParent<SheetContainer>();
-
-            if (container)
-            {
-                s_instanceCacheByTransform.Add(id, container);
-                return container;
-            }
-
-            Debug.LogError($"Cannot find any parent {nameof(SheetContainer)} component", rectTransform);
-            return null;
-        }
-
-        /// <summary>
-        /// Find the <see cref="SheetContainer" /> of <paramref name="containerName"/>.
-        /// </summary>
-        /// <param name="containerName"></param>
-        /// <returns></returns>
-        public static SheetContainer Find(string containerName)
-        {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
-            {
-                return instance;
-            }
-
-            Debug.LogError($"Cannot find any {nameof(SheetContainer)} by name `{containerName}`");
-            return null;
-        }
-
-        /// <summary>
-        /// Find the <see cref="SheetContainer" /> of <paramref name="containerName"/>.
-        /// </summary>
-        /// <param name="containerName"></param>
-        /// <returns></returns>
-        public static bool TryFind(string containerName, out SheetContainer container)
-        {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
-            {
-                container = instance;
-                return true;
-            }
-
-            Debug.LogError($"Cannot find any {nameof(SheetContainer)} by name `{containerName}`");
-            container = default;
-            return false;
-        }
-
-        #endregion
 
         /// <summary>
         /// Add a callback receiver.

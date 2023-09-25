@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
 {
     public sealed class SimpleControlContainer : ControlContainerBase
     {
-        private static Dictionary<int, SimpleControlContainer> s_instanceCacheByTransform = new();
-        private static Dictionary<string, SimpleControlContainer> s_instanceCacheByName = new();
-
         [SerializeField] private RectTransform _content;
         [SerializeField] private bool _disableInteractionInTransition;
         [SerializeField] private bool _destroyOnHide;
@@ -30,18 +26,8 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             }
         }
 
-        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
-        {
-            s_instanceCacheByTransform = new();
-            s_instanceCacheByName = new();
-        }
-
         protected override void Awake()
         {
-            s_instanceCacheByName[ContainerName] = this;
-
             base.Awake();
 
             _callbackReceivers.AddRange(GetComponents<ISimpleControlContainerCallbackReceiver>());
@@ -104,100 +90,7 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
             }
 
             controls.Clear();
-
-            s_instanceCacheByName.Remove(ContainerName);
-
-            using var keysToRemove = new PooledList<int>(s_instanceCacheByTransform.Count);
-
-            foreach (var cache in s_instanceCacheByTransform)
-            {
-                if (Equals(cache.Value))
-                {
-                    keysToRemove.Add(cache.Key);
-                }
-            }
-
-            foreach (var keyToRemove in keysToRemove)
-            {
-                s_instanceCacheByTransform.Remove(keyToRemove);
-            }
         }
-
-        #region STATIC_METHODS
-
-        /// <summary>
-        /// Get the <see cref="SimpleControlContainer" /> that manages the control to which <paramref name="transform"/> belongs.
-        /// </summary>
-        /// <param name="transform"></param>
-        /// <param name="useCache">Use the previous result for the <paramref name="transform"/>.</param>
-        /// <returns></returns>
-        public static SimpleControlContainer Of(Transform transform, bool useCache = true)
-        {
-            return Of((RectTransform)transform, useCache);
-        }
-
-        /// <summary>
-        /// Get the <see cref="SimpleControlContainer" /> that manages the control to which <paramref name="rectTransform"/> belongs.
-        /// </summary>
-        /// <param name="rectTransform"></param>
-        /// <param name="useCache">Use the previous result for the <paramref name="rectTransform"/>.</param>
-        /// <returns></returns>
-        public static SimpleControlContainer Of(RectTransform rectTransform, bool useCache = true)
-        {
-            var id = rectTransform.GetInstanceID();
-
-            if (useCache && s_instanceCacheByTransform.TryGetValue(id, out var container))
-            {
-                return container;
-            }
-
-            container = rectTransform.GetComponentInParent<SimpleControlContainer>();
-
-            if (container)
-            {
-                s_instanceCacheByTransform.Add(id, container);
-                return container;
-            }
-
-            Debug.LogError($"Cannot find any parent {nameof(SimpleControlContainer)} component", rectTransform);
-            return null;
-        }
-
-        /// <summary>
-        /// Find the <see cref="SimpleControlContainer" /> of <paramref name="containerName"/>.
-        /// </summary>
-        /// <param name="containerName"></param>
-        /// <returns></returns>
-        public static SimpleControlContainer Find(string containerName)
-        {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
-            {
-                return instance;
-            }
-
-            Debug.LogError($"Cannot find any {nameof(SimpleControlContainer)} by name `{containerName}`");
-            return null;
-        }
-
-        /// <summary>
-        /// Find the <see cref="SimpleControlContainer" /> of <paramref name="containerName"/>.
-        /// </summary>
-        /// <param name="containerName"></param>
-        /// <returns></returns>
-        public static bool TryFind(string containerName, out SimpleControlContainer container)
-        {
-            if (s_instanceCacheByName.TryGetValue(containerName, out var instance))
-            {
-                container = instance;
-                return true;
-            }
-
-            Debug.LogError($"Cannot find any {nameof(SimpleControlContainer)} by name `{containerName}`");
-            container = default;
-            return false;
-        }
-
-        #endregion
 
         /// <summary>
         /// Add a callback receiver.
