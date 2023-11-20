@@ -119,7 +119,7 @@ openupm add com.zbase.unityscreennavigator
 3. Enter the following to install
 
 ```
-https://github.com/Zitga-Tech/ZBase.UnityScreenNavigator.git?path=/Packages/ZBase.UnityScreenNavigator
+https://github.com/whynames/ZBase.UnityScreenNavigator.git?path=/Packages/ZBase.UnityScreenNavigator
 ```
 
 <p align="center">
@@ -131,7 +131,7 @@ Or, open Packages/manifest.json and add the following to the dependencies block.
 ```json
 {
     "dependencies": {
-        "com.zbase.unityscreennavigator": "https://github.com/Zitga-Tech/ZBase.UnityScreenNavigator.git?path=/Packages/ZBase.UnityScreenNavigator"
+        "com.zbase.unityscreennavigator": "https://github.com/whynames/ZBase.UnityScreenNavigator.git?path=/Packages/ZBase.UnityScreenNavigator"
     }
 }
 ```
@@ -141,7 +141,7 @@ If you want to set the target version, specify it like follow.
 ```json
 {
     "dependencies": {
-        "com.zbase.unityscreennavigator": "https://github.com/Zitga-Tech/ZBase.UnityScreenNavigator.git?path=/Packages/ZBase.UnityScreenNavigator#1.0.0"
+        "com.zbase.unityscreennavigator": "https://github.com/whynames/ZBase.UnityScreenNavigator.git?path=/Packages/ZBase.UnityScreenNavigator#1.0.0"
     }
 }
 ```
