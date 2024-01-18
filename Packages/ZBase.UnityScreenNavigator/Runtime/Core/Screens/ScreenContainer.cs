@@ -15,6 +15,16 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         private static Dictionary<int, ScreenContainer> s_instancesCacheByTransformId = new();
         private static Dictionary<string, ScreenContainer> s_instancesCacheByName = new();
 
+        public static IReadOnlyCollection<ScreenContainer> Containers => s_instancesCacheByTransformId.Values;
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            s_instancesCacheByTransformId = new();
+            s_instancesCacheByName = new();
+        }
+
         private readonly List<IScreenContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Screen>> _screens = new();
 
@@ -31,14 +41,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         public IReadOnlyList<ViewRef<Screen>> Screens => _screens;
 
         public ViewRef<Screen> Current => _screens[^1];
-
-        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
-        {
-            s_instancesCacheByTransformId = new();
-            s_instancesCacheByName = new();
-        }
 
         protected override void Awake()
         {
