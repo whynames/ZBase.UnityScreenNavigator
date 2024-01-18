@@ -15,6 +15,8 @@ namespace ZBase.UnityScreenNavigator.Core.Sheets
         private readonly Dictionary<int, ViewRef<Sheet>> _sheets = new();
         private int? _activeSheetId;
 
+        public IReadOnlyDictionary<int, ViewRef<Sheet>> Sheets => _sheets;
+
         public int? ActiveSheetId => _activeSheetId;
 
         public Sheet ActiveSheet
