@@ -794,7 +794,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             // Unload unused Modal
-            await exitModal.BeforeReleaseAsync();
+            await exitModal.BeforeReleaseAsync(args);
 
             DestroyAndForget(exitModalRef);
 

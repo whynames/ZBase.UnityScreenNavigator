@@ -98,7 +98,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         /// <inheritdoc/>
-        public virtual UniTask Cleanup()
+        public virtual UniTask Cleanup(Memory<object> args)
         {
             return UniTask.CompletedTask;
         }
@@ -268,9 +268,9 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             TransitionAnimationType = null;
         }
 
-        internal async UniTask BeforeReleaseAsync()
+        internal async UniTask BeforeReleaseAsync(Memory<object> args)
         {
-            var tasks = _lifecycleEvents.Select(x => x.Cleanup());
+            var tasks = _lifecycleEvents.Select(x => x.Cleanup(args));
             await WaitForAsync(tasks);
         }
 

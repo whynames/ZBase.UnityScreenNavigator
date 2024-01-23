@@ -24,7 +24,8 @@ namespace Demo.Scripts
 
         private void OnClick()
         {
-            ActivityContainer.Find(ContainerKey.Activities).Show(ResourceKey.LoadingActivity());
+            var options = new ActivityOptions(ResourceKey.LoadingActivity(), false);
+            ActivityContainer.Find(ContainerKey.Activities).Show(options);
             ScreenContainer.Of(transform).Push(ResourceKey.HomeScreenPrefab());
         }
     }

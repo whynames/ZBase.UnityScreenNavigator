@@ -24,7 +24,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             , Func<Memory<object>, UniTask> onWillPushExit = null, Action<Memory<object>> onDidPushExit = null
             , Func<Memory<object>, UniTask> onWillPopEnter = null, Action<Memory<object>> onDidPopEnter = null
             , Func<Memory<object>, UniTask> onWillPopExit = null, Action<Memory<object>> onDidPopExit = null
-            , Func<UniTask> onCleanup = null
+            , Func<Memory<object>, UniTask> onCleanup = null
         )
         {
             if (initialize != null)
@@ -70,7 +70,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         public List<Func<Memory<object>, UniTask>> OnWillPopExit { get; } = new();
 
         /// <see cref="IModalLifecycleEvent.Cleanup"/>
-        public List<Func<UniTask>> OnCleanup { get; } = new();
+        public List<Func<Memory<object>, UniTask>> OnCleanup { get; } = new();
 
         async UniTask IModalLifecycleEvent.Initialize(Memory<object> args)
         {
@@ -122,10 +122,10 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             OnDidPopExit?.Invoke(args);
         }
 
-        async UniTask IModalLifecycleEvent.Cleanup()
+        async UniTask IModalLifecycleEvent.Cleanup(Memory<object> args)
         {
             foreach (var onCleanup in OnCleanup)
-                await onCleanup.Invoke();
+                await onCleanup.Invoke(args);
         }
     }
 }

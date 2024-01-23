@@ -496,7 +496,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
 
             // Unload unused Activity
-            await activity.BeforeReleaseAsync();
+            await activity.BeforeReleaseAsync(args);
 
             DestroyAndForget(activity, resourcePath, viewRef.PoolingPolicy).Forget();
 

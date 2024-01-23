@@ -410,7 +410,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             // Unload unused Screen
             if (_isActiveScreenStacked == false && exitScreenRef.HasValue)
             {
-                await exitScreen.BeforeReleaseAsync();
+                await exitScreen.BeforeReleaseAsync(args);
 
                 DestroyAndForget(exitScreenRef.Value);
             }
@@ -597,7 +597,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             // Unload unused Screen
             if (_isActiveScreenStacked == false && exitScreenRef.HasValue)
             {
-                await exitScreen.BeforeReleaseAsync();
+                await exitScreen.BeforeReleaseAsync(args);
 
                 DestroyAndForget(exitScreenRef.Value);
             }
@@ -728,7 +728,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             }
 
             // Unload unused Screen
-            await exitScreen.BeforeReleaseAsync();
+            await exitScreen.BeforeReleaseAsync(args);
 
             DestroyAndForget(exitScreenRef);
 
