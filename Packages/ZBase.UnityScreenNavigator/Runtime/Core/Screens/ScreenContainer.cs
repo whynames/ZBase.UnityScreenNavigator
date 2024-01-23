@@ -10,7 +10,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
-    public sealed class ScreenContainer : WindowContainerBase
+    public class ScreenContainer : WindowContainerBase
     {
         private static Dictionary<int, ScreenContainer> s_instancesCacheByTransformId = new();
         private static Dictionary<string, ScreenContainer> s_instancesCacheByName = new();

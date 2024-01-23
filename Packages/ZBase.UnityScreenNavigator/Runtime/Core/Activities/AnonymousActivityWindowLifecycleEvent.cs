@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace ZBase.UnityScreenNavigator.Core.Activities
 {
-    public sealed class AnonymousActivityWindowLifecycleEvent : IActivityLifecycleEvent
+    public class AnonymousActivityWindowLifecycleEvent : IActivityLifecycleEvent
     {
         /// <see cref="IActivityLifecycleEvent.DidEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidEnter;
@@ -16,7 +16,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
               Func<Memory<object>, UniTask> initialize = null
             , Func<Memory<object>, UniTask> onWillEnter = null, Action<Memory<object>> onDidEnter = null
             , Func<Memory<object>, UniTask> onWillExit = null, Action<Memory<object>> onDidExit = null
-            , Func<UniTask> onCleanup = null
+            , Func<Memory<object>, UniTask> onCleanup = null
         )
         {
             if (initialize != null)
@@ -46,7 +46,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         public List<Func<Memory<object>, UniTask>> OnWillExit { get; } = new();
 
         /// <see cref="IActivityLifecycleEvent.Cleanup"/>
-        public List<Func<UniTask>> OnCleanup { get; } = new();
+        public List<Func<Memory<object>, UniTask>> OnCleanup { get; } = new();
 
         async UniTask IActivityLifecycleEvent.Initialize(Memory<object> args)
         {
@@ -76,10 +76,10 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             OnDidExit?.Invoke(args);
         }
 
-        async UniTask IActivityLifecycleEvent.Cleanup()
+        async UniTask IActivityLifecycleEvent.Cleanup(Memory<object> args)
         {
             foreach (var onCleanup in OnCleanup)
-                await onCleanup.Invoke();
+                await onCleanup.Invoke(args);
         }
     }
 }

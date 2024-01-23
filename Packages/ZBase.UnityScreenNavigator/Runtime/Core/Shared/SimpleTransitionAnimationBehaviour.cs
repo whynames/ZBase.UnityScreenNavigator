@@ -2,7 +2,7 @@
 
 namespace ZBase.UnityScreenNavigator.Core
 {
-    public sealed class SimpleTransitionAnimationBehaviour : TransitionAnimationBehaviour
+    public class SimpleTransitionAnimationBehaviour : TransitionAnimationBehaviour
     {
         [SerializeField] private float _delay;
         [SerializeField] private float _duration = 0.3f;

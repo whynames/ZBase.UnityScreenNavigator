@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    public sealed class AnonymousModalLifecycleEvent : IModalLifecycleEvent
+    public class AnonymousModalLifecycleEvent : IModalLifecycleEvent
     {
         /// <see cref="IModalLifecycleEvent.DidPushEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidPushEnter;

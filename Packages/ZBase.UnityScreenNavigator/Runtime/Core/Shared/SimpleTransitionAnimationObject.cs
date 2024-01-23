@@ -3,7 +3,7 @@
 namespace ZBase.UnityScreenNavigator.Core
 {
     [CreateAssetMenu(fileName = "SimpleTransitionAnimation", menuName = "Screen Navigator/Animations/Simple Transition Animation")]
-    public sealed class SimpleTransitionAnimationObject : TransitionAnimationObject
+    public class SimpleTransitionAnimationObject : TransitionAnimationObject
     {
         [SerializeField] private float _delay;
         [SerializeField] private float _duration = 0.3f;

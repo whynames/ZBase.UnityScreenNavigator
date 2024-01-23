@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
     [Serializable]
-    public sealed class ScreenTransitionAnimationContainer
+    public class ScreenTransitionAnimationContainer
     {
         [SerializeField] private List<TransitionAnimation> _pushEnterAnimations = new();
         [SerializeField] private List<TransitionAnimation> _pushExitAnimations = new();
@@ -41,7 +41,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         }
 
         [Serializable]
-        public sealed class TransitionAnimation
+        public class TransitionAnimation
         {
             [FormerlySerializedAs("_partnerPageIdentifierRegex")] [SerializeField] private string _partnerScreenIdentifierRegex;
 

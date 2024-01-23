@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
-    public sealed class AnonymousScreenLifecycleEvent : IScreenLifecycleEvent
+    public class AnonymousScreenLifecycleEvent : IScreenLifecycleEvent
     {
         /// <inheritdoc cref="IScreenLifecycleEvent.DidPushEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidPushEnter;

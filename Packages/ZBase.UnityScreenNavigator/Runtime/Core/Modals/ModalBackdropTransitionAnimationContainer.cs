@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
     [Serializable]
-    public sealed class ModalBackdropTransitionAnimationContainer
+    public class ModalBackdropTransitionAnimationContainer
     {
         [SerializeField] private TransitionAnimation _enterAnimation;
         [SerializeField] private TransitionAnimation _exitAnimation;
@@ -21,7 +21,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         }
 
         [Serializable]
-        public sealed class TransitionAnimation
+        public class TransitionAnimation
         {
             [SerializeField] private AnimationAssetType _assetType;
 

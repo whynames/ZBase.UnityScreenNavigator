@@ -11,7 +11,7 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    public sealed class ModalContainer : WindowContainerBase
+    public class ModalContainer : WindowContainerBase
     {
         private static Dictionary<int, ModalContainer> s_instancesCachedByTransformId = new();
         private static Dictionary<string, ModalContainer> s_instancesCachedByName = new();
