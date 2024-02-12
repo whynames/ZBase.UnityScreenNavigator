@@ -5,7 +5,7 @@ using UnityEngine.Timeline;
 
 namespace ZBase.UnityScreenNavigator.Core
 {
-    public sealed class TimelineTransitionAnimationBehaviour : TransitionAnimationBehaviour
+    public class TimelineTransitionAnimationBehaviour : TransitionAnimationBehaviour
     {
         [SerializeField] private PlayableDirector _director;
         [SerializeField] private TimelineAsset _timelineAsset;

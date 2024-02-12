@@ -2,7 +2,7 @@ using System;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
-    public sealed class AnonymousScreenContainerCallbackReceiver : IScreenContainerCallbackReceiver
+    public class AnonymousScreenContainerCallbackReceiver : IScreenContainerCallbackReceiver
     {
         public event Action<Screen, Screen, Memory<object>> OnAfterPop;
         public event Action<Screen, Screen, Memory<object>> OnAfterPush;

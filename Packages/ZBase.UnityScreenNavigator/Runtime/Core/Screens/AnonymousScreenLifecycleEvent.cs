@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace ZBase.UnityScreenNavigator.Core.Screens
 {
-    public sealed class AnonymousScreenLifecycleEvent : IScreenLifecycleEvent
+    public class AnonymousScreenLifecycleEvent : IScreenLifecycleEvent
     {
         /// <inheritdoc cref="IScreenLifecycleEvent.DidPushEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidPushEnter;
@@ -24,7 +24,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             , Func<Memory<object>, UniTask> onWillPushExit = null, Action<Memory<object>> onDidPushExit = null
             , Func<Memory<object>, UniTask> onWillPopEnter = null, Action<Memory<object>> onDidPopEnter = null
             , Func<Memory<object>, UniTask> onWillPopExit = null, Action<Memory<object>> onDidPopExit = null
-            , Func<UniTask> onCleanup = null
+            , Func<Memory<object>, UniTask> onCleanup = null
         )
         {
             if (initialize != null)
@@ -70,7 +70,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         public List<Func<Memory<object>, UniTask>> OnWillPopExit { get; } = new();
 
         /// <inheritdoc cref="IScreenLifecycleEvent.Cleanup"/>
-        public List<Func<UniTask>> OnCleanup { get; } = new();
+        public List<Func<Memory<object>, UniTask>> OnCleanup { get; } = new();
 
         async UniTask IScreenLifecycleEvent.Initialize(Memory<object> args)
         {
@@ -122,10 +122,10 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             OnDidPopExit?.Invoke(args);
         }
 
-        async UniTask IScreenLifecycleEvent.Cleanup()
+        async UniTask IScreenLifecycleEvent.Cleanup(Memory<object> args)
         {
             foreach (var onCleanup in OnCleanup)
-                await onCleanup.Invoke();
+                await onCleanup.Invoke(args);
         }
     }
 }

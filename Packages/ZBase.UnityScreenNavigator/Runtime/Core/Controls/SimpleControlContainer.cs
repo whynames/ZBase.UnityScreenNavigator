@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    public sealed class SimpleControlContainer : ControlContainerBase
+    public class SimpleControlContainer : ControlContainerBase
     {
         [SerializeField] private RectTransform _content;
         [SerializeField] private bool _disableInteractionInTransition;
@@ -14,6 +14,8 @@ namespace ZBase.UnityScreenNavigator.Core.Controls
 
         private readonly List<ISimpleControlContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ViewRef<Control>> _controls = new();
+
+        public IReadOnlyDictionary<int, ViewRef<Control>> Controls => _controls;
 
         public RectTransform Content
         {

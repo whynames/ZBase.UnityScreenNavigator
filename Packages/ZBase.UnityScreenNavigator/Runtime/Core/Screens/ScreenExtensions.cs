@@ -12,7 +12,7 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
             , Func<Memory<object>, UniTask> onWillPushExit = null, Action<Memory<object>> onDidPushExit = null
             , Func<Memory<object>, UniTask> onWillPopEnter = null, Action<Memory<object>> onDidPopEnter = null
             , Func<Memory<object>, UniTask> onWillPopExit = null, Action<Memory<object>> onDidPopExit = null
-            , Func<UniTask> onCleanup = null
+            , Func<Memory<object>, UniTask> onCleanup = null
             , int priority = 0
         )
         {

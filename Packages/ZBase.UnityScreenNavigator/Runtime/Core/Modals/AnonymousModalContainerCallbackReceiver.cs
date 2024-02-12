@@ -2,7 +2,7 @@ using System;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    public sealed class AnonymousModalContainerCallbackReceiver : IModalContainerCallbackReceiver
+    public class AnonymousModalContainerCallbackReceiver : IModalContainerCallbackReceiver
     {
         public event Action<Modal, Modal, Memory<object>> OnAfterPop;
         public event Action<Modal, Modal, Memory<object>> OnAfterPush;

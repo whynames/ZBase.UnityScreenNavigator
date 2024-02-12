@@ -2,7 +2,7 @@ using System;
 
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
-    public sealed class AnonymousSheetContainerCallbackReceiver : ISheetContainerCallbackReceiver
+    public class AnonymousSheetContainerCallbackReceiver : ISheetContainerCallbackReceiver
     {
         public event Action<Sheet, Sheet, Memory<object>> OnBeforeShow;
         public event Action<Sheet, Sheet, Memory<object>> OnAfterShow;

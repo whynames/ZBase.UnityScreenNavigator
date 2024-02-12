@@ -59,6 +59,6 @@ namespace ZBase.UnityScreenNavigator.Core.Screens
         /// Called just before this screen is released.
         /// </summary>
         /// <returns></returns>
-        UniTask Cleanup();
+        UniTask Cleanup(Memory<object> args);
     }
 }

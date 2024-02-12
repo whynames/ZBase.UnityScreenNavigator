@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace ZBase.UnityScreenNavigator.Core.Controls
 {
-    public sealed class AnonymousControlLifecycleEvent : IControlLifecycleEvent
+    public class AnonymousControlLifecycleEvent : IControlLifecycleEvent
     {
         /// <see cref="IControlLifecycleEvent.DidEnter(Memory{object})"/>
         public event Action<Memory<object>> OnDidEnter;

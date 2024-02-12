@@ -16,10 +16,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         private static Dictionary<int, ActivityContainer> s_instancesCachedByTransformId = new();
         private static Dictionary<string, ActivityContainer> s_instancesCachedByName = new();
 
-        private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
-        private readonly Dictionary<string, ViewRef<Activity>> _activities = new();
-
-        public IReadOnlyDictionary<string, ViewRef<Activity>> Activities => _activities;
+        public static IReadOnlyCollection<ActivityContainer> Containers => s_instancesCachedByTransformId.Values;
 
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -28,6 +25,11 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             s_instancesCachedByTransformId = new();
             s_instancesCachedByName = new();
         }
+
+        private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
+        private readonly Dictionary<string, ViewRef<Activity>> _activities = new();
+
+        public IReadOnlyDictionary<string, ViewRef<Activity>> Activities => _activities;
 
         /// <summary>
         /// Get the <see cref="ActivityContainer" /> that manages the screen to which <see cref="transform" /> belongs.
@@ -494,7 +496,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             }
 
             // Unload unused Activity
-            await activity.BeforeReleaseAsync();
+            await activity.BeforeReleaseAsync(args);
 
             DestroyAndForget(activity, resourcePath, viewRef.PoolingPolicy).Forget();
 

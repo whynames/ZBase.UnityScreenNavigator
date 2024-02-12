@@ -83,7 +83,7 @@ namespace Demo.Scripts
             };
         }
 
-        public override UniTask Cleanup()
+        public override UniTask Cleanup(Memory<object> args)
         {
             _expandButton.onClick.RemoveListener(OnExpandButtonClicked);
             return UniTask.CompletedTask;

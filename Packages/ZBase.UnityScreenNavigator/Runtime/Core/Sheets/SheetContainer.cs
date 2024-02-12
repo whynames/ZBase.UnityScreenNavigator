@@ -9,11 +9,13 @@ using ZBase.UnityScreenNavigator.Core.Controls;
 namespace ZBase.UnityScreenNavigator.Core.Sheets
 {
     [RequireComponent(typeof(RectMask2D), typeof(CanvasGroup))]
-    public sealed class SheetContainer : ControlContainerBase
+    public class SheetContainer : ControlContainerBase
     {
         private readonly List<ISheetContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<int, ViewRef<Sheet>> _sheets = new();
         private int? _activeSheetId;
+
+        public IReadOnlyDictionary<int, ViewRef<Sheet>> Sheets => _sheets;
 
         public int? ActiveSheetId => _activeSheetId;
 

@@ -11,10 +11,20 @@ using ZBase.UnityScreenNavigator.Foundation.Collections;
 
 namespace ZBase.UnityScreenNavigator.Core.Modals
 {
-    public sealed class ModalContainer : WindowContainerBase
+    public class ModalContainer : WindowContainerBase
     {
         private static Dictionary<int, ModalContainer> s_instancesCachedByTransformId = new();
         private static Dictionary<string, ModalContainer> s_instancesCachedByName = new();
+
+        public static IReadOnlyCollection<ModalContainer> Containers => s_instancesCachedByTransformId.Values;
+
+        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            s_instancesCachedByTransformId = new();
+            s_instancesCachedByName = new();
+        }
 
         private readonly List<IModalContainerCallbackReceiver> _callbackReceivers = new();
         private readonly List<ViewRef<Modal>> _modals = new();
@@ -38,14 +48,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         public IReadOnlyList<ViewRef<ModalBackdrop>> Backdrops => _backdrops;
 
         public ViewRef<Modal> Current => _modals[^1];
-
-        /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
-        {
-            s_instancesCachedByTransformId = new();
-            s_instancesCachedByName = new();
-        }
 
         protected override void OnInitialize()
         {
@@ -792,7 +794,7 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
             }
 
             // Unload unused Modal
-            await exitModal.BeforeReleaseAsync();
+            await exitModal.BeforeReleaseAsync(args);
 
             DestroyAndForget(exitModalRef);
 

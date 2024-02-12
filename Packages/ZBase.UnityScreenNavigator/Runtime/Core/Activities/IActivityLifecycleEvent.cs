@@ -37,6 +37,6 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
         /// Called just before this activity is released.
         /// </summary>
         /// <returns></returns>
-        UniTask Cleanup();
+        UniTask Cleanup(Memory<object> args);
     }
 }

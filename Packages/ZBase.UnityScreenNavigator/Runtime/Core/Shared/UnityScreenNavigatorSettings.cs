@@ -5,7 +5,7 @@ using ZBase.UnityScreenNavigator.Foundation.AssetLoaders;
 
 namespace ZBase.UnityScreenNavigator.Core
 {
-    public sealed partial class UnityScreenNavigatorSettings : ScriptableObject
+    public partial class UnityScreenNavigatorSettings : ScriptableObject
     {
         private const string DEFAULT_MODAL_BACKDROP_PREFAB_KEY = "DefaultModalBackdrop";
 

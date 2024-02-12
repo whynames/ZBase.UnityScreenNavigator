@@ -59,6 +59,6 @@ namespace ZBase.UnityScreenNavigator.Core.Modals
         /// Called just before this modal is released.
         /// </summary>
         /// <returns></returns>
-        UniTask Cleanup();
+        UniTask Cleanup(Memory<object> args);
     }
 }

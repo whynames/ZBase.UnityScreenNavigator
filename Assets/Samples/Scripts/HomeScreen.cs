@@ -33,7 +33,7 @@ namespace Demo.Scripts
             ActivityContainer.Find(ContainerKey.Activities).Hide(ResourceKey.LoadingActivity());
         }
 
-        public override UniTask Cleanup()
+        public override UniTask Cleanup(Memory<object> args)
         {
             _settingButton.onClick.RemoveListener(OnSettingButtonClicked);
             _shopButton.onClick.RemoveListener(OnShopButtonClicked);
