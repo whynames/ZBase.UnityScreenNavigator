@@ -11,12 +11,14 @@ namespace ZBase.UnityScreenNavigator.Foundation
 
         private readonly Queue<T> _queue = new();
 
+#if UNITY_EDITOR
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
         {
             s_shared = new();
         }
+#endif
 
         public T Rent()
             => _queue.Count == 0 ? new T() : _queue.Dequeue();
