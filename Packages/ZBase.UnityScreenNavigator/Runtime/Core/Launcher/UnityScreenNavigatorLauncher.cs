@@ -17,7 +17,7 @@ namespace ZBase.UnityScreenNavigator.Core
         [SerializeField, FormerlySerializedAs("containerLayerSettings")]
         private WindowContainerSettings windowContainerSettings;
 
-        protected override void Awake()
+        protected sealed override void Awake()
         {
             if (unityScreenNavigatorSettings == false)
             {
@@ -30,29 +30,51 @@ namespace ZBase.UnityScreenNavigator.Core
             }
 
             UnityScreenNavigatorSettings.DefaultSettings = unityScreenNavigatorSettings;
+            OnAwake();
         }
 
-        protected override void Start()
+        protected sealed override void Start()
         {
-            var layers = windowContainerSettings.Containers.Span;
+            OnPreCreateContainers();
 
-            foreach (var layer in layers)
+            var configs = windowContainerSettings.Containers.Span;
+
+            foreach (var config in configs)
             {
-                switch (layer.containerType)
+                switch (config.containerType)
                 {
                     case WindowContainerType.Modal:
-                        ModalContainer.Create(layer, this, unityScreenNavigatorSettings);
+                    {
+                        var container = ModalContainer.Create(config, this, unityScreenNavigatorSettings);
+                        OnCreateContainer(config, container);
                         break;
+                    }
 
                     case WindowContainerType.Screen:
-                        ScreenContainer.Create(layer, this, unityScreenNavigatorSettings);
+                    {
+                        var container = ScreenContainer.Create(config, this, unityScreenNavigatorSettings);
+                        OnCreateContainer(config, container);
                         break;
+                    }
 
                     case WindowContainerType.Activity:
-                        ActivityContainer.Create(layer, this, unityScreenNavigatorSettings);
+                    {
+                        var container = ActivityContainer.Create(config, this, unityScreenNavigatorSettings);
+                        OnCreateContainer(config, container);
                         break;
+                    }
                 }
             }
+
+            OnPostCreateContainers();
         }
+
+        protected virtual void OnAwake() { }
+
+        protected virtual void OnPreCreateContainers() { }
+
+        protected virtual void OnPostCreateContainers() { }
+
+        protected virtual void OnCreateContainer(WindowContainerConfig config, WindowContainerBase container) { }
     }
 }

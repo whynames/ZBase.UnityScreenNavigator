@@ -18,6 +18,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
 
         public static IReadOnlyCollection<ActivityContainer> Containers => s_instancesCachedByTransformId.Values;
 
+#if UNITY_EDITOR
         /// <seealso href="https://docs.unity3d.com/Manual/DomainReloading.html"/>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Init()
@@ -25,6 +26,7 @@ namespace ZBase.UnityScreenNavigator.Core.Activities
             s_instancesCachedByTransformId = new();
             s_instancesCachedByName = new();
         }
+#endif
 
         private readonly List<IActivityContainerCallbackReceiver> _callbackReceivers = new();
         private readonly Dictionary<string, ViewRef<Activity>> _activities = new();

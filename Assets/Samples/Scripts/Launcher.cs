@@ -10,15 +10,13 @@ namespace Demo.Scripts
     {
         public static WindowContainerManager ContainerManager { get; private set; }
 
-        protected override void Awake()
+        protected override void OnAwake()
         {
-            base.Awake();
             ContainerManager = this;
         }
 
-        protected override void Start()
+        protected override void OnPostCreateContainers()
         {
-            base.Start();
             ShowTopPage().Forget();
         }
 
